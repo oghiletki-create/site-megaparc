@@ -892,3 +892,16 @@ body.intro-lock { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .page.enter { animation: none; }
 }
+
+@media (max-width: 720px) {
+  .hero-kicker { font-size: 11px; letter-spacing: 0.2em; gap: 10px; }
+  .hero-kicker i { width: 24px; flex: none; }
+  .hero-shade {
+    background:
+      linear-gradient(180deg, rgba(16, 11, 14, 0.55) 0%, rgba(16, 11, 14, 0.22) 38%, rgba(16, 11, 14, 0.94) 100%),
+      radial-gradient(110% 80% at 14% 78%, rgba(16, 11, 14, 0.5) 0%, transparent 52%);
+  }
+  .hero-sub { color: rgba(251, 250, 255, 0.96); }
+  .hero h1 { font-size: clamp(46px, 13.5vw, 152px); }
+  .intro-svg { width: 92vw; }
+}
