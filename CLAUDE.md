@@ -37,9 +37,21 @@
 - alt/aria-label nu se traduc la schimbarea limbii (ar necesita extinderea
   `applyLang()` din i18n.js — prioritate scăzută).
 
-## Următorul pas discutat
-- Primul bot pentru clienți (canal: Telegram / WhatsApp / chat pe site — neales încă).
-- Funcție: răspuns la întrebări / programări / preluare comenzi — neales încă.
+## Primul bot — FĂCUT (în folderul `bot/`)
+- Bot **Telegram** simplu, „răspunde la întrebări" (FAQ), în Python pur (fără
+  dependențe — rulează cu `python3 bot/bot.py`).
+- **Pe configurări**: pentru fiecare client nou se schimbă doar `bot/config.json`
+  (nume, mesaje, listă întrebări/cuvinte-cheie/răspunsuri). Cod neschimbat.
+- Potrivire inteligentă: prinde începutul cuvântului (terminații RO) și alege
+  cuvântul-cheie cel mai specific. Testat cu mai multe formulări.
+- Token-ul se ia din variabila de mediu `BOT_TOKEN`. Ghid: `bot/README.md`.
+
+## Următorii pași posibili (de discutat)
+- Punerea botului pe un **server** ca să meargă 24/24 (acum merge doar cât e pornit).
+- **Programări direct prin bot** (acum trimite la telefon/WhatsApp).
+- **Sistem de licență**: fiecare client plătitor primește o cheie care îi
+  activează botul lui.
+- Extindere pe alte canale (WhatsApp / chat pe site) folosind același config.
 
 ---
 _Actualizează acest fișier când iau decizii noi sau termin etape, ca să rămână memoria proaspătă._
