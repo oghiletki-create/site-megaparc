@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amenajare AI — spațiu comercial după site-ul clientului</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1f232c; --line:#2a2f3a;
+    --text:#e8eaed; --muted:#9aa3b2; --accent:#CB0102; --accent2:#e31e2d;
+    --ok:#28c76f; --warn:#ffb547;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    background:var(--bg); color:var(--text); line-height:1.5;
+  }
+  .wrap{max-width:1100px; margin:0 auto; padding:22px 18px 60px}
+  header h1{font-size:22px; margin:0 0 4px}
+  header p{color:var(--muted); margin:0 0 22px; font-size:14px}
+  .accent{color:var(--accent)}
+
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:16px}
+  .card h2{font-size:14px; margin:0 0 12px; display:flex; align-items:center; gap:8px}
+  .step{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;display:inline-grid;place-items:center;font-size:13px;font-weight:700;flex:0 0 auto}
+
+  label.lab{display:block; font-size:13px; color:var(--muted); margin-bottom:6px}
+  input[type=text], input[type=password], input[type=url], textarea, select{
+    width:100%; font:inherit; font-size:14px; padding:10px 12px; border-radius:10px;
+    border:1px solid var(--line); background:var(--panel2); color:var(--text);
+  }
+  textarea{resize:vertical; min-height:90px; line-height:1.45}
+  .hint{font-size:12px; color:var(--muted); margin-top:6px}
+  a{color:var(--accent2)}
+
+  button{font:inherit; cursor:pointer; border:1px solid var(--line); background:var(--panel2);
+    color:var(--text); padding:10px 16px; border-radius:10px; transition:.15s; font-size:14px;
+    display:inline-flex; align-items:center; gap:8px}
+  button:hover{border-color:#3a4150; background:#262b35}
+  button:disabled{opacity:.45; cursor:not-allowed}
+  .btn-accent{background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600}
+  .btn-accent:hover{background:var(--accent2); border-color:var(--accent2)}
+  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+
+  .drop{border:2px dashed var(--line); border-radius:12px; padding:26px; text-align:center; color:var(--muted); cursor:pointer; transition:.15s}
+  .drop.over{border-color:var(--accent); background:rgba(203,1,2,.06); color:var(--text)}
+  .drop strong{color:var(--text)}
+
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  @media (max-width:720px){ .grid{grid-template-columns:1fr} }
+  .imgbox{background:var(--panel2); border:1px solid var(--line); border-radius:12px; overflow:hidden; min-height:220px; display:flex; align-items:center; justify-content:center; position:relative}
+  .imgbox img{max-width:100%; max-height:420px; display:block}
+  .imgbox .ph{color:var(--muted); font-size:13px; padding:20px; text-align:center}
+  .imgbox .cap{position:absolute; top:8px; left:8px; background:rgba(0,0,0,.6); padding:3px 9px; border-radius:6px; font-size:11px}
+
+  .status{font-size:13px; padding:11px 14px; border-radius:10px; margin-top:12px; display:none}
+  .status.show{display:block}
+  .status.work{background:rgba(255,181,71,.12); border:1px solid var(--warn); color:#ffd089}
+  .status.err{background:rgba(231,30,45,.12); border:1px solid var(--accent2); color:#ff9aa3}
+  .status.ok{background:rgba(40,199,111,.12); border:1px solid var(--ok); color:#8ff0bd}
+
+  details summary{cursor:pointer; color:var(--muted); font-size:13px; user-select:none}
+  .spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .free{font-size:12px; background:rgba(40,199,111,.12); color:#8ff0bd; border:1px solid var(--ok); padding:2px 8px; border-radius:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>🏬 Amenajare AI <span class="accent">·</span> spațiu comercial</h1>
+    <p>Încarci poza unui spațiu gol, pui link-ul site-ului clientului — AI-ul citește ce face clientul și amenajează spațiul pentru el. <span class="free">gratis în limita lunară Gemini</span></p>
+  </header>
+
+  <!-- PAS 0: cheia -->
+  <div class="card">
+    <h2><span class="step">0</span> Cheia Gemini (o singură dată)</h2>
+    <label class="lab" for="key">Cheia ta API Gemini</label>
+    <div class="row">
+      <input type="password" id="key" placeholder="AIza..." autocomplete="off" style="flex:1;min-width:220px">
+      <button id="saveKey">💾 Salvează</button>
+    </div>
+    <div class="hint">
+      O iei gratis în 1 minut de pe <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> →
+      „Create API key". Se salvează doar în browserul tău (localStorage), nu se trimite nicăieri în altă parte decât la Google.
+    </div>
+  </div>
+
+  <!-- PAS 1: poza -->
+  <div class="card">
+    <h2><span class="step">1</span> Poza spațiului gol</h2>
+    <div class="drop" id="drop">
+      <strong>Trage poza aici</strong> sau apasă ca s-o alegi · JPG / PNG / WEBP
+    </div>
+    <input type="file" id="file" accept="image/*" hidden>
+  </div>
+
+  <!-- PAS 2: clientul -->
+  <div class="card">
+    <h2><span class="step">2</span> Clientul</h2>
+    <label class="lab" for="url">Link-ul site-ului clientului</label>
+    <input type="url" id="url" placeholder="https://exemplu-cafenea.md">
+    <div class="hint">Gemini va citi acest site ca să înțeleagă tipul de business, produsele și stilul brandului.</div>
+
+    <label class="lab" for="extra" style="margin-top:14px">Cerințe în plus (opțional)</label>
+    <input type="text" id="extra" placeholder="ex: stil modern, multă lumină, păstrează ferestrele">
+  </div>
+
+  <!-- ACȚIUNE -->
+  <div class="card">
+    <div class="row">
+      <button id="go" class="btn-accent" disabled>✨ Amenajează spațiul</button>
+      <button id="regen" disabled>🔁 Regenerează</button>
+    </div>
+    <div class="status" id="status"></div>
+
+    <details style="margin-top:14px">
+      <summary>Vezi / editează „rețeta" de amenajare (promptul generat din site)</summary>
+      <textarea id="prompt" style="margin-top:10px" placeholder="După ce apeși «Amenajează», aici apare instrucțiunea pe care AI-ul a scris-o din site-ul clientului. O poți modifica și apăsa «Regenerează»."></textarea>
+    </details>
+
+    <details style="margin-top:10px">
+      <summary>Setări avansate (modele)</summary>
+      <div style="margin-top:10px">
+        <label class="lab">Model pentru citit site-ul</label>
+        <input type="text" id="textModel" value="gemini-2.5-flash">
+        <label class="lab" style="margin-top:10px">Model pentru generat imaginea</label>
+        <input type="text" id="imgModel" value="gemini-2.5-flash-image">
+        <div class="hint">Le schimbi doar dacă Google actualizează numele modelelor (ex. „nano banana 2" = gemini-3.1-flash-image).</div>
+      </div>
+    </details>
+  </div>
+
+  <!-- REZULTAT -->
+  <div class="grid">
+    <div>
+      <div class="imgbox" id="boxIn"><div class="ph">Aici apare poza ta originală</div></div>
+    </div>
+    <div>
+      <div class="imgbox" id="boxOut"><div class="ph">Aici apare spațiul amenajat</div></div>
+      <div class="row" style="margin-top:10px">
+        <button id="download" disabled>⬇️ Descarcă rezultatul</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const $ = s => document.querySelector(s);
+  const API = "https://generativelanguage.googleapis.com/v1beta/models/";
+
+  let inputBase64 = null;   // base64 fără prefix
+  let inputMime = "image/jpeg";
+  let outputDataUrl = null;
+
+  // ---- cheia ----
+  const keyInput = $("#key");
+  keyInput.value = localStorage.getItem("gemini_key") || "";
+  $("#saveKey").addEventListener("click", () => {
+    localStorage.setItem("gemini_key", keyInput.value.trim());
+    setStatus("ok", "Cheia a fost salvată în acest browser. ✔");
+    refreshGo();
+  });
+
+  // ---- status ----
+  const statusEl = $("#status");
+  function setStatus(type, html){
+    statusEl.className = "status show " + type;
+    statusEl.innerHTML = html;
+  }
+  function clearStatus(){ statusEl.className = "status"; statusEl.innerHTML = ""; }
+
+  // ---- încărcare poză ----
+  const drop = $("#drop"), fileInput = $("#file");
+  drop.addEventListener("click", () => fileInput.click());
+  fileInput.addEventListener("change", e => handleFile(e.target.files[0]));
+  ["dragenter","dragover"].forEach(ev => drop.addEventListener(ev, e=>{e.preventDefault(); drop.classList.add("over");}));
+  ["dragleave","drop"].forEach(ev => drop.addEventListener(ev, e=>{e.preventDefault(); drop.classList.remove("over");}));
+  drop.addEventListener("drop", e => { if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+
+  function handleFile(file){
+    if(!file || !file.type.startsWith("image/")) return;
+    inputMime = file.type;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const dataUrl = e.target.result;
+      inputBase64 = dataUrl.split(",")[1];
+      $("#boxIn").innerHTML = '<span class="cap">Original</span><img src="'+dataUrl+'" alt="original">';
+      drop.innerHTML = "<strong>✔ Poză încărcată.</strong> Apasă ca să o schimbi.";
+      refreshGo();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ---- activare buton ----
+  function hasKey(){ return (localStorage.getItem("gemini_key")||"").length > 10; }
+  function refreshGo(){
+    $("#go").disabled = !(inputBase64 && hasKey());
+  }
+  $("#url").addEventListener("input", refreshGo);
+  refreshGo();
+
+  // ---- apel Gemini generic ----
+  async function callGemini(model, body){
+    const key = localStorage.getItem("gemini_key");
+    const res = await fetch(API + model + ":generateContent?key=" + encodeURIComponent(key), {
+      method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)
+    });
+    const data = await res.json();
+    if(!res.ok){
+      const msg = (data && data.error && data.error.message) || ("Eroare HTTP " + res.status);
+      throw new Error(msg);
+    }
+    return data;
+  }
+
+  // ---- PAS A: citește site-ul → prompt ----
+  async function buildPromptFromSite(){
+    const url = $("#url").value.trim();
+    const extra = $("#extra").value.trim();
+    const instruction =
+      "Citește conținutul de la acest URL: " + url + "\n\n" +
+      "Pe baza site-ului, identifică: tipul de business, produsele/serviciile, publicul, " +
+      "stilul și culorile brandului.\n\n" +
+      "Apoi scrie O SINGURĂ instrucțiune detaliată, ÎN ENGLEZĂ, pentru un model de generare de imagini, " +
+      "care să transforme o fotografie a unui spațiu comercial interior GOL într-un spațiu complet AMENAJAT " +
+      "pentru acest client: mobilier potrivit, rafturi/expunere, produse, branding și logo discret, " +
+      "paletă de culori a brandului, iluminat și atmosferă. " +
+      "Cere explicit păstrarea pereților, ferestrelor, podelei, tavanului, perspectivei și proporțiilor reale din fotografie, " +
+      "și un rezultat fotorealist. " +
+      (extra ? ("Ține cont și de aceste cerințe: " + extra + ". ") : "") +
+      "Returnează DOAR textul instrucțiunii în engleză, fără explicații, fără ghilimele.";
+
+    const data = await callGemini($("#textModel").value.trim(), {
+      contents:[{ parts:[{ text:instruction }] }],
+      tools:[{ url_context:{} }]
+    });
+    const parts = (((data.candidates||[])[0]||{}).content||{}).parts || [];
+    const text = parts.map(p=>p.text||"").join("").trim();
+    if(!text) throw new Error("Nu am putut extrage informații din site. Verifică link-ul.");
+    return text;
+  }
+
+  // ---- PAS B: generează imaginea amenajată ----
+  async function generateImage(promptText){
+    const finalPrompt =
+      "Using the provided photograph of an EMPTY commercial interior, realistically furnish and stage it. " +
+      promptText + " " +
+      "Strictly preserve the existing architecture: walls, windows, doors, floor, ceiling, camera angle, " +
+      "perspective and proportions. Output a single photorealistic image.";
+
+    const data = await callGemini($("#imgModel").value.trim(), {
+      contents:[{ parts:[
+        { text: finalPrompt },
+        { inline_data:{ mime_type: inputMime, data: inputBase64 } }
+      ]}],
+      generationConfig:{ responseModalities:["TEXT","IMAGE"] }
+    });
+
+    const parts = (((data.candidates||[])[0]||{}).content||{}).parts || [];
+    const imgPart = parts.find(p => p.inline_data || p.inlineData);
+    const inline = imgPart && (imgPart.inline_data || imgPart.inlineData);
+    if(!inline || !inline.data){
+      const txt = parts.map(p=>p.text||"").join(" ").trim();
+      throw new Error("Modelul nu a returnat o imagine." + (txt ? (" Răspuns: " + txt) : ""));
+    }
+    const mime = inline.mime_type || inline.mimeType || "image/png";
+    return "data:" + mime + ";base64," + inline.data;
+  }
+
+  // ---- flux complet ----
+  async function run(useExistingPrompt){
+    if(!inputBase64){ setStatus("err","Încarcă întâi o poză."); return; }
+    if(!hasKey()){ setStatus("err","Adaugă și salvează cheia Gemini (pasul 0)."); return; }
+    $("#go").disabled = true; $("#regen").disabled = true; $("#download").disabled = true;
+
+    try{
+      let promptText;
+      if(useExistingPrompt && $("#prompt").value.trim()){
+        promptText = $("#prompt").value.trim();
+        setStatus("work", '<span class="spinner"></span> Generez spațiul amenajat...');
+      } else {
+        if(!$("#url").value.trim()){ setStatus("err","Pune link-ul site-ului clientului."); resetButtons(); return; }
+        setStatus("work", '<span class="spinner"></span> Citesc site-ul clientului și pregătesc amenajarea...');
+        promptText = await buildPromptFromSite();
+        $("#prompt").value = promptText;
+        setStatus("work", '<span class="spinner"></span> Am înțeles clientul. Generez spațiul amenajat...');
+      }
+
+      outputDataUrl = await generateImage(promptText);
+      $("#boxOut").innerHTML = '<span class="cap">Amenajat</span><img src="'+outputDataUrl+'" alt="amenajat">';
+      setStatus("ok", "Gata! ✔ Dacă vrei altă variantă, apasă «Regenerează». Poți edita și «rețeta» de mai sus.");
+      $("#download").disabled = false;
+    } catch(err){
+      setStatus("err", "❌ " + err.message);
+    } finally {
+      resetButtons();
+    }
+  }
+  function resetButtons(){
+    $("#go").disabled = !(inputBase64 && hasKey());
+    $("#regen").disabled = !$("#prompt").value.trim();
+  }
+
+  $("#go").addEventListener("click", () => run(false));
+  $("#regen").addEventListener("click", () => run(true));
+
+  // ---- descărcare ----
+  $("#download").addEventListener("click", () => {
+    if(!outputDataUrl) return;
+    const a = document.createElement("a");
+    a.href = outputDataUrl; a.download = "spatiu-amenajat.png"; a.click();
+  });
+
+})();
+</script>
+</body>
+</html>

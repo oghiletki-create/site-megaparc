@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editor de poze — gratuit, în browser</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1f232c; --line:#2a2f3a;
+    --text:#e8eaed; --muted:#9aa3b2; --accent:#CB0102; --accent2:#e31e2d;
+    --radius:12px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    background:var(--bg); color:var(--text);
+    display:flex; flex-direction:column; height:100vh; overflow:hidden;
+  }
+  header{
+    display:flex; align-items:center; gap:14px; padding:12px 18px;
+    border-bottom:1px solid var(--line); background:var(--panel);
+    flex-wrap:wrap;
+  }
+  header h1{font-size:16px; margin:0; font-weight:700; letter-spacing:.2px}
+  header .sub{color:var(--muted); font-size:12px}
+  .grow{flex:1}
+  .row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+
+  button, .btn{
+    font:inherit; cursor:pointer; border:1px solid var(--line);
+    background:var(--panel2); color:var(--text);
+    padding:8px 12px; border-radius:10px; transition:.15s;
+    display:inline-flex; align-items:center; gap:7px; font-size:13px;
+  }
+  button:hover{border-color:#3a4150; background:#262b35}
+  button:disabled{opacity:.4; cursor:not-allowed}
+  .btn-accent{background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600}
+  .btn-accent:hover{background:var(--accent2); border-color:var(--accent2)}
+
+  main{display:flex; flex:1; min-height:0}
+  .stage{
+    flex:1; position:relative; display:flex; align-items:center; justify-content:center;
+    background:
+      linear-gradient(45deg,#13151a 25%,transparent 25%),
+      linear-gradient(-45deg,#13151a 25%,transparent 25%),
+      linear-gradient(45deg,transparent 75%,#13151a 75%),
+      linear-gradient(-45deg,transparent 75%,#13151a 75%);
+    background-size:22px 22px; background-position:0 0,0 11px,11px -11px,-11px 0;
+    overflow:hidden; padding:20px;
+  }
+  canvas{max-width:100%; max-height:100%; box-shadow:0 10px 40px rgba(0,0,0,.5); border-radius:4px; touch-action:none}
+
+  .drop{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:14px; text-align:center;
+    color:var(--muted); border:2px dashed var(--line); margin:24px; border-radius:16px;
+  }
+  .drop.hide{display:none}
+  .drop.over{border-color:var(--accent); background:rgba(203,1,2,.06); color:var(--text)}
+  .drop svg{opacity:.5}
+
+  aside{
+    width:300px; background:var(--panel); border-left:1px solid var(--line);
+    overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:6px;
+  }
+  aside.empty{opacity:.4; pointer-events:none}
+  .group{border:1px solid var(--line); border-radius:var(--radius); margin-bottom:8px; overflow:hidden}
+  .group>summary{
+    list-style:none; cursor:pointer; padding:11px 13px; font-weight:600; font-size:13px;
+    background:var(--panel2); user-select:none; display:flex; justify-content:space-between; align-items:center;
+  }
+  .group>summary::-webkit-details-marker{display:none}
+  .group>summary::after{content:"▾"; color:var(--muted); font-size:11px}
+  .group[open]>summary::after{content:"▴"}
+  .group .body{padding:12px 13px; display:flex; flex-direction:column; gap:13px}
+
+  .ctrl label{display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-bottom:6px}
+  .ctrl label b{color:var(--text); font-weight:600}
+  input[type=range]{width:100%; accent-color:var(--accent); cursor:pointer}
+  .chips{display:flex; flex-wrap:wrap; gap:6px}
+  .chip{font-size:12px; padding:6px 9px}
+  .chip.on{background:var(--accent); border-color:var(--accent); color:#fff}
+
+  .field{display:flex; flex-direction:column; gap:6px}
+  .field input[type=text], .field select{
+    font:inherit; font-size:13px; padding:8px 10px; border-radius:9px;
+    border:1px solid var(--line); background:var(--panel2); color:var(--text); width:100%;
+  }
+  .inline{display:flex; gap:8px; align-items:center}
+  .inline > *{flex:1}
+  input[type=color]{width:38px; height:38px; padding:0; border:1px solid var(--line); border-radius:9px; background:none; cursor:pointer; flex:0 0 auto}
+  .hint{font-size:11px; color:var(--muted); line-height:1.5}
+
+  footer{
+    border-top:1px solid var(--line); background:var(--panel); padding:10px 18px;
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+  }
+  footer .hint{flex:1; min-width:120px}
+
+  @media (max-width:760px){
+    main{flex-direction:column}
+    aside{width:auto; max-height:42vh; border-left:none; border-top:1px solid var(--line)}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🖼️ Editor de poze</h1>
+    <div class="sub">Gratuit · în browser · fără cont · fără internet</div>
+  </div>
+  <div class="grow"></div>
+  <div class="row">
+    <button id="btnOpen" class="btn-accent">📂 Atașează poză</button>
+    <button id="btnSample" title="Încarcă o poză de probă">Poză de probă</button>
+  </div>
+</header>
+
+<main>
+  <div class="stage" id="stage">
+    <canvas id="canvas" hidden></canvas>
+    <div class="drop" id="drop">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+      </svg>
+      <div>
+        <div style="font-size:15px;color:var(--text);font-weight:600">Trage o poză aici</div>
+        <div style="margin-top:4px">sau apasă „Atașează poză" · JPG, PNG, WEBP</div>
+      </div>
+    </div>
+  </div>
+
+  <aside id="panel" class="empty">
+
+    <details class="group" open>
+      <summary>Ajustări</summary>
+      <div class="body" id="adjust"></div>
+    </details>
+
+    <details class="group">
+      <summary>Filtre rapide</summary>
+      <div class="body">
+        <div class="chips" id="presets"></div>
+      </div>
+    </details>
+
+    <details class="group">
+      <summary>Rotire & oglindire</summary>
+      <div class="body">
+        <div class="row">
+          <button data-act="rot-left">↺ Stânga</button>
+          <button data-act="rot-right">↻ Dreapta</button>
+        </div>
+        <div class="row">
+          <button data-act="flip-h">⇋ Orizontal</button>
+          <button data-act="flip-v">⇅ Vertical</button>
+        </div>
+      </div>
+    </details>
+
+    <details class="group">
+      <summary>Text pe poză</summary>
+      <div class="body">
+        <div class="field">
+          <input type="text" id="txtValue" placeholder="Scrie un text...">
+          <div class="inline">
+            <input type="color" id="txtColor" value="#ffffff">
+            <select id="txtFont">
+              <option value="system-ui">Standard</option>
+              <option value="Georgia,serif">Serif</option>
+              <option value="'Courier New',monospace">Mono</option>
+              <option value="Impact,sans-serif">Impact</option>
+            </select>
+          </div>
+          <div class="ctrl">
+            <label>Mărime <b id="txtSizeV">48 px</b></label>
+            <input type="range" id="txtSize" min="12" max="200" value="48">
+          </div>
+          <button data-act="add-text">＋ Adaugă text</button>
+          <div class="hint">După adăugare, trage textul cu mouse-ul/degetul ca să-l poziționezi.</div>
+        </div>
+      </div>
+    </details>
+
+    <details class="group">
+      <summary>Desenare</summary>
+      <div class="body">
+        <div class="row">
+          <button id="penToggle">✏️ Activează creionul</button>
+        </div>
+        <div class="inline">
+          <input type="color" id="penColor" value="#CB0102">
+          <div class="ctrl" style="flex:1">
+            <label>Grosime <b id="penSizeV">6 px</b></label>
+            <input type="range" id="penSize" min="1" max="60" value="6">
+          </div>
+        </div>
+      </div>
+    </details>
+
+  </aside>
+</main>
+
+<footer>
+  <div class="row">
+    <button id="btnUndo" disabled>↶ Anulează</button>
+    <button id="btnReset" disabled>⟲ Resetează</button>
+  </div>
+  <div class="hint">Totul rămâne pe dispozitivul tău. Nimic nu se trimite pe internet.</div>
+  <div class="row">
+    <select id="dlFormat" class="field" style="width:auto">
+      <option value="image/png">PNG (calitate max)</option>
+      <option value="image/jpeg">JPG (fișier mic)</option>
+    </select>
+    <button id="btnDownload" class="btn-accent" disabled>⬇️ Descarcă</button>
+  </div>
+</footer>
+
+<input type="file" id="file" accept="image/*" hidden>
+
+<script>
+(function(){
+  "use strict";
+
+  const $ = s => document.querySelector(s);
+  const canvas = $("#canvas");
+  const ctx = canvas.getContext("2d");
+  const stage = $("#stage");
+  const drop = $("#drop");
+  const panel = $("#panel");
+
+  // baseImage = imaginea curentă "coaptă" (cu rotiri, text, desen deja aplicate)
+  // Ajustările din slidere se aplică non-distructiv peste baseImage la fiecare randare.
+  let baseImage = null;          // ImageBitmap / HTMLCanvasElement
+  const history = [];            // stivă de canvas-uri pentru Undo
+
+  const ADJ = [
+    {key:"brightness", label:"Luminozitate", min:0,   max:200, val:100, unit:"%"},
+    {key:"contrast",   label:"Contrast",     min:0,   max:200, val:100, unit:"%"},
+    {key:"saturate",   label:"Saturație",    min:0,   max:200, val:100, unit:"%"},
+    {key:"grayscale",  label:"Alb-negru",    min:0,   max:100, val:0,   unit:"%"},
+    {key:"sepia",      label:"Sepia",        min:0,   max:100, val:0,   unit:"%"},
+    {key:"hue-rotate", label:"Nuanță",       min:0,   max:360, val:0,   unit:"deg"},
+    {key:"blur",       label:"Blur",         min:0,   max:20,  val:0,   unit:"px"},
+  ];
+  const adj = {};
+  ADJ.forEach(a => adj[a.key] = a.val);
+
+  const PRESETS = {
+    "Original":   {brightness:100,contrast:100,saturate:100,grayscale:0,sepia:0,"hue-rotate":0,blur:0},
+    "Vivid":      {brightness:105,contrast:120,saturate:150,grayscale:0,sepia:0,"hue-rotate":0,blur:0},
+    "B&W":        {brightness:105,contrast:115,saturate:0,grayscale:100,sepia:0,"hue-rotate":0,blur:0},
+    "Vintage":    {brightness:105,contrast:95,saturate:90,grayscale:0,sepia:45,"hue-rotate":0,blur:0},
+    "Rece":       {brightness:100,contrast:105,saturate:110,grayscale:0,sepia:0,"hue-rotate":190,blur:0},
+    "Cald":       {brightness:104,contrast:102,saturate:120,grayscale:0,sepia:25,"hue-rotate":0,blur:0},
+    "Estompat":   {brightness:102,contrast:95,saturate:100,grayscale:0,sepia:0,"hue-rotate":0,blur:3},
+    "Contrast +": {brightness:100,contrast:160,saturate:110,grayscale:0,sepia:0,"hue-rotate":0,blur:0},
+  };
+
+  function filterString(){
+    return ADJ.map(a => `${a.key}(${adj[a.key]}${a.unit})`).join(" ");
+  }
+
+  // ---- randare ----
+  function render(){
+    if(!baseImage) return;
+    canvas.width = baseImage.width;
+    canvas.height = baseImage.height;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.filter = filterString();
+    ctx.drawImage(baseImage,0,0);
+    ctx.filter = "none";
+  }
+
+  // "Coace" ajustările curente în baseImage (înainte de rotire/text/desen)
+  function bake(){
+    const tmp = document.createElement("canvas");
+    tmp.width = canvas.width; tmp.height = canvas.height;
+    const tctx = tmp.getContext("2d");
+    tctx.filter = filterString();
+    tctx.drawImage(baseImage,0,0);
+    baseImage = tmp;
+    resetAdj();
+  }
+
+  function resetAdj(){
+    ADJ.forEach(a => {
+      adj[a.key] = a.val;
+      const r = document.getElementById("adj-"+a.key);
+      if(r){ r.value = a.val; r.previousElementSibling.querySelector("b").textContent = a.val+a.unit; }
+    });
+  }
+
+  function pushHistory(){
+    const snap = document.createElement("canvas");
+    snap.width = baseImage.width; snap.height = baseImage.height;
+    snap.getContext("2d").drawImage(baseImage,0,0);
+    history.push(snap);
+    if(history.length > 25) history.shift();
+    updateButtons();
+  }
+
+  function updateButtons(){
+    $("#btnUndo").disabled = history.length === 0;
+    $("#btnReset").disabled = !originalImage;
+    $("#btnDownload").disabled = !baseImage;
+  }
+
+  // ---- încărcare imagine ----
+  let originalImage = null;
+  async function loadFromSource(src){
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      c.getContext("2d").drawImage(img,0,0);
+      baseImage = c;
+      originalImage = c;
+      history.length = 0;
+      resetAdj();
+      canvas.hidden = false;
+      drop.classList.add("hide");
+      panel.classList.remove("empty");
+      updateButtons();
+      render();
+    };
+    img.onerror = () => alert("Nu am putut încărca imaginea.");
+    img.src = src;
+  }
+
+  function loadFromFile(file){
+    if(!file || !file.type.startsWith("image/")) return;
+    const reader = new FileReader();
+    reader.onload = e => loadFromSource(e.target.result);
+    reader.readAsDataURL(file);
+  }
+
+  // ---- UI: ajustări ----
+  const adjustBox = $("#adjust");
+  ADJ.forEach(a => {
+    const ctrl = document.createElement("div");
+    ctrl.className = "ctrl";
+    ctrl.innerHTML = `<label>${a.label} <b>${a.val}${a.unit}</b></label>
+      <input type="range" id="adj-${a.key}" min="${a.min}" max="${a.max}" value="${a.val}">`;
+    const range = ctrl.querySelector("input");
+    range.addEventListener("input", () => {
+      adj[a.key] = +range.value;
+      ctrl.querySelector("b").textContent = range.value + a.unit;
+      render();
+    });
+    adjustBox.appendChild(ctrl);
+  });
+
+  // ---- UI: presets ----
+  const presetBox = $("#presets");
+  Object.keys(PRESETS).forEach(name => {
+    const b = document.createElement("button");
+    b.className = "chip"; b.textContent = name;
+    b.addEventListener("click", () => {
+      const p = PRESETS[name];
+      ADJ.forEach(a => {
+        adj[a.key] = p[a.key];
+        const r = document.getElementById("adj-"+a.key);
+        r.value = p[a.key];
+        r.previousElementSibling.querySelector("b").textContent = p[a.key]+a.unit;
+      });
+      presetBox.querySelectorAll(".chip").forEach(c=>c.classList.remove("on"));
+      b.classList.add("on");
+      render();
+    });
+    presetBox.appendChild(b);
+  });
+
+  // ---- rotire / oglindire ----
+  function transform(act){
+    if(!baseImage) return;
+    bake(); pushHistory();
+    const w = baseImage.width, h = baseImage.height;
+    const out = document.createElement("canvas");
+    const o = out.getContext("2d");
+    if(act === "rot-left" || act === "rot-right"){
+      out.width = h; out.height = w;
+      o.translate(out.width/2, out.height/2);
+      o.rotate((act === "rot-right" ? 90 : -90) * Math.PI/180);
+      o.drawImage(baseImage, -w/2, -h/2);
+    } else {
+      out.width = w; out.height = h;
+      o.translate(act === "flip-h" ? w : 0, act === "flip-v" ? h : 0);
+      o.scale(act === "flip-h" ? -1 : 1, act === "flip-v" ? -1 : 1);
+      o.drawImage(baseImage,0,0);
+    }
+    baseImage = out;
+    render();
+  }
+
+  // ---- text ----
+  let pendingText = null; // {text,color,font,size}
+  function addText(){
+    const v = $("#txtValue").value.trim();
+    if(!v){ $("#txtValue").focus(); return; }
+    bake(); pushHistory();
+    pendingText = {
+      text:v, color:$("#txtColor").value, font:$("#txtFont").value,
+      size:+$("#txtSize").value, x:baseImage.width/2, y:baseImage.height/2
+    };
+    drawWithText();
+    stage.style.cursor = "move";
+  }
+  function drawWithText(){
+    render();
+    if(!pendingText) return;
+    ctx.font = `bold ${pendingText.size}px ${pendingText.font}`;
+    ctx.fillStyle = pendingText.color;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.shadowColor = "rgba(0,0,0,.45)"; ctx.shadowBlur = pendingText.size/6;
+    ctx.fillText(pendingText.text, pendingText.x, pendingText.y);
+    ctx.shadowBlur = 0;
+  }
+
+  // ---- desenare (creion) ----
+  let penOn = false, drawing = false, last = null;
+  $("#penToggle").addEventListener("click", () => {
+    penOn = !penOn;
+    $("#penToggle").classList.toggle("btn-accent", penOn);
+    $("#penToggle").textContent = penOn ? "✏️ Creion activ" : "✏️ Activează creionul";
+    stage.style.cursor = penOn ? "crosshair" : "default";
+    if(penOn && pendingText){ commitText(); }
+  });
+
+  function canvasPos(e){
+    const r = canvas.getBoundingClientRect();
+    const p = e.touches ? e.touches[0] : e;
+    return {
+      x:(p.clientX - r.left) * (canvas.width / r.width),
+      y:(p.clientY - r.top) * (canvas.height / r.height)
+    };
+  }
+
+  // ---- interacțiune pe canvas (text drag + desen) ----
+  function pointerDown(e){
+    if(!baseImage) return;
+    const pos = canvasPos(e);
+    if(penOn){
+      e.preventDefault();
+      bake(); pushHistory();
+      drawing = true; last = pos;
+    } else if(pendingText){
+      e.preventDefault();
+      drawing = true;
+      pendingText.x = pos.x; pendingText.y = pos.y;
+      drawWithText();
+    }
+  }
+  function pointerMove(e){
+    if(!drawing) return;
+    e.preventDefault();
+    const pos = canvasPos(e);
+    if(penOn){
+      ctx.strokeStyle = $("#penColor").value;
+      ctx.lineWidth = +$("#penSize").value;
+      ctx.lineCap = "round"; ctx.lineJoin = "round";
+      ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(pos.x,pos.y); ctx.stroke();
+      last = pos;
+      // pe măsură ce desenăm direct pe canvas, sincronizăm baseImage
+      baseImage = snapshotCanvas();
+    } else if(pendingText){
+      pendingText.x = pos.x; pendingText.y = pos.y;
+      drawWithText();
+    }
+  }
+  function pointerUp(){ drawing = false; }
+
+  function snapshotCanvas(){
+    const c = document.createElement("canvas");
+    c.width = canvas.width; c.height = canvas.height;
+    c.getContext("2d").drawImage(canvas,0,0);
+    return c;
+  }
+  function commitText(){
+    if(!pendingText) return;
+    drawWithText();
+    baseImage = snapshotCanvas();
+    pendingText = null;
+    $("#txtValue").value = "";
+    stage.style.cursor = penOn ? "crosshair" : "default";
+    render();
+  }
+
+  canvas.addEventListener("mousedown", pointerDown);
+  window.addEventListener("mousemove", pointerMove);
+  window.addEventListener("mouseup", pointerUp);
+  canvas.addEventListener("touchstart", pointerDown, {passive:false});
+  canvas.addEventListener("touchmove", pointerMove, {passive:false});
+  window.addEventListener("touchend", pointerUp);
+
+  // dacă era text în lucru și apeși altundeva în panel, îl fixăm
+  document.addEventListener("click", e => {
+    if(pendingText && !stage.contains(e.target) &&
+       !e.target.closest('[data-act="add-text"]') &&
+       !e.target.closest('#txtValue,#txtColor,#txtFont,#txtSize')){
+      commitText();
+    }
+  });
+
+  // ---- acțiuni grupate (data-act) ----
+  document.addEventListener("click", e => {
+    const act = e.target.closest("[data-act]")?.dataset.act;
+    if(!act) return;
+    if(act === "add-text") addText();
+    else transform(act);
+  });
+
+  // ---- sliders live labels pentru text/pen ----
+  $("#txtSize").addEventListener("input", e => $("#txtSizeV").textContent = e.target.value+" px");
+  $("#penSize").addEventListener("input", e => $("#penSizeV").textContent = e.target.value+" px");
+
+  // ---- undo / reset ----
+  $("#btnUndo").addEventListener("click", () => {
+    if(!history.length) return;
+    baseImage = history.pop();
+    pendingText = null;
+    resetAdj();
+    updateButtons();
+    render();
+  });
+  $("#btnReset").addEventListener("click", () => {
+    if(!originalImage) return;
+    baseImage = originalImage;
+    history.length = 0;
+    pendingText = null;
+    resetAdj();
+    presetBox.querySelectorAll(".chip").forEach(c=>c.classList.remove("on"));
+    updateButtons();
+    render();
+  });
+
+  // ---- descărcare ----
+  $("#btnDownload").addEventListener("click", () => {
+    if(!baseImage) return;
+    commitText();
+    bake();
+    const type = $("#dlFormat").value;
+    const ext = type === "image/jpeg" ? "jpg" : "png";
+    // fundal alb pentru JPG (nu suportă transparență)
+    let url;
+    if(type === "image/jpeg"){
+      const c = document.createElement("canvas");
+      c.width = canvas.width; c.height = canvas.height;
+      const cc = c.getContext("2d");
+      cc.fillStyle = "#fff"; cc.fillRect(0,0,c.width,c.height);
+      cc.drawImage(canvas,0,0);
+      url = c.toDataURL(type, 0.92);
+    } else {
+      url = canvas.toDataURL(type);
+    }
+    const a = document.createElement("a");
+    a.href = url; a.download = "poza-editata." + ext; a.click();
+  });
+
+  // ---- input fișier + drag&drop ----
+  $("#btnOpen").addEventListener("click", () => $("#file").click());
+  $("#file").addEventListener("change", e => loadFromFile(e.target.files[0]));
+
+  ["dragenter","dragover"].forEach(ev =>
+    stage.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
+  ["dragleave","drop"].forEach(ev =>
+    stage.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
+  stage.addEventListener("drop", e => {
+    const f = e.dataTransfer.files[0];
+    if(f) loadFromFile(f);
+  });
+
+  // lipire din clipboard (Ctrl+V)
+  window.addEventListener("paste", e => {
+    const item = [...e.clipboardData.items].find(i => i.type.startsWith("image/"));
+    if(item) loadFromFile(item.getAsFile());
+  });
+
+  // ---- poză de probă (generată local, fără internet) ----
+  $("#btnSample").addEventListener("click", () => {
+    const c = document.createElement("canvas");
+    c.width = 1000; c.height = 700;
+    const g = c.getContext("2d");
+    const grd = g.createLinearGradient(0,0,1000,700);
+    grd.addColorStop(0,"#1b2735"); grd.addColorStop(1,"#CB0102");
+    g.fillStyle = grd; g.fillRect(0,0,1000,700);
+    for(let i=0;i<60;i++){
+      g.fillStyle = `rgba(255,255,255,${Math.random()*0.5})`;
+      g.beginPath();
+      g.arc(Math.random()*1000, Math.random()*350, Math.random()*2.5, 0, 7);
+      g.fill();
+    }
+    g.fillStyle = "rgba(255,255,255,.95)";
+    g.font = "bold 90px system-ui"; g.textAlign = "center";
+    g.fillText("PROBĂ", 500, 420);
+    loadFromSource(c.toDataURL());
+  });
+
+})();
+</script>
+</body>
+</html>
