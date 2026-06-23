@@ -230,15 +230,103 @@ const CATALOG = {
   protectie:{emoji:"🧤", cat:{ro:"Echipament",ru:"Защита"},
     price:{retail:110,fermier:99,angro:89}, origin:{type:"ro"}, inStock:true, lead:null,
     name:{ro:"Set protecție (mască + mănuși)",ru:"Набор защиты (маска + перчатки)"},
-    dosePer100m2:null, water:null, phi:0}
+    dosePer100m2:null, water:null, phi:0},
+  topas:{emoji:"🌫️", cat:{ro:"Fungicid",ru:"Фунгицид"},
+    price:{retail:240,fermier:210,angro:188}, origin:{type:"import",country:"CH"}, inStock:true, lead:null,
+    name:{ro:"Topas (fungicid făinare/rugină)",ru:"Топаз (мучнистая роса/ржавчина)"},
+    dosePer100m2:5, water:{ro:"5 L apă",ru:"5 л воды"}, phi:14},
+  vertimec:{emoji:"🕷️", cat:{ro:"Acaricid",ru:"Акарицид"},
+    price:{retail:285,fermier:250,angro:222}, origin:{type:"import",country:"CH"}, inStock:true, lead:null,
+    name:{ro:"Vertimec (păianjen / tripși)",ru:"Вертимек (клещ / трипс)"},
+    dosePer100m2:8, water:{ro:"5 L apă",ru:"5 л воды"}, phi:3},
+  decis:{emoji:"🐛", cat:{ro:"Insecticid",ru:"Инсектицид"},
+    price:{retail:130,fermier:112,angro:99}, origin:{type:"import",country:"FR"}, inStock:true, lead:null,
+    name:{ro:"Decis (contact – omizi/molii)",ru:"Децис (контакт – гусеницы)"},
+    dosePer100m2:5, water:{ro:"5 L apă",ru:"5 л воды"}, phi:7},
+  uragan:{emoji:"🚫", cat:{ro:"Erbicid total",ru:"Тотальный гербицид"},
+    price:{retail:180,fermier:158,angro:140}, origin:{type:"import",country:"CH"}, inStock:true, lead:null,
+    name:{ro:"Uragan (glifosat – buruieni perene)",ru:"Ураган (глифосат – многолетние)"},
+    dosePer100m2:40, water:{ro:"3 L apă",ru:"3 л воды"}, phi:0},
+  foliar:{emoji:"🌿", cat:{ro:"Îngrășământ foliar",ru:"Листовое удобрение"},
+    price:{retail:60,fermier:52,angro:46}, origin:{type:"ro"}, inStock:true, lead:null,
+    name:{ro:"Îngrășământ foliar (Diolsem)",ru:"Листовое удобрение (Diolsem)"},
+    dosePer100m2:20, water:{ro:"5 L apă",ru:"5 л воды"}, phi:0}
 };
 const CATS = {
   seminte:{ic:"🌱", name:{ro:"Semințe",ru:"Семена"}, items:["seminte"]},
-  ingrasaminte:{ic:"💎", name:{ro:"Îngrășăminte",ru:"Удобрения"}, items:["npk"]},
-  pesticide:{ic:"🧴", name:{ro:"Protecția plantelor",ru:"Защита растений"}, items:["ridomil","cupru","aktara","titus"]},
+  ingrasaminte:{ic:"💎", name:{ro:"Îngrășăminte",ru:"Удобрения"}, items:["npk","foliar"]},
+  fungicide:{ic:"🧴", name:{ro:"Fungicide",ru:"Фунгициды"}, items:["ridomil","cupru","topas"]},
+  insecticide:{ic:"🐞", name:{ro:"Insecticide / acaricide",ru:"Инсектициды / акарициды"}, items:["aktara","vertimec","decis"]},
+  erbicide:{ic:"🌿", name:{ro:"Erbicide",ru:"Гербициды"}, items:["titus","uragan"]},
   adjuvanti:{ic:"💧", name:{ro:"Adjuvanți",ru:"Прилипатели"}, items:["trend"]},
   echipament:{ic:"🧤", name:{ro:"Echipament",ru:"Оборудование"}, items:["protectie"]}
 };
+
+/* ============================================================
+   BAZĂ DE CUNOȘTINȚE AGRONOMICE (demo)
+   În producție: LLM (Claude) + RAG pe fișele tehnice + profil
+   agro-climatic → răspunde la ORICE întrebare. Aici acoperim cele
+   mai frecvente probleme pe culturi din R. Moldova, fiecare cu
+   soluția din catalogul Diolsem.
+   ============================================================ */
+const KB = [
+  {kw:["rapan","răpăn","venturia","парша","măr ","mar ","яблон"],
+   ans:{ro:"Rapănul mărului (pete brune-măslinii pe frunze și fructe) e favorizat de primăverile umede din Moldova. Program: cupru la dezmugurit, apoi un fungicid sistemic în perioadele de risc. Repetă la 10–12 zile.",
+        ru:"Парша яблони (бурo-оливковые пятна на листьях и плодах) развивается во влажную весну. Схема: медь по зелёному конусу, затем системный фунгицид в периоды риска. Повтор каждые 10–12 дней."},
+   prods:["cupru","topas"], dose:true, rotate:true},
+  {kw:["fainar","făinar","oidium","oidiu","mucegai alb","alb pe frunz","мучнист","оидиум","белый налет"],
+   ans:{ro:"Făinarea (oidiu) apare ca un strat albicios pe frunze și boabe — frecventă vara la viță, castraveți, dovlecei, măr și trandafir, pe timp cald. Tratează preventiv și la primele semne cu un fungicid sistemic (triazol).",
+        ru:"Мучнистая роса (оидиум) — белёсый налёт на листьях и ягодах, часто летом на винограде, огурцах, кабачках, яблоне. Обрабатывайте профилактически и при первых признаках системным фунгицидом (триазол)."},
+   prods:["topas","cupru"], dose:true, rotate:true},
+  {kw:["rugina","rugină","ржавчин"],
+   ans:{ro:"Rugina (pustule ruginii pe frunze — grâu, usturoi, prun, trandafir) se combate cu fungicide triazole, aplicate preventiv și la primele pustule.",
+        ru:"Ржавчина (рыжие пустулы на листьях — пшеница, чеснок, слива, роза) контролируется триазольными фунгицидами, профилактически и при первых пустулах."},
+   prods:["topas"], dose:true, rotate:true},
+  {kw:["colorado","gandac","gândac","жук"],
+   ans:{ro:"Gândacul de Colorado atacă cartoful și vânăta. Cel mai eficient e tratamentul la apariția larvelor tinere. Folosește un insecticid sistemic și alternează grupele între generații, ca să eviți rezistența.",
+        ru:"Колорадский жук поражает картофель и баклажан. Эффективнее всего обработка по молодым личинкам. Системный инсектицид + чередование групп между поколениями от устойчивости."},
+   prods:["aktara"], dose:true, rotate:true},
+  {kw:["acarian","acarien","paianjen","păianjen","клещ","паутин"],
+   ans:{ro:"Acarienii (păianjenul roșu) apar pe timp cald și uscat — frecvent vara în sudul Moldovei — și dau frunze bronzate cu pânză fină. Au nevoie de un acaricid specific; insecticidele obișnuite și cuprul nu îi opresc.",
+        ru:"Клещи (паутинный) появляются в жару и засуху — часто летом на юге Молдовы — лист бронзовеет, тонкая паутина. Нужен специальный акарицид; обычные инсектициды и медь не помогают."},
+   prods:["vertimec"], dose:true},
+  {kw:["trips","трипс","тripс"],
+   ans:{ro:"Tripșii dau pete argintii și deformează frunzele și florile (ceapă, castraveți, ardei). Tratează repetat la ~7 zile și alternează un acaricid-insecticid cu unul sistemic.",
+        ru:"Трипс оставляет серебристые пятна и деформирует листья/цветки (лук, огурцы, перец). Обработка повторно ~каждые 7 дней, чередуя акарицид-инсектицид с системным."},
+   prods:["vertimec","aktara"], dose:true},
+  {kw:["omid","omizi","molie","molia","omid","larve","viermi","гусениц","листоверт","плодожорк"],
+   ans:{ro:"Omizile (molia strugurilor, molia mărului, omizi defoliatoare) rod frunzele și fructele. Tratează la apariția larvelor, ideal pe baza capcanelor de avertizare; un insecticid de contact dă rezultat rapid.",
+        ru:"Гусеницы (листовёртка винограда, плодожорка яблони, листогрызущие) повреждают листья и плоды. Обработка по выходу личинок, лучше по феромонным ловушкам; контактный инсектицид действует быстро."},
+   prods:["decis"], dose:true, rotate:true},
+  {kw:["afid","paduch","păduch","тля"],
+   ans:{ro:"Afidele (păduchii de frunză) sug seva și transmit viroze; apar primăvara–vara pe multe culturi. Un insecticid sistemic le controlează rapid — tratează dimineața, pe vreme fără vânt.",
+        ru:"Тля высасывает сок и переносит вирусы; появляется весной–летом на многих культурах. Системный инсектицид быстро решает — обрабатывайте утром, в безветрие."},
+   prods:["aktara"], dose:true},
+  {kw:["palamida","pălămid","pir","costrei","volbura","perene","curatare","curățare","parloag","pârloag","глифос","пырей","осот","многолетн"],
+   ans:{ro:"Pentru buruieni perene (pir, pălămidă, volbură) sau curățarea unui teren necultivat, folosește un erbicid total (glifosat), pe buruieni în creștere activă. Atenție: nu pe cultură — distruge tot ce e verde.",
+        ru:"Против многолетних сорняков (пырей, осот, вьюнок) или для очистки участка — тотальный гербицид (глифосат) по активно растущим сорнякам. Внимание: не по культуре — уничтожает всё зелёное."},
+   prods:["uragan"], dose:true},
+  {kw:["buruien","buruiana","sorni","сорня","сорняк"],
+   ans:{ro:"Pentru buruieni într-o cultură (porumb, cartof) folosește un erbicid selectiv, aplicat postemergent pe buruieni tinere, respectând cultura și faza ei.",
+        ru:"Против сорняков в культуре (кукуруза, картофель) — селективный гербицид, послевсходово по молодым сорнякам, с учётом культуры и её фазы."},
+   prods:["titus"], dose:true},
+  {kw:["ingalbenire","îngălbenire","galben","желте","carenta","carență","питание","подкорм","ingras","îngrăș","удобр","rod slab","nu creste","nu cresc","slab","weak"],
+   ans:{ro:"Îngălbenirea și creșterea slabă indică des o carență de nutriție. Pe cernoziomurile Moldovei, un îngrășământ complex NPK la sol plus unul foliar pentru corecție rapidă dau rezultat. Doza se stabilește după cultură.",
+        ru:"Пожелтение и слабый рост часто означают дефицит питания. На чернозёмах Молдовы помогает комплексное NPK в почву плюс листовое для быстрой коррекции. Доза — по культуре."},
+   prods:["npk","foliar"], dose:false},
+  {kw:["program","schema","schemă","calendar","tratament vie","tratamente","stropir","stropit","schema vie"],
+   ans:{ro:"Program de bază la viță în Moldova: cupru/contact la început, fungicid sistemic în perioadele de risc (mană, făinare), cu rotația grupelor la 10–14 zile. Îți pot detalia pe fenofaze.",
+        ru:"Базовая схема на винограде в Молдове: медь/контакт в начале, системный фунгицид в периоды риска (милдью, оидиум), с чередованием групп каждые 10–14 дней. Могу расписать по фенофазам."},
+   prods:["cupru","ridomil","topas"], dose:false, rotate:true},
+  {kw:["masca","mască","manusi","mănuși","protectie","protecție","respirator","echipament","защит","маска","перчатк"],
+   ans:{ro:"Lucrul cu pesticide cere echipament de protecție: mască/respirator, mănuși, ochelari. Îl avem ca set complet.",
+        ru:"Работа с пестицидами требует средств защиты: маска/респиратор, перчатки, очки. У нас есть полный набор."},
+   prods:["protectie"], dose:false},
+  {kw:["seminte","semințe","rasad","răsad","семен","рассад","посев","посад","soi","sort","сорт"],
+   ans:{ro:"Pentru un start bun, alege semințe de soi productiv, adaptat zonei, plus un îngrășământ de pornire la plantare. Spune-mi cultura ca să-ți recomand soiul potrivit.",
+        ru:"Для хорошего старта выбирайте семена урожайного, районированного сорта плюс стартовое удобрение при посадке. Назовите культуру — подберу сорт."},
+   prods:["seminte","npk"], dose:false}
+];
 
 /* ============================================================
    TRADUCERI
@@ -260,8 +348,9 @@ const T = {
     mCatalog:"Catalog produse", mAgronom:"Consultant agronom", mOrders:"Comenzile mele",
     mOffers:"Ofertele mele", mDelivery:"Livrare & plată", mContact:"Contact & program", mMenu:"Meniu",
     catTitle:"Alege o categorie:", backMenu:"⬅ Meniu principal",
-    agronomPrompt:"Spune-mi cultura și ce observi (ex. 'mană la vie', 'gândaci la cartof') sau alege o problemă frecventă:",
-    agronomChips:["🍅 Pete pe roșii","🍇 Mană la vie","🥔 Gândaci la cartof","🌽 Buruieni la porumb"],
+    agronomPrompt:"Întreabă-mă orice despre cultura ta, ca pe un agronom: spune cultura și simptomul, iar eu îți dau soluția din catalogul Diolsem. Câteva exemple:",
+    agronomChips:["🍇 Făinare la vie","🕷️ Păianjen la castraveți","🍎 Rapăn la măr","🌾 Buruieni perene","🐛 Omizi la pomi","🌱 Îngălbenire / carență"],
+    askMore:"Ca să-ți dau soluția exactă, ca agronom: spune-mi <b>cultura</b> (vie, roșii, măr, cartof, grâu…) și <b>simptomul</b> (pete, mucegai alb, dăunător, îngălbenire). Îți recomand apoi produsul potrivit din catalogul Diolsem; la nevoie te conectez cu un agronom al companiei. 🌿",
     ordersText:"Comanda ta activă:",
     orderLine:"<b>#DL-48217</b> · 3 produse · expediată 🚚<br>livrare azi 14:00–18:00, Chișinău",
     offersText:"Ofertele tale (toate rămân în fișa ta de client):",
@@ -311,8 +400,9 @@ const T = {
     mCatalog:"Каталог товаров", mAgronom:"Агроном-консультант", mOrders:"Мои заказы",
     mOffers:"Мои предложения", mDelivery:"Доставка и оплата", mContact:"Контакты и режим", mMenu:"Меню",
     catTitle:"Выберите категорию:", backMenu:"⬅ Главное меню",
-    agronomPrompt:"Назовите культуру и что замечаете (например 'милдью на винограде', 'жук на картофеле') или выберите частую проблему:",
-    agronomChips:["🍅 Пятна на томатах","🍇 Милдью на винограде","🥔 Жук на картофеле","🌽 Сорняки в кукурузе"],
+    agronomPrompt:"Спрашивайте что угодно о вашей культуре, как у агронома: назовите культуру и симптом — дам решение из каталога Diolsem. Примеры:",
+    agronomChips:["🍇 Оидиум на винограде","🕷️ Клещ на огурцах","🍎 Парша на яблоне","🌾 Многолетние сорняки","🐛 Гусеницы на деревьях","🌱 Пожелтение / дефицит"],
+    askMore:"Чтобы дать точное решение, как агроном: назовите <b>культуру</b> (виноград, томаты, яблоня, картофель, пшеница…) и <b>симптом</b> (пятна, белый налёт, вредитель, пожелтение). Затем порекомендую товар из каталога Diolsem; при необходимости соединю с агрономом компании. 🌿",
     ordersText:"Ваш активный заказ:",
     orderLine:"<b>#DL-48217</b> · 3 товара · отправлен 🚚<br>доставка сегодня 14:00–18:00, Кишинёв",
     offersText:"Ваши предложения (все хранятся в вашей карточке):",
@@ -472,6 +562,24 @@ async function recommend(key,intro){
   await bot(productCard(key)+phiBlock(key),450);
   if(CATALOG[key].dosePer100m2){pendingDose=key;await bot(tr.askArea,500);} else await bot(backBtn(),300);
 }
+// caută cea mai potrivită intrare din baza de cunoștințe (scor după nr. de cuvinte-cheie)
+function findKB(t){
+  let best=null, bestScore=0;
+  for(const e of KB){
+    let s=0; for(const k of e.kw) if(t.includes(k)) s++;
+    if(s>bestScore){ bestScore=s; best=e; }
+  }
+  return best;
+}
+async function answerKB(e){
+  const tr=T[lang];
+  await bot(e.ans[lang]);
+  for(const k of e.prods){ await bot(productCard(k)+phiBlock(k),350); }
+  if(e.rotate) await bot(tr.rotate,400);
+  if(e.dose){ const dk=e.prods.find(k=>CATALOG[k].dosePer100m2); if(dk){ pendingDose=dk; await bot(tr.askArea,450); return; } }
+  await bot(backBtn(),300);
+}
+
 async function handle(text){
   const t=text.toLowerCase().trim(), tr=T[lang];
   if(pendingDose){const a=parseArea(t);if(a){await doseFlow(a);return;}}
@@ -479,14 +587,13 @@ async function handle(text){
   if(has(t,KW.order)){ await myOrders(); return; }
   if(has(t,KW.catalog)){ await catCats(); return; }
   if(has(t,KW.greet)&&t.length<14){ await bot(tr.greet); await menuMain(); return; }
-  if(has(t,KW.gandac)){ await recommend('aktara'); return; }
-  if(has(t,KW.buruieni)){ await recommend('titus'); return; }
-  if(has(t,KW.mana)||(has(t,KW.vita)&&!has(t,KW.seminte))||(has(t,KW.rosii)&&has(t,KW.mana))){ await recommendMana(); return; }
-  if(has(t,KW.seminte)){ await bot(tr.seedRec); await bot(productCard('seminte'),420); await bot(productCard('npk'),420); await bot(backBtn(),300); return; }
-  if(has(t,KW.rosii)){ await recommendMana(); return; }
-  if(has(t,KW.cartof)){ await recommend('aktara'); return; }
-  if(t.length>40){ await bot(tr.fallback); await menuMain(); return; }
-  await bot(tr.notUnderstand); await menuMain();
+  // mana/mildiu = recomandare optimă în funcție de zona climatică
+  if(has(t,KW.mana)){ await recommendMana(); return; }
+  // orice altă problemă scrisă → baza de cunoștințe agronomice
+  const e=findKB(t);
+  if(e){ await answerKB(e); return; }
+  // necunoscut → răspuns profesionist care cere cultura + simptomul
+  await bot(tr.askMore); setAgronomChips();
 }
 
 /* ---------- CHIPS / INPUT / SELECTOARE ---------- */
