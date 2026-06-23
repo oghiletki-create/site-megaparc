@@ -76,7 +76,21 @@ Astfel, recomandarea e mereu corectă agronomic **și** corectă comercial, făr
 
 ---
 
-## 5. Beneficii
+## 5. Magazinul online — aceeași politică de preț, fără excepții
+
+Diolsem are și **magazin online** (diolsem.md). Online-ul **nu** are prețuri proprii: e doar încă un canal alimentat din **aceeași listă unică de preț**. Politica de preț **persistă identic** și online.
+
+- **Vizitator neidentificat** (guest) → preț **Retail** (de listă).
+- **Client autentificat** (cont Fermier/Angro) → prețul **nivelului lui**, afișat automat la logare.
+- **Sincronizare în timp real:** o modificare de preț — făcută **doar de directorul de vânzări** — se reflectă **instant** și pe site, și în magazinele fizice, și în oferte/contabilitate. Niciun canal nu rămâne cu un preț vechi sau divergent.
+- **Promoțiile online** trec tot prin politică: o reducere pe site = un preț special **aprobat de director**, jurnalizat — nu o setare independentă a echipei de e-commerce.
+- **Nicio cale de ocolire:** platforma online nu permite publicarea unui preț în afara listei aprobate.
+
+> Rezultat: clientul vede **același preț corect**, indiferent că intră în magazin, sună un agent, primește o ofertă sau cumpără de pe site. Un singur adevăr de preț, un singur decident.
+
+---
+
+## 6. Beneficii
 
 - **Prețuri corecte automat** pe fiecare categorie — zero erori manuale.
 - **Control total al directorului de vânzări** asupra prețului, fără să blocheze viteza echipei.
@@ -85,12 +99,13 @@ Astfel, recomandarea e mereu corectă agronomic **și** corectă comercial, făr
 
 ---
 
-## 6. Ce ne trebuie ca să implementăm
+## 7. Ce ne trebuie ca să implementăm
 
 1. Cele trei **liste de preț** (Retail / Fermier / Angro) și cum se stabilesc azi.
 2. Cum se **clasifică** un client într-un nivel (criterii) și cine decide.
 3. Regulile de **discount** permise (dacă există) și pragul de la care e nevoie de director.
 4. Confirmarea fluxului de **aprobare** dorit de directorul de vânzări (cum vrea să primească și să aprobe cererile).
+5. Detalii despre **platforma magazinului online** (cum se gestionează azi prețurile și logarea clienților), ca să sincronizăm aceeași politică de preț și acolo.
 
 ---
 
