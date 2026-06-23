@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birovits — Demo automatizare AI</title>
+<style>
+  :root{--green:#1565c0;--green-d:#0d47a1;--green-l:#e3f2fd;--ink:#1f2733;--muted:#6b7280;--line:#e3e7ee;--accent:#f9a825}
+  *{box-sizing:border-box} html,body{margin:0;min-height:100%}
+  body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;background:linear-gradient(160deg,#eef1f6,#e3ecf7);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .wrap{width:100%;max-width:760px;text-align:center}
+  .logo{display:inline-flex;align-items:center;gap:13px;margin-bottom:8px}
+  .logo .mark{width:48px;height:48px}
+  .logo b{font-size:30px;font-weight:800;color:var(--green-d);letter-spacing:.2px}
+  .logo span{font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);display:block;text-align:left;margin-top:2px}
+  h1{font-size:22px;margin:10px 0 4px}
+  p.sub{color:var(--muted);margin:0 0 26px;font-size:14.5px}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:620px){.cards{grid-template-columns:1fr}}
+  a.card{display:block;text-decoration:none;color:inherit;background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px 22px;box-shadow:0 10px 30px rgba(13,71,161,.10);transition:transform .15s,box-shadow .15s}
+  a.card:hover{transform:translateY(-3px);box-shadow:0 16px 38px rgba(13,71,161,.16);border-color:var(--green)}
+  .ic{width:60px;height:60px;border-radius:16px;background:var(--green-l);display:grid;place-items:center;font-size:30px;margin:0 auto 14px}
+  a.card b{font-size:17px;display:block;margin-bottom:6px}
+  a.card span{color:var(--muted);font-size:13px;line-height:1.5;display:block}
+  a.card .go{display:inline-block;margin-top:14px;background:var(--green);color:#fff;border-radius:10px;padding:9px 18px;font-size:13px;font-weight:700}
+  .legal{margin-top:26px;color:var(--muted);font-size:11px;line-height:1.5}
+  .badge{background:var(--accent);color:#3a2c00;padding:2px 9px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#0d47a1"/><text x="24" y="34" text-anchor="middle" font-family="'Segoe UI',Arial,sans-serif" font-weight="800" font-size="30" fill="#fff">B</text></svg>
+    <div><b>Birovits</b><span>Birotică & papetărie · Moldova</span></div>
+  </div>
+  <h1>Demo automatizare AI <span class="badge">DEMO</span></h1>
+  <p class="sub">Panouri de management interactive. Alege ce vrei să vezi:</p>
+  <div class="cards">
+    <a class="card" href="demo-ceo/">
+      <div class="ic">📊</div>
+      <b>Panou Director General (CEO)</b>
+      <span>Vedere executivă pe toată compania: finanțe, vânzări, import, divizia promoțională (Rexuvit), risc — și ce s-ar automatiza pentru conducere.</span>
+      <span class="go">Deschide panoul →</span>
+    </a>
+    <a class="card" href="demo-director/">
+      <div class="ic">💼</div>
+      <b>Panou Director Vânzări</b>
+      <span>Compania pe magazine și departamente: angajați, sarcini, agenți B2B (clasament + comisioane) și ce s-ar automatiza.</span>
+      <span class="go">Deschide panoul →</span>
+    </a>
+  </div>
+  <p class="legal">© 2026 · Demo confidențial, realizat la comandă. Date ilustrative. Concept, design și implementare = proprietatea dezvoltatorului; reproducerea fără acord interzisă.</p>
+</div>
+</body>
+</html>
