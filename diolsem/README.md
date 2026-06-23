@@ -5,7 +5,8 @@ Materiale de pitch pentru **S.C. „DIOLSEM" S.R.L.** (cel mai mare magazin agri
 > Notă: aceste materiale sunt găzduite temporar în repo-ul `site-megaparc`, într-un folder dedicat, deoarece sesiunea curentă nu are permisiunea de a crea un repository nou. Pot fi mutate ușor într-un repo propriu `diolsem-ai-automatizare`.
 
 ## Conținut
-- [`STRATEGIE-AUTOMATIZARE-AI.md`](./STRATEGIE-AUTOMATIZARE-AI.md) — strategia completă: bot consultant agronom + automatizare pe **magazine / produse / clienți**, arhitectură, roadmap, KPI/ROI, riscuri.
+- [`AUTOMATIZARE-DEPARTAMENTE.md`](./AUTOMATIZARE-DEPARTAMENTE.md) — **automatizarea întregii companii**: departamentele Vânzări · Producere · Achiziții legate într-un singur sistem (cerere → producție → achiziție), cu copiloti AI pe fiecare echipă.
+- [`STRATEGIE-AUTOMATIZARE-AI.md`](./STRATEGIE-AUTOMATIZARE-AI.md) — partea de **front-office**: bot consultant agronom + automatizare pe magazine / produse / clienți, arhitectură, roadmap, KPI/ROI, riscuri.
 - [`REZUMAT-1-PAGINA.md`](./REZUMAT-1-PAGINA.md) — varianta scurtă, de o pagină, pentru prima întâlnire.
 - [`demo/index.html`](./demo/index.html) — **prototip demonstrativ funcțional** al botului (se deschide direct în browser, fără instalare).
 
