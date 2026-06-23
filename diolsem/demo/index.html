@@ -38,7 +38,7 @@
 
   .pitch{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px;border:1px solid var(--line)}
   .logo{display:flex;align-items:center;gap:12px}
-  .logo .mark{width:46px;height:46px;flex:0 0 46px}
+  .logo .mark{width:46px;height:46px;flex:0 0 46px;color:var(--green-d)}
   .logo .wm{line-height:1}
   .logo .wm b{font-size:25px;font-weight:800;color:var(--green-d);letter-spacing:.2px;display:block}
   .logo .wm span{font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
@@ -52,7 +52,7 @@
 
   .chat{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line);display:flex;flex-direction:column;height:700px;overflow:hidden}
   .chat-head{background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px}
-  .chat-head .mark{width:40px;height:40px;flex:0 0 40px;background:#fff;border-radius:10px;padding:4px}
+  .chat-head .mark{width:38px;height:38px;flex:0 0 38px;color:#fff}
   .chat-head .who{flex:1}
   .chat-head .who b{font-size:15px;display:block}
   .chat-head .who span{font-size:12px;opacity:.9;display:flex;align-items:center;gap:6px}
@@ -128,18 +128,18 @@
 </head>
 <body>
 <div class="wrap">
-  <p class="topnote"><b id="t-badge">DEMO</b> &nbsp;<span id="t-note">Prototip pentru pitch — logo de probă în identitatea Diolsem; în producție: logo oficial + LLM (Claude) + RAG pe catalogul real.</span></p>
+  <p class="topnote"><b id="t-badge">DEMO</b> &nbsp;<span id="t-note">Prototip pentru pitch cu logo-ul Diolsem; în producție: LLM (Claude) + RAG pe catalogul real.</span></p>
 
   <div class="layout">
     <section class="pitch">
       <div class="logo">
-        <svg class="mark" viewBox="0 0 48 48" aria-hidden="true">
-          <defs><linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#43a047"/><stop offset="1" stop-color="#1b5e20"/></linearGradient></defs>
-          <rect width="48" height="48" rx="12" fill="url(#lg1)"/>
-          <path d="M24 37 V21" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
-          <path d="M24 24 C24 16 31 12 38 12 C38 20 31 24 24 24 Z" fill="#fff"/>
-          <path d="M24 29 C24 23 18 20 11 20 C11 26 17 29 24 29 Z" fill="#c8e6c9"/>
-        </svg>
+        <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><g fill="currentColor">
+          <ellipse cx="24" cy="12.5" rx="6.4" ry="10.6"/>
+          <ellipse cx="24" cy="12.5" rx="6.4" ry="10.6" transform="rotate(72 24 24)"/>
+          <ellipse cx="24" cy="12.5" rx="6.4" ry="10.6" transform="rotate(144 24 24)"/>
+          <ellipse cx="24" cy="12.5" rx="6.4" ry="10.6" transform="rotate(216 24 24)"/>
+          <ellipse cx="24" cy="12.5" rx="6.4" ry="10.6" transform="rotate(288 24 24)"/>
+        </g></svg>
         <div class="wm"><b>Diolsem</b><span>Magazin agricol · Moldova</span></div>
       </div>
       <h1 id="p-h1">Bot complet pentru magazinul agricol</h1>
@@ -153,13 +153,13 @@
 
     <section class="chat">
       <div class="chat-head">
-        <svg class="mark" viewBox="0 0 48 48" aria-hidden="true">
-          <defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#43a047"/><stop offset="1" stop-color="#1b5e20"/></linearGradient></defs>
-          <rect width="48" height="48" rx="11" fill="url(#lg2)"/>
-          <path d="M24 37 V21" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
-          <path d="M24 24 C24 16 31 12 38 12 C38 20 31 24 24 24 Z" fill="#fff"/>
-          <path d="M24 29 C24 23 18 20 11 20 C11 26 17 29 24 29 Z" fill="#c8e6c9"/>
-        </svg>
+        <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><g fill="currentColor">
+          <ellipse cx="24" cy="12.5" rx="6.4" ry="10.6"/>
+          <ellipse cx="24" cy="12.5" rx="6.4" ry="10.6" transform="rotate(72 24 24)"/>
+          <ellipse cx="24" cy="12.5" rx="6.4" ry="10.6" transform="rotate(144 24 24)"/>
+          <ellipse cx="24" cy="12.5" rx="6.4" ry="10.6" transform="rotate(216 24 24)"/>
+          <ellipse cx="24" cy="12.5" rx="6.4" ry="10.6" transform="rotate(288 24 24)"/>
+        </g></svg>
         <div class="who"><b id="c-name">Diolsem · Asistent</b><span><i class="dot"></i> <span id="c-status">online · răspunde instant</span></span></div>
         <div class="cart">🛒<span class="badge" id="cart-badge">0</span></div>
         <div class="lang"><button data-l="ro" class="on">RO</button><button data-l="ru">RU</button></div>
@@ -246,14 +246,14 @@ const CATS = {
 const T = {
   ro:{
     placeholder:"Scrie un mesaj…", name:"Diolsem · Asistent", status:"online · răspunde instant",
-    badge:"DEMO", tnote:"Prototip pentru pitch — logo de probă în identitatea Diolsem; în producție: logo oficial + LLM (Claude) + RAG pe catalogul real.",
+    badge:"DEMO", tnote:"Prototip pentru pitch cu logo-ul Diolsem; în producție: LLM (Claude) + RAG pe catalogul real.",
     h1:"Bot complet pentru magazinul agricol",
     lead:"Cu meniu principal ca orice bot serios: catalog, comenzi, oferte, livrare, contact — plus un consultant agronom care alege varianta optimă pentru zona clientului.",
     f1b:"Meniu principal", f1s:"Catalog · Agronom · Comenzile mele · Oferte · Livrare · Contact — totul la un clic.",
     f2b:"Consultant agronom climatic", f2s:"Recomandă varianta optimă după regiune (Nord/Centru/Sud) și sezon.",
     f3b:"Comenzi & oferte în fișa ta", f3s:"Vezi comenzile și ofertele cu statusul plății — confirmare automată a achitării.",
     f4b:"Preț pe nivel, blocat", f4s:"Retail/Fermier/Angro automat. Prețul îl modifică doar directorul de vânzări.",
-    foot:"Demo cu eșantion de catalog și logică simulată. Logo de probă în identitatea Diolsem — se înlocuiește cu cel oficial. În producție răspunsurile sunt ancorate în datele oficiale Diolsem.",
+    foot:"Demo cu eșantion de catalog și logică simulată, cu logo-ul Diolsem (reprodus SVG). În producție răspunsurile sunt ancorate în datele oficiale Diolsem.",
     lblClient:"Client:", lblZone:"Zonă:", lockTxt:"preț fixat",
     greet:"Bună ziua! 👋 Sunt asistentul Diolsem. Te pot ajuta cu catalogul, comenzile, ofertele și sfaturi de agronom. Alege din meniu 👇",
     menuTitle:"Meniu principal:",
@@ -297,14 +297,14 @@ const T = {
   },
   ru:{
     placeholder:"Напишите сообщение…", name:"Diolsem · Ассистент", status:"онлайн · отвечает сразу",
-    badge:"ДЕМО", tnote:"Прототип для презентации — пробный логотип в стиле Diolsem; в продакшене: официальный логотип + LLM (Claude) + RAG по каталогу.",
+    badge:"ДЕМО", tnote:"Прототип для презентации с логотипом Diolsem; в продакшене: LLM (Claude) + RAG по каталогу.",
     h1:"Полноценный бот агромагазина",
     lead:"С главным меню, как у любого серьёзного бота: каталог, заказы, предложения, доставка, контакты — плюс агроном, который выбирает оптимальный вариант для зоны клиента.",
     f1b:"Главное меню", f1s:"Каталог · Агроном · Мои заказы · Предложения · Доставка · Контакты — в один клик.",
     f2b:"Агроном с учётом климата", f2s:"Рекомендует оптимум по региону (Север/Центр/Юг) и сезону.",
     f3b:"Заказы и предложения в вашей карточке", f3s:"Заказы и предложения со статусом оплаты — автоподтверждение оплаты.",
     f4b:"Цена по уровню, без правки", f4s:"Retail/Fermier/Angro автоматически. Цену меняет только директор по продажам.",
-    foot:"Демо с образцом каталога и имитацией логики. Пробный логотип в стиле Diolsem — заменяется официальным. В продакшене ответы строго по данным Diolsem.",
+    foot:"Демо с образцом каталога и имитацией логики, с логотипом Diolsem (воспроизведён в SVG). В продакшене ответы строго по данным Diolsem.",
     lblClient:"Клиент:", lblZone:"Зона:", lockTxt:"цена фикс.",
     greet:"Здравствуйте! 👋 Я ассистент Diolsem. Помогу с каталогом, заказами, предложениями и советами агронома. Выберите в меню 👇",
     menuTitle:"Главное меню:",
