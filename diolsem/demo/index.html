@@ -33,6 +33,7 @@
   .wrap{width:100%;max-width:1060px}
   .topnote{text-align:center;margin:0 0 16px;color:var(--green-d);font-size:13px}
   .topnote b{background:var(--accent);color:#3a2c00;padding:2px 8px;border-radius:999px;font-size:11px;letter-spacing:.5px}
+  .legal{text-align:center;margin:16px auto 0;max-width:760px;color:var(--muted);font-size:11px;line-height:1.5}
   .layout{display:grid;grid-template-columns:1.02fr .98fr;gap:22px;align-items:start}
   @media(max-width:900px){.layout{grid-template-columns:1fr}}
 
@@ -192,6 +193,7 @@
       </div>
     </section>
   </div>
+  <p class="legal" id="legal"></p>
 </div>
 
 <script>
@@ -343,6 +345,7 @@ const T = {
     f4b:"Preț pe nivel, blocat", f4s:"Retail/Fermier/Angro automat. Prețul îl modifică doar directorul de vânzări.",
     foot:"Demo cu eșantion de catalog și logică simulată, cu logo-ul Diolsem (reprodus SVG). În producție răspunsurile sunt ancorate în datele oficiale Diolsem.",
     lblClient:"Client:", lblZone:"Zonă:", lockTxt:"preț fixat",
+    legal:"© 2026 · Demo confidențial, realizat la comandă. Concept, design și implementare sunt proprietatea dezvoltatorului. Reproducerea, copierea sau reutilizarea fără acord scris sunt interzise.",
     greet:"Bună ziua! 👋 Sunt asistentul Diolsem. Te pot ajuta cu catalogul, comenzile, ofertele și sfaturi de agronom. Alege din meniu 👇",
     menuTitle:"Meniu principal:",
     mCatalog:"Catalog produse", mAgronom:"Consultant agronom", mOrders:"Comenzile mele",
@@ -399,6 +402,7 @@ const T = {
     f4b:"Цена по уровню, без правки", f4s:"Retail/Fermier/Angro автоматически. Цену меняет только директор по продажам.",
     foot:"Демо с образцом каталога и имитацией логики, с логотипом Diolsem (воспроизведён в SVG). В продакшене ответы строго по данным Diolsem.",
     lblClient:"Клиент:", lblZone:"Зона:", lockTxt:"цена фикс.",
+    legal:"© 2026 · Конфиденциальное демо, разработанное на заказ. Концепция, дизайн и реализация являются собственностью разработчика. Копирование или повторное использование без письменного согласия запрещены.",
     greet:"Здравствуйте! 👋 Я ассистент Diolsem. Помогу с каталогом, заказами, предложениями и советами агронома. Выберите в меню 👇",
     menuTitle:"Главное меню:",
     mCatalog:"Каталог товаров", mAgronom:"Агроном-консультант", mOrders:"Мои заказы",
@@ -643,6 +647,7 @@ function applyLang(){
   $('#f4b').textContent=tr.f4b; $('#f4s').textContent=tr.f4s;
   $('#p-foot').textContent=tr.foot;
   $('#lbl-client').textContent=tr.lblClient; $('#lbl-zone').textContent=tr.lblZone; $('#lock-txt').textContent=tr.lockTxt;
+  $('#legal').textContent=tr.legal;
 }
 document.querySelectorAll('.lang button').forEach(b=>{b.onclick=()=>{document.querySelectorAll('.lang button').forEach(x=>x.classList.remove('on'));b.classList.add('on');lang=b.dataset.l;pendingDose=null;applyLang();msgs.innerHTML='';boot();};});
 
