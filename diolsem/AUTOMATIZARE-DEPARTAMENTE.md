@@ -2,20 +2,20 @@
 
 **Client:** S.C. „DIOLSEM" S.R.L. — **producător** autohton de îngrășăminte și produse de protecție a plantelor + cel mai mare magazin agricol din Moldova
 **Scop:** harta completă de automatizare a companiei, nu doar a vânzării online — front-office (clienți) + back-office (cele 3 departamente) ca **un singur sistem**
-**Document complementar:** `STRATEGIE-AUTOMATIZARE-AI.md` (botul de clienți), `REZUMAT-1-PAGINA.md`
+**Document complementar:** `STRATEGIE-AUTOMATIZARE-AI.md` (sistemul automatizat de clienți), `REZUMAT-1-PAGINA.md`
 **Versiune:** 1.0 · iunie 2026
 
 ---
 
 ## 1. Schimbarea de perspectivă
 
-Botul pentru clienți (vezi documentul precedent) rezolvă **front-office-ul**. Dar Diolsem are un avantaj de producător: valoarea reală apare când legăm **cererea** (clienți + vânzări) de **producție** și de **achiziții** într-un singur flux.
+Sistemul automatizat pentru clienți (vezi documentul precedent) rezolvă **front-office-ul**. Dar Diolsem are un avantaj de producător: valoarea reală apare când legăm **cererea** (clienți + vânzări) de **producție** și de **achiziții** într-un singur flux.
 
-Trecem de la „un bot" la un **sistem nervos digital al companiei**: un strat comun de date peste care lucrează câte un **copilot AI** în fiecare departament. Fiecare departament rămâne stăpân pe munca lui, dar nu mai re-introduce date manual și nu mai ia decizii „pe orb".
+Trecem de la „un sistem automatizat" la un **sistem nervos digital al companiei**: un strat comun de date peste care lucrează câte un **copilot AI** în fiecare departament. Fiecare departament rămâne stăpân pe munca lui, dar nu mai re-introduce date manual și nu mai ia decizii „pe orb".
 
 ```
         ┌──────────────── SEMNAL DE CERERE ────────────────┐
-        │  Clienți (bot, site, magazin) → Vânzări          │
+        │  Clienți (sistem automatizat, site, magazin) → Vânzări          │
         ▼                                                   │
    ┌──────────┐      ce se vinde       ┌──────────┐         │
    │ VÂNZĂRI  │ ───── trage ─────────► │ PRODUCERE│         │
@@ -47,7 +47,7 @@ Diolsem vinde pe mai multe canale: **B2B** (fermieri mari, distribuitori agro), 
 | Funcție | Ce automatizăm | Unde intră AI |
 |---|---|---|
 | **Generator de oferte B2B** | ofertă/proformă în secunde din catalog, cu preț pe client și disponibilitate | AI compune oferta, sugerează produse asociate și discountul optim pe baza istoricului |
-| **Captură comenzi omnicanal** | comenzile din bot/telefon/WhatsApp/email intră automat în sistem | AI citește comanda din text/voce și o structurează (produs, cantitate, client) |
+| **Captură comenzi omnicanal** | comenzile din sistem automatizat/telefon/WhatsApp/email intră automat în sistem | AI citește comanda din text/voce și o structurează (produs, cantitate, client) |
 | **CRM viu** | fișa fiecărui client: istoric, culturi, sezon, sold | AI rezumă „unde am rămas cu clientul X" și ce să-i propun acum |
 | **Copilot pentru reprezentanți** | app pe teren: stoc/preț/istoric instant | AI: „la ferma asta, anul trecut a luat erbicid X în mai — sună-l acum" |
 | **Prognoză de vânzări** | pe produs/sezon/regiune | AI prezice cererea → alimentează direct Producția și Achizițiile |
@@ -116,7 +116,7 @@ Rupturi de stoc în sezon · zile de stoc · cost mediu de achiziție · % comen
 Departamentele se automatizează cu adevărat doar dacă vorbesc între ele. Componente:
 
 1. **Sursa unică de adevăr (ERP/bază de date).** Catalog, stoc, comenzi, loturi, clienți, furnizori — un singur loc. Dacă Diolsem folosește deja un sistem (ex. 1C, foarte comun în regiune), construim **peste** el, nu îl înlocuim.
-2. **Strat de integrare.** Conectează ERP ↔ site/e-commerce ↔ marketplace-uri ↔ bot ↔ canale (WhatsApp/Viber). Datele curg automat.
+2. **Strat de integrare.** Conectează ERP ↔ site/e-commerce ↔ marketplace-uri ↔ sistem automatizat ↔ canale (WhatsApp/Viber). Datele curg automat.
 3. **Orchestrator AI + copiloti.** Modelele Claude pun „inteligența" deasupra: rezumă, prezic, propun, redactează, extrag din documente. Câte un copilot per departament, plus agentul care leagă lanțul cerere→producție→achiziție.
 4. **Tablou de bord pentru conducere.** O privire: ce se vinde, ce se produce, ce trebuie cumpărat, unde e riscul. Rapoarte generate de AI în limbaj natural.
 
@@ -159,7 +159,7 @@ Fiecare echipă primește un asistent care „știe" contextul ei și lucrează 
 
 | Etapă | Departament(e) | Livrabil | De ce întâi |
 |---|---|---|---|
-| **Q-win 1** | Vânzări + Clienți | Bot clienți + generator oferte + captură comenzi | venit imediat, vizibil |
+| **Q-win 1** | Vânzări + Clienți | Sistem automatizat clienți + generator oferte + captură comenzi | venit imediat, vizibil |
 | **Q-win 2** | Achiziții | Procesare automată facturi/documente + alerte stoc | scapă de muncă manuală, fără risc mare |
 | **Core 1** | toate | Strat de date comun + integrare ERP/site/marketplace | fundația tuturor |
 | **Core 2** | Vânzări→Producere | Prognoză vânzări → plan de producție | cel mai mare câștig de profit |
@@ -199,8 +199,8 @@ Rezultatul: o **hartă a fluxurilor + plan prioritizat** cu efort/impact pentru 
 
 ## 10. Pasul următor
 
-Un **workshop de descoperire pe departamente** (o jumătate de zi, împărțit pe cele 3 echipe) + livrarea hărții de automatizare cu roadmap și estimări. În paralel, quick-win-ul de Vânzări (botul + generatorul de oferte) poate porni imediat, ca să se vadă valoare concretă cât construim fundația.
+Un **workshop de descoperire pe departamente** (o jumătate de zi, împărțit pe cele 3 echipe) + livrarea hărții de automatizare cu roadmap și estimări. În paralel, quick-win-ul de Vânzări (sistemul automatizat + generatorul de oferte) poate porni imediat, ca să se vadă valoare concretă cât construim fundația.
 
 ---
 
-*Acest document extinde propunerea de la botul de clienți la automatizarea întregii companii. Cifrele și fluxurile se confirmă în faza de descoperire, pe procesele reale Diolsem.*
+*Acest document extinde propunerea de la sistemul automatizat de clienți la automatizarea întregii companii. Cifrele și fluxurile se confirmă în faza de descoperire, pe procesele reale Diolsem.*

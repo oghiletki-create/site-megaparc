@@ -3,7 +3,7 @@
 ### Retail · Fermier · Angro — cu regula: prețul îl poate modifica doar directorul de vânzări
 
 **Pentru:** S.C. „DIOLSEM" S.R.L.
-**Complementar:** `AUTOMATIZARE-DEPARTAMENTE.md` (Vânzări), `CONTABILITATE-OFERTE-INCASARI.md`, `BOT-INTELIGENTA-AGRONOMICA.md`
+**Complementar:** `AUTOMATIZARE-DEPARTAMENTE.md` (Vânzări), `CONTABILITATE-OFERTE-INCASARI.md`, `INTELIGENTA-AGRONOMICA.md`
 **Versiune:** 1.0 · iunie 2026
 
 ---
@@ -19,7 +19,7 @@ Diolsem vinde aceluiași catalog de produse la categorii diferite de clienți, c
 | **Angro** | distribuitori, revânzători, volume mari | cel mai bun preț, pe volum |
 
 Fiecare client din sistem are atașat **nivelul lui**, iar prețul corect se aplică **automat** peste tot:
-- în **bot** (clientul identificat vede prețul categoriei lui),
+- în **sistem automatizat** (clientul identificat vede prețul categoriei lui),
 - în **ofertele** generate de Vânzări,
 - în **proformele și facturile** din Contabilitate,
 - în **magazinul online** (după autentificare/identificare).
@@ -35,7 +35,7 @@ Fiecare client din sistem are atașat **nivelul lui**, iar prețul corect se apl
 Sistemul aplică această regulă **tehnic**, nu doar pe hârtie:
 
 - Listele de preț (Retail / Fermier / Angro) și orice **modificare de preț** sau **discount special** sunt **blocate** pentru:
-  - bot,
+  - sistem automatizat,
   - reprezentanții de vânzări,
   - personalul de magazin,
   - contabilitate.
@@ -53,13 +53,13 @@ Sistemul aplică această regulă **tehnic**, nu doar pe hârtie:
 
 - Fiecare modificare de preț e **jurnalizată** (cine a cerut, cine a aprobat, când, pentru ce client) → transparență totală și control.
 
-**Rolul AI-ului aici:** botul și copiloții **respectă** regula — pot calcula, propune produse și întocmi oferte, dar **nu pot modifica prețul**. Cel mult, copilotul Vânzări poate *pregăti* o cerere de preț special către director, cu o justificare (volum, istoric, concurență) — decizia rămâne a omului.
+**Rolul AI-ului aici:** sistemul automatizat și copiloții **respectă** regula — pot calcula, propune produse și întocmi oferte, dar **nu pot modifica prețul**. Cel mult, copilotul Vânzări poate *pregăti* o cerere de preț special către director, cu o justificare (volum, istoric, concurență) — decizia rămâne a omului.
 
 ---
 
-## 3. Cum se leagă de bot și de inteligența agronomică
+## 3. Cum se leagă de sistem automatizat și de inteligența agronomică
 
-Botul recomandă **varianta optimă** agronomic (vezi `BOT-INTELIGENTA-AGRONOMICA.md`) și afișează prețul **conform nivelului clientului**:
+Sistemul automatizat recomandă **varianta optimă** agronomic (vezi `INTELIGENTA-AGRONOMICA.md`) și afișează prețul **conform nivelului clientului**:
 - client **Retail** neidentificat → preț de listă;
 - client **Fermier/Angro** identificat (cont/telefon) → prețul categoriei lui.
 
@@ -95,7 +95,7 @@ Diolsem are și **magazin online** (diolsem.md). Online-ul **nu** are prețuri p
 - **Prețuri corecte automat** pe fiecare categorie — zero erori manuale.
 - **Control total al directorului de vânzări** asupra prețului, fără să blocheze viteza echipei.
 - **Trasabilitate**: orice excepție de preț e justificată și jurnalizată.
-- **Coerență** între bot, oferte, magazin și contabilitate — același preț peste tot.
+- **Coerență** între sistem automatizat, oferte, magazin și contabilitate — același preț peste tot.
 
 ---
 

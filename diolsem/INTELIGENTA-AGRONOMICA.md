@@ -1,4 +1,4 @@
-# Diolsem — Inteligența agronomică a botului + conștiență climatică + produse de import
+# Diolsem — Inteligența agronomică a sistemului automatizat + conștiență climatică + produse de import
 
 **Pentru:** S.C. „DIOLSEM" S.R.L.
 **Complementar:** `STRATEGIE-AUTOMATIZARE-AI.md`, `PROPUNERE-DIOLSEM.md`
@@ -8,18 +8,18 @@
 
 ## 1. Obiectiv
 
-Botul nu trebuie să fie un simplu „motor de căutare în catalog", ci un **agronom digital** care:
+Sistemul automatizat nu trebuie să fie un simplu „motor de căutare în catalog", ci un **agronom digital** care:
 1. **înțelege zona climaterică** în care se află clientul (Republica Moldova, pe regiuni),
 2. ține cont de **cultură, sol, sezon, fază de vegetație și problemă**,
 3. recomandă **varianta optimă** din lista de produse Diolsem — inclusiv din **produsele de import** — nu prima care se potrivește.
 
-Pe scurt: din mai multe produse care „merg", botul îl alege pe **cel mai bun pentru situația concretă a clientului**.
+Pe scurt: din mai multe produse care „merg", sistemul automatizat îl alege pe **cel mai bun pentru situația concretă a clientului**.
 
 ---
 
 ## 2. Conștiența climatică — Republica Moldova
 
-Botul lucrează cu un **profil agro-climatic** al țării, pe regiuni:
+Sistemul automatizat lucrează cu un **profil agro-climatic** al țării, pe regiuni:
 
 | Regiune | Specific climatic | Culturi dominante | Riscuri agronomice |
 |---|---|---|---|
@@ -36,9 +36,9 @@ Elemente pe care le ia în calcul:
 
 ---
 
-## 3. Cum alege botul „varianta optimă"
+## 3. Cum alege sistemul automatizat „varianta optimă"
 
-Când mai multe produse din catalog rezolvă aceeași problemă, botul le **ierarhizează** după criterii agronomice reale, nu la întâmplare:
+Când mai multe produse din catalog rezolvă aceeași problemă, sistemul automatizat le **ierarhizează** după criterii agronomice reale, nu la întâmplare:
 
 ```
 Problemă + cultură + regiune + sezon + suprafață
@@ -63,11 +63,11 @@ Problemă + cultură + regiune + sezon + suprafață
 Exemplu de răspuns:
 > „Pentru mana la viță în zona Centru (umed), recomand **Produsul A** — rezistent la spălare de ploaie și omologat pe viță. Alternativă: **Produsul B** (mai ieftin, dar de reaplicat după ploaie). Pentru a evita rezistența, alternează cu o grupă diferită la tratamentul următor."
 
-**Important — managementul rezistenței:** botul nu recomandă mereu același produs; ține cont de **rotația substanțelor active** (grupe FRAC pentru fungicide / IRAC pentru insecticide), ca tratamentele să rămână eficiente în timp. E un sfat de agronom adevărat, nu de vânzător.
+**Important — managementul rezistenței:** sistemul automatizat nu recomandă mereu același produs; ține cont de **rotația substanțelor active** (grupe FRAC pentru fungicide / IRAC pentru insecticide), ca tratamentele să rămână eficiente în timp. E un sfat de agronom adevărat, nu de vânzător.
 
 ---
 
-## 4. De unde „știe" botul (surse, fără halucinații)
+## 4. De unde „știe" sistemul automatizat (surse, fără halucinații)
 
 Cunoștințele de agronom sunt **ancorate în date oficiale**, nu inventate:
 - **Fișele tehnice / etichetele** produselor Diolsem (omologare, culturi, ținte, doze, perioadă de pauză, grupă de rezistență).
@@ -81,17 +81,17 @@ La orice dubiu sau situație neomologată → **escaladare la agronomul Diolsem*
 
 ## 5. Produse de import — tratare specială
 
-Diolsem comercializează și **produse de import**, nu doar producție proprie. Botul și sistemul le tratează corect:
+Diolsem comercializează și **produse de import**, nu doar producție proprie. Sistemul automatizat și sistemul le tratează corect:
 
 | Aspect | Cum îl gestionăm |
 |---|---|
 | **Origine** | fiecare produs e marcat „autohton (Diolsem)" sau „import" + țara |
-| **Omologare în Moldova** | botul recomandă din import **doar** produse omologate local pentru cultura cerută |
-| **Disponibilitate** | „în stoc acum" vs. „import, termen ~X" — botul spune clar, ca să propună o alternativă în stoc dacă clientul se grăbește |
+| **Omologare în Moldova** | sistemul automatizat recomandă din import **doar** produse omologate local pentru cultura cerută |
+| **Disponibilitate** | „în stoc acum" vs. „import, termen ~X" — sistemul automatizat spune clar, ca să propună o alternativă în stoc dacă clientul se grăbește |
 | **Preț & curs valutar** | prețul de import depinde de cursul valutar → legătură cu Achiziții și Contabilitate (vezi documentele respective) |
 | **Reaprovizionare** | termenele lungi de import intră în reaprovizionarea predictivă (comandă din timp pentru sezon) |
 
-> Astfel, dacă produsul optim e din import și are termen de livrare, botul propune fie să-l rezerve, fie o alternativă echivalentă din stoc — în funcție de urgența clientului.
+> Astfel, dacă produsul optim e din import și are termen de livrare, sistemul automatizat propune fie să-l rezerve, fie o alternativă echivalentă din stoc — în funcție de urgența clientului.
 
 ---
 
@@ -120,4 +120,4 @@ Recomandarea optimă ține cont și de **nivelul de preț al clientului** (Retai
 
 ---
 
-*Cunoștințele agronomice sunt ancorate în datele oficiale Diolsem și validate cu un agronom al companiei; pe situații neomologate sau incerte, botul escaladează la om. Profilul climatic se rafinează în faza de descoperire.*
+*Cunoștințele agronomice sunt ancorate în datele oficiale Diolsem și validate cu un agronom al companiei; pe situații neomologate sau incerte, sistemul automatizat escaladează la om. Profilul climatic se rafinează în faza de descoperire.*

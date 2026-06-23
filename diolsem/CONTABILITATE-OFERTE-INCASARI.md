@@ -28,7 +28,7 @@ Fiecare client (fermier, distribuitor, gospodărie) are o **fișă** în care se
 - **Proformele și facturile** emise.
 - **Plățile** (avansuri, plăți parțiale, achitări integrale) și **soldul** curent.
 - **Comenzile și livrările** legate de fiecare ofertă.
-- **Istoricul** discuțiilor (inclusiv din botul de clienți) și culturile/sezonul clientului.
+- **Istoricul** discuțiilor (inclusiv din sistemul automatizat de clienți) și culturile/sezonul clientului.
 
 > Reprezentantul de vânzări sau contabilul deschide o singură fișă și vede instant: ce i-am oferit, ce a acceptat, ce a plătit, ce mai datorează, ce s-a livrat.
 
@@ -125,7 +125,7 @@ Un asistent care lucrează în limbaj natural (RO/RU) pentru echipa financiară:
 Acest flux este „nodul financiar" al sistemului nervos digital:
 
 ```
-  Bot/Clienți → VÂNZĂRI → [OFERTĂ] → CONTABILITATE → [ACHITARE CONFIRMATĂ]
+  Sistem automatizat/Clienți → VÂNZĂRI → [OFERTĂ] → CONTABILITATE → [ACHITARE CONFIRMATĂ]
                                                               │
                                   ┌───────────────────────────┘
                                   ▼
