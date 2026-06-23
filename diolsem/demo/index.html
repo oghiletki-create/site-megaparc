@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diolsem — Bot magazin agricol (demo)</title>
+<title>Diolsem — Sistem automatizat magazin agricol (demo)</title>
 <!--
   PROTOTIP DEMONSTRATIV pentru pitch — Diolsem.md
   ---------------------------------------------------------------
-  Bot complet, cu MENIU PRINCIPAL (nu doar consultant agronom):
+  Sistem automatizat complet, cu MENIU PRINCIPAL (nu doar consultant agronom):
    • Catalog pe categorii   • Consultant agronom (climă + variantă optimă)
    • Comenzile mele         • Ofertele mele (fișa clientului, status plată)
    • Livrare & plată        • Contact & program
@@ -143,8 +143,8 @@
         </g></svg>
         <div class="wm"><b>Diolsem</b><span>Magazin agricol · Moldova</span></div>
       </div>
-      <h1 id="p-h1">Bot complet pentru magazinul agricol</h1>
-      <p class="lead" id="p-lead">Cu meniu principal ca orice bot serios: catalog, comenzi, oferte, livrare, contact — plus un consultant agronom care alege varianta optimă pentru zona clientului.</p>
+      <h1 id="p-h1">Sistem automatizat complet pentru magazinul agricol</h1>
+      <p class="lead" id="p-lead">Cu meniu principal ca orice sistem serios: catalog, comenzi, oferte, livrare, contact — plus un consultant agronom care alege varianta optimă pentru zona clientului.</p>
       <div class="feat"><div class="ic">🧭</div><div><b id="f1b">Meniu principal</b><span id="f1s">Catalog · Agronom · Comenzile mele · Oferte · Livrare · Contact — totul la un clic.</span></div></div>
       <div class="feat"><div class="ic">🌍</div><div><b id="f2b">Consultant agronom climatic</b><span id="f2s">Recomandă varianta optimă după regiune (Nord/Centru/Sud) și sezon.</span></div></div>
       <div class="feat"><div class="ic">📄</div><div><b id="f3b">Comenzi & oferte în fișa ta</b><span id="f3s">Vezi comenzile și ofertele cu statusul plății — confirmare automată a achitării.</span></div></div>
@@ -337,8 +337,8 @@ const T = {
   ro:{
     placeholder:"Scrie un mesaj…", name:"Diolsem · Asistent", status:"online · răspunde instant",
     badge:"DEMO", tnote:"Prototip pentru pitch cu logo-ul Diolsem; în producție: LLM (Claude) + RAG pe catalogul real.",
-    h1:"Bot complet pentru magazinul agricol",
-    lead:"Cu meniu principal ca orice bot serios: catalog, comenzi, oferte, livrare, contact — plus un consultant agronom care alege varianta optimă pentru zona clientului.",
+    h1:"Sistem automatizat complet pentru magazinul agricol",
+    lead:"Cu meniu principal ca orice sistem serios: catalog, comenzi, oferte, livrare, contact — plus un consultant agronom care alege varianta optimă pentru zona clientului.",
     f1b:"Meniu principal", f1s:"Catalog · Agronom · Comenzile mele · Oferte · Livrare · Contact — totul la un clic.",
     f2b:"Consultant agronom climatic", f2s:"Recomandă varianta optimă după regiune (Nord/Centru/Sud) și sezon.",
     f3b:"Comenzi & oferte în fișa ta", f3s:"Vezi comenzile și ofertele cu statusul plății — confirmare automată a achitării.",
@@ -351,7 +351,7 @@ const T = {
     mCatalog:"Catalog produse", mAgronom:"Consultant agronom", mOrders:"Comenzile mele",
     mOffers:"Ofertele mele", mDelivery:"Livrare & plată", mContact:"Contact & program", mMenu:"Meniu",
     mFeedback:"Idei / ce mai dorești?",
-    fbPrompt:"Acesta e un demo 🙂 Spune-mi ce ți-ar plăcea să mai poată face botul (ex. integrare cu 1C, plată online, fișa fermierului, comenzi repetate…) și transmit echipei.",
+    fbPrompt:"Acesta e un demo 🙂 Spune-mi ce ți-ar plăcea să mai poată face sistemul automatizat (ex. integrare cu 1C, plată online, fișa fermierului, comenzi repetate…) și transmit echipei.",
     fbThanks:"Mulțumim! 🌱 Am notat ideea ta. O poți trimite și echipei printr-un clic:",
     fbSend:"✉️ Trimite ideea echipei",
     catTitle:"Alege o categorie:", backMenu:"⬅ Meniu principal",
@@ -395,7 +395,7 @@ const T = {
     placeholder:"Напишите сообщение…", name:"Diolsem · Ассистент", status:"онлайн · отвечает сразу",
     badge:"ДЕМО", tnote:"Прототип для презентации с логотипом Diolsem; в продакшене: LLM (Claude) + RAG по каталогу.",
     h1:"Полноценный бот агромагазина",
-    lead:"С главным меню, как у любого серьёзного бота: каталог, заказы, предложения, доставка, контакты — плюс агроном, который выбирает оптимальный вариант для зоны клиента.",
+    lead:"С главным меню, как у любой серьёзной системы: каталог, заказы, предложения, доставка, контакты — плюс агроном, который выбирает оптимальный вариант для зоны клиента.",
     f1b:"Главное меню", f1s:"Каталог · Агроном · Мои заказы · Предложения · Доставка · Контакты — в один клик.",
     f2b:"Агроном с учётом климата", f2s:"Рекомендует оптимум по региону (Север/Центр/Юг) и сезону.",
     f3b:"Заказы и предложения в вашей карточке", f3s:"Заказы и предложения со статусом оплаты — автоподтверждение оплаты.",
@@ -408,7 +408,7 @@ const T = {
     mCatalog:"Каталог товаров", mAgronom:"Агроном-консультант", mOrders:"Мои заказы",
     mOffers:"Мои предложения", mDelivery:"Доставка и оплата", mContact:"Контакты и режим", mMenu:"Меню",
     mFeedback:"Идеи / что добавить?",
-    fbPrompt:"Это демо 🙂 Напишите, что бы вы хотели, чтобы бот ещё умел (например интеграция с 1С, онлайн-оплата, карточка фермера, повторные заказы…) — передам команде.",
+    fbPrompt:"Это демо 🙂 Напишите, что бы вы хотели, чтобы система ещё умела (например интеграция с 1С, онлайн-оплата, карточка фермера, повторные заказы…) — передам команде.",
     fbThanks:"Спасибо! 🌱 Записал вашу идею. Можно отправить её команде в один клик:",
     fbSend:"✉️ Отправить идею команде",
     catTitle:"Выберите категорию:", backMenu:"⬅ Главное меню",
@@ -531,7 +531,7 @@ async function feedbackFlow(){ chipsEl.innerHTML=''; pendingFeedback=true; await
 window.feedbackFlow=feedbackFlow;
 async function sendFeedback(text){
   const tr=T[lang];
-  const href="mailto:oghiletki@gmail.com?subject="+encodeURIComponent("Idee pentru botul Diolsem")+"&body="+encodeURIComponent(text);
+  const href="mailto:oghiletki@gmail.com?subject="+encodeURIComponent("Idee pentru sistemul automatizat Diolsem")+"&body="+encodeURIComponent(text);
   const link=`<div class="menu single"><a href="${href}" style="display:flex;align-items:center;gap:8px;border:1px solid var(--green);background:var(--green-l);border-radius:10px;padding:9px 11px;font-size:12.5px;font-weight:600;color:var(--green-d);text-decoration:none"><span class="mi">✉️</span>${tr.fbSend}</a></div>`;
   await bot(tr.fbThanks+link+backBtn());
 }
