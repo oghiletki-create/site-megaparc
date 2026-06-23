@@ -54,21 +54,21 @@ Datele se introduc **o singură dată** și circulă automat. Fiecare departamen
 
 ## 4. Ce automatizăm — pe scurt, pe cele patru zone
 
-### 🛒 Clienți (front-office)
-Bot consultant agronom, 24/7, RO/RU, pe site + WhatsApp/Viber/Telegram/Messenger: diagnostichează problema, recomandă produsul omologat, calculează doza pe suprafață, face cross-sell corect și plasează comanda. *Există deja un prototip funcțional demonstrativ.*
-> **Beneficiu:** mai puține întrebări manuale, conversie mai mare, comandă medie mai mare.
+### 🛒 Clienți (front-office) — bot cu inteligență de agronom
+Bot consultant agronom, 24/7, RO/RU, pe site + WhatsApp/Viber/Telegram/Messenger. Nu doar caută în catalog: **înțelege zona climaterică a Moldovei** (Nord/Centru/Sud, sol, sezon, riscuri) și recomandă **varianta optimă** din listă pentru cultura, problema și regiunea clientului — inclusiv din **produsele de import** (cu origine, omologare și termen de livrare). Calculează doza, face cross-sell corect, ține cont de rotația anti-rezistență și plasează comanda. Afișează prețul **conform nivelului clientului** (Retail / Fermier / Angro). *Există deja un prototip funcțional demonstrativ.*
+> **Beneficiu:** recomandări de nivel de agronom, diferențiere reală, conversie și comandă medie mai mari.
 
 ### 💼 Vânzări
-Generator de oferte B2B în secunde, captură automată a comenzilor din orice canal, CRM viu cu istoricul fiecărui client, app pentru reprezentanții de pe teren și prognoză de vânzări care alimentează producția.
-> **Beneficiu:** ofertă în minute, nu ore; vânzare proactivă, nu reactivă.
+Generator de oferte B2B în secunde, captură automată a comenzilor din orice canal, CRM viu cu istoricul fiecărui client, app pentru reprezentanții de pe teren și prognoză de vânzări care alimentează producția. **Trei niveluri de preț** — Retail / Fermier / Angro — aplicate automat, cu regula de guvernanță: **prețul îl poate modifica doar directorul de vânzări** (aplicată tehnic, prin permisiuni + flux de aprobare jurnalizat).
+> **Beneficiu:** ofertă în minute, nu ore; preț corect automat pe fiecare categorie; control total al directorului asupra prețului, fără să încetinească echipa.
 
 ### 🏭 Producere
 Planificare a producției pornind de la cerere, calcul automat de șarjă și materii, fișe de lot digitale, control de calitate, **trasabilitate completă a lotului** și gestiunea omologărilor/valabilităților.
 > **Beneficiu:** produci ce se va cere, prinzi sezonul, regăsești orice lot în secunde.
 
-### 📦 Achiziții
-Reaprovizionare predictivă (ce și **când** să comanzi, ținând cont de termenele de import), necesar de materii generat din planul de producție, comparare de furnizori și citire automată a facturilor și documentelor.
-> **Beneficiu:** fără rupturi de stoc în vârf de sezon, fără comenzi-urgență scumpe.
+### 📦 Achiziții (producție proprie + **import**)
+Reaprovizionare predictivă (ce și **când** să comanzi, ținând cont de termenele lungi de **import** și de cursul valutar), necesar de materii generat din planul de producție, comparare de furnizori și citire automată a facturilor și documentelor. Produsele de import sunt urmărite cu origine, omologare și termen de livrare — vizibile și în bot.
+> **Beneficiu:** fără rupturi de stoc în vârf de sezon, fără comenzi-urgență scumpe, importul comandat din timp.
 
 ### 💰 Contabilitate și fluxul ofertă → încasare
 Sistemul se unește cu **contabilitatea**: oferta acceptată generează proforma fără re-tastare, iar plata se **confirmă automat** — AI-ul potrivește încasarea (din bancă / online / casă) cu proforma corectă și marchează „achitat", apoi pornește livrarea/producția. **Toate ofertele, facturile și plățile rămân în fișa clientului**, cu soldul la zi.
@@ -83,6 +83,7 @@ Sistemul se unește cu **contabilitatea**: oferta acceptată generează proforma
 - **Ancorat în datele Diolsem.** AI-ul nu „inventează": răspunde și calculează strict pe baza catalogului, fișelor tehnice și omologărilor reale (tehnologie RAG). Pe pesticide, asta e obligatoriu.
 - **Omul are mereu ultimul cuvânt.** AI-ul propune oferta, planul de producție, comanda de aprovizionare — un om le aprobă. Zero decizii publicate fără validare.
 - **Construim peste ce aveți.** Dacă folosiți deja un ERP/sistem (ex. 1C), ne integrăm cu el, nu îl înlocuim. Fără schimbări brutale pentru echipe.
+- **Regulile voastre de business sunt aplicate tehnic.** Ex.: prețul îl poate schimba doar directorul de vânzări — sistemul nu permite altora, iar orice excepție trece prin aprobarea lui, jurnalizat.
 - **Asistă, nu înlocuiește.** Copiloții preiau munca repetitivă; expertiza agronomică și comercială a Diolsem rămâne în centru.
 
 ---
@@ -144,7 +145,7 @@ Cifrele exacte se stabilesc după descoperire, pe procesele reale — nu vindem 
 
 Propunem un **workshop de descoperire** (o jumătate de zi, pe cele trei departamente) din care livrăm harta de automatizare și planul cu estimări. În paralel, putem porni imediat **quick-win-ul de Clienți + Vânzări**, ca să vedeți valoare concretă cât construim fundația.
 
-> **Anexe:** `STRATEGIE-AUTOMATIZARE-AI.md` (botul de clienți, detaliat) · `AUTOMATIZARE-DEPARTAMENTE.md` (Vânzări/Producere/Achiziții, detaliat) · `CONTABILITATE-OFERTE-INCASARI.md` (fluxul ofertă → încasare + contabilitate) · `demo/index.html` (prototip funcțional) · `REZUMAT-1-PAGINA.md` (sinteză).
+> **Anexe:** `STRATEGIE-AUTOMATIZARE-AI.md` (botul de clienți, detaliat) · `BOT-INTELIGENTA-AGRONOMICA.md` (inteligență de agronom + climă + produse de import) · `AUTOMATIZARE-DEPARTAMENTE.md` (Vânzări/Producere/Achiziții, detaliat) · `CONTABILITATE-OFERTE-INCASARI.md` (fluxul ofertă → încasare + contabilitate) · `PRETURI-CLIENTI-GUVERNANTA.md` (niveluri Retail/Fermier/Angro + regula de preț) · `demo/index.html` (prototip funcțional) · `REZUMAT-1-PAGINA.md` (sinteză).
 
 ---
 
