@@ -3,21 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diolsem — Asistent agronom AI (demo)</title>
+<title>Diolsem — Bot magazin agricol (demo)</title>
 <!--
   PROTOTIP DEMONSTRATIV pentru pitch — Diolsem.md
   ---------------------------------------------------------------
-  Demo AUTO-CONȚINUT (un fișier, fără backend). Logica botului este
-  SIMULATĂ (reguli + eșantion de catalog), ca să se vadă experiența:
-   • inteligență de agronom + conștiență climatică (Nord/Centru/Sud)
-   • alegerea variantei OPTIME din listă, cu motivare + rotație anti-rezistență
-   • produse autohtone vs IMPORT (origine, omologare, termen, stoc)
-   • niveluri de preț Retail / Fermier / Angro aplicate automat
-   • preț BLOCAT la editare — îl modifică doar directorul de vânzări
+  Bot complet, cu MENIU PRINCIPAL (nu doar consultant agronom):
+   • Catalog pe categorii   • Consultant agronom (climă + variantă optimă)
+   • Comenzile mele         • Ofertele mele (fișa clientului, status plată)
+   • Livrare & plată        • Contact & program
+  Plus: niveluri de preț Retail/Fermier/Angro (preț blocat — doar directorul
+  de vânzări îl modifică), produse autohton vs. import, RO/RU.
 
-  În PRODUCȚIE: LLM (Claude) + RAG peste catalogul real, fișele tehnice
-  și profilul agro-climatic, conectat la ERP/e-commerce. Vezi documentele
-  din folderul diolsem/.
+  LOGO: marcaj SVG în identitatea Diolsem (verde, lăstar). În producție se
+  înlocuiește cu logo-ul oficial al clientului (un singur fișier).
+  CREIER: în producție LLM (Claude) + RAG pe catalogul real + fișe tehnice.
 -->
 <style>
   :root{
@@ -38,9 +37,12 @@
   @media(max-width:900px){.layout{grid-template-columns:1fr}}
 
   .pitch{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px;border:1px solid var(--line)}
-  .pitch .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px;color:var(--green-d)}
-  .leaf{width:30px;height:30px;border-radius:8px;background:var(--green);display:grid;place-items:center;color:#fff;font-size:18px}
-  .pitch h1{font-size:21px;margin:16px 0 6px;line-height:1.25}
+  .logo{display:flex;align-items:center;gap:12px}
+  .logo .mark{width:46px;height:46px;flex:0 0 46px}
+  .logo .wm{line-height:1}
+  .logo .wm b{font-size:25px;font-weight:800;color:var(--green-d);letter-spacing:.2px;display:block}
+  .logo .wm span{font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+  .pitch h1{font-size:21px;margin:18px 0 6px;line-height:1.25}
   .pitch p.lead{color:var(--muted);margin:0 0 16px;font-size:14.5px;line-height:1.5}
   .feat{display:flex;gap:11px;padding:11px 0;border-top:1px solid var(--line)}
   .feat .ic{flex:0 0 34px;height:34px;border-radius:9px;background:var(--green-l);display:grid;place-items:center;font-size:17px}
@@ -48,9 +50,9 @@
   .feat span{color:var(--muted);font-size:13px;line-height:1.45}
   .pitch .foot{margin-top:16px;font-size:12px;color:var(--muted);line-height:1.5;border-top:1px solid var(--line);padding-top:12px}
 
-  .chat{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line);display:flex;flex-direction:column;height:680px;overflow:hidden}
-  .chat-head{background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;padding:13px 16px;display:flex;align-items:center;gap:12px}
-  .avatar{width:40px;height:40px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:21px;flex:0 0 40px}
+  .chat{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line);display:flex;flex-direction:column;height:700px;overflow:hidden}
+  .chat-head{background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px}
+  .chat-head .mark{width:40px;height:40px;flex:0 0 40px;background:#fff;border-radius:10px;padding:4px}
   .chat-head .who{flex:1}
   .chat-head .who b{font-size:15px;display:block}
   .chat-head .who span{font-size:12px;opacity:.9;display:flex;align-items:center;gap:6px}
@@ -60,7 +62,6 @@
   .lang button{border:1px solid rgba(255,255,255,.5);background:transparent;color:#fff;border-radius:7px;padding:4px 8px;font-size:12px;font-weight:700;cursor:pointer}
   .lang button.on{background:#fff;color:var(--green-d)}
 
-  /* context bar: client tier + region */
   .ctxbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding:9px 14px;background:#f0f5ef;border-bottom:1px solid var(--line);font-size:12px}
   .ctx{display:flex;align-items:center;gap:7px}
   .ctx>label{color:var(--muted);font-weight:600}
@@ -70,7 +71,7 @@
   .lockhint{display:flex;align-items:center;gap:5px;color:var(--earth);font-size:11px;margin-left:auto}
 
   .msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:11px;background:var(--bg)}
-  .row{display:flex;gap:9px;max-width:90%}
+  .row{display:flex;gap:9px;max-width:92%}
   .row.user{align-self:flex-end;flex-direction:row-reverse}
   .bub{padding:10px 13px;border-radius:14px;font-size:14px;line-height:1.5;box-shadow:0 1px 2px rgba(0,0,0,.05)}
   .row.bot .bub{background:#fff;border:1px solid var(--line);border-top-left-radius:4px}
@@ -82,6 +83,13 @@
   .typing i{width:7px;height:7px;border-radius:50%;background:#bcc9bf;animation:bounce 1.3s infinite}
   .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
   @keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
+
+  /* MENIU principal (butoane în mesaj) */
+  .menu{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
+  .menu.single{grid-template-columns:1fr}
+  .menu button{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 11px;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;text-align:left}
+  .menu button:hover{border-color:var(--green);background:var(--green-l)}
+  .menu button .mi{font-size:16px;flex:0 0 18px;text-align:center}
 
   .prod{background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px;margin-top:8px;display:flex;gap:11px;align-items:flex-start}
   .prod .pic{width:46px;height:46px;border-radius:10px;background:var(--green-l);display:grid;place-items:center;font-size:24px;flex:0 0 46px}
@@ -101,11 +109,16 @@
   .prod button.add:hover{background:var(--green-d)}
   .note{font-size:11.5px;color:var(--earth);background:#fff7e6;border:1px solid #ffe2a8;border-radius:9px;padding:7px 10px;margin-top:8px;line-height:1.45}
   .why{font-size:12px;color:var(--green-d);background:#f1f8e9;border-left:3px solid var(--green);border-radius:6px;padding:6px 10px;margin-top:7px;line-height:1.45}
+  .offer{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-top:7px;font-size:13px}
+  .offer .st{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px}
+  .st.paid{background:#e8f5e9;color:#2e7d32}.st.wait{background:#fff3e0;color:var(--amber)}
 
-  .chips{display:flex;flex-wrap:wrap;gap:7px;padding:10px 14px;border-top:1px solid var(--line);background:#fff}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;padding:10px 14px;border-top:1px solid var(--line);background:#fff;min-height:0}
   .chips button{border:1px solid var(--green);color:var(--green-d);background:#fff;border-radius:999px;padding:6px 12px;font-size:12.5px;cursor:pointer;font-weight:600}
   .chips button:hover{background:var(--green-l)}
   .composer{display:flex;gap:8px;padding:11px 12px;border-top:1px solid var(--line);background:#fff}
+  .composer .menu-btn{border:1px solid var(--line);background:#fff;color:var(--green-d);width:44px;border-radius:11px;font-size:17px;cursor:pointer}
+  .composer .menu-btn:hover{background:var(--green-l);border-color:var(--green)}
   .composer input{flex:1;border:1px solid var(--line);border-radius:11px;padding:11px 13px;font-size:14px;outline:none}
   .composer input:focus{border-color:var(--green)}
   .composer .send{border:0;background:var(--green);color:#fff;width:44px;border-radius:11px;font-size:18px;cursor:pointer}
@@ -115,24 +128,39 @@
 </head>
 <body>
 <div class="wrap">
-  <p class="topnote"><b id="t-badge">DEMO</b> &nbsp;<span id="t-note">Prototip pentru pitch — în producție: LLM (Claude) + RAG pe catalogul real, fișele tehnice și profilul agro-climatic.</span></p>
+  <p class="topnote"><b id="t-badge">DEMO</b> &nbsp;<span id="t-note">Prototip pentru pitch — logo de probă în identitatea Diolsem; în producție: logo oficial + LLM (Claude) + RAG pe catalogul real.</span></p>
 
   <div class="layout">
     <section class="pitch">
-      <div class="brand"><span class="leaf">🌱</span> Diolsem</div>
-      <h1 id="p-h1">Agronom AI cu conștiență climatică</h1>
-      <p class="lead" id="p-lead">Botul nu listează produse — alege varianta optimă pentru cultura, problema și regiunea clientului, ține cont de rotația anti-rezistență, de stoc vs. import și afișează prețul nivelului corect (Retail/Fermier/Angro).</p>
-      <div class="feat"><div class="ic">🌍</div><div><b id="f1b">Conștiență climatică</b><span id="f1s">Nord/Centru/Sud al Moldovei — recomandarea optimă diferă după regiune și sezon.</span></div></div>
-      <div class="feat"><div class="ic">🏆</div><div><b id="f2b">Varianta optimă, cu motivare</b><span id="f2s">Din mai multe produse care merg, îl alege pe cel mai bun și explică de ce + alternativă.</span></div></div>
-      <div class="feat"><div class="ic">✈️</div><div><b id="f3b">Autohton vs. import</b><span id="f3s">Marchează originea, omologarea și termenul; propune alternativă din stoc dacă te grăbești.</span></div></div>
-      <div class="feat"><div class="ic">🔒</div><div><b id="f4b">Preț pe nivel, blocat la editare</b><span id="f4s">Retail/Fermier/Angro automat. Prețul îl modifică doar directorul de vânzări.</span></div></div>
-      <p class="foot" id="p-foot">Demo cu eșantion de catalog și logică simulată. În producție răspunsurile sunt ancorate strict în datele oficiale Diolsem, cu escaladare la agronom uman când e nevoie.</p>
+      <div class="logo">
+        <svg class="mark" viewBox="0 0 48 48" aria-hidden="true">
+          <defs><linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#43a047"/><stop offset="1" stop-color="#1b5e20"/></linearGradient></defs>
+          <rect width="48" height="48" rx="12" fill="url(#lg1)"/>
+          <path d="M24 37 V21" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+          <path d="M24 24 C24 16 31 12 38 12 C38 20 31 24 24 24 Z" fill="#fff"/>
+          <path d="M24 29 C24 23 18 20 11 20 C11 26 17 29 24 29 Z" fill="#c8e6c9"/>
+        </svg>
+        <div class="wm"><b>Diolsem</b><span>Magazin agricol · Moldova</span></div>
+      </div>
+      <h1 id="p-h1">Bot complet pentru magazinul agricol</h1>
+      <p class="lead" id="p-lead">Cu meniu principal ca orice bot serios: catalog, comenzi, oferte, livrare, contact — plus un consultant agronom care alege varianta optimă pentru zona clientului.</p>
+      <div class="feat"><div class="ic">🧭</div><div><b id="f1b">Meniu principal</b><span id="f1s">Catalog · Agronom · Comenzile mele · Oferte · Livrare · Contact — totul la un clic.</span></div></div>
+      <div class="feat"><div class="ic">🌍</div><div><b id="f2b">Consultant agronom climatic</b><span id="f2s">Recomandă varianta optimă după regiune (Nord/Centru/Sud) și sezon.</span></div></div>
+      <div class="feat"><div class="ic">📄</div><div><b id="f3b">Comenzi & oferte în fișa ta</b><span id="f3s">Vezi comenzile și ofertele cu statusul plății — confirmare automată a achitării.</span></div></div>
+      <div class="feat"><div class="ic">🔒</div><div><b id="f4b">Preț pe nivel, blocat</b><span id="f4s">Retail/Fermier/Angro automat. Prețul îl modifică doar directorul de vânzări.</span></div></div>
+      <p class="foot" id="p-foot">Demo cu eșantion de catalog și logică simulată. Logo de probă în identitatea Diolsem — se înlocuiește cu cel oficial. În producție răspunsurile sunt ancorate în datele oficiale Diolsem.</p>
     </section>
 
     <section class="chat">
       <div class="chat-head">
-        <div class="avatar">🌾</div>
-        <div class="who"><b id="c-name">Agronomul Diolsem</b><span><i class="dot"></i> <span id="c-status">online · răspunde instant</span></span></div>
+        <svg class="mark" viewBox="0 0 48 48" aria-hidden="true">
+          <defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#43a047"/><stop offset="1" stop-color="#1b5e20"/></linearGradient></defs>
+          <rect width="48" height="48" rx="11" fill="url(#lg2)"/>
+          <path d="M24 37 V21" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+          <path d="M24 24 C24 16 31 12 38 12 C38 20 31 24 24 24 Z" fill="#fff"/>
+          <path d="M24 29 C24 23 18 20 11 20 C11 26 17 29 24 29 Z" fill="#c8e6c9"/>
+        </svg>
+        <div class="who"><b id="c-name">Diolsem · Asistent</b><span><i class="dot"></i> <span id="c-status">online · răspunde instant</span></span></div>
         <div class="cart">🛒<span class="badge" id="cart-badge">0</span></div>
         <div class="lang"><button data-l="ro" class="on">RO</button><button data-l="ru">RU</button></div>
       </div>
@@ -158,7 +186,8 @@
       <div class="msgs" id="msgs"></div>
       <div class="chips" id="chips"></div>
       <div class="composer">
-        <input id="input" placeholder="Scrie problema ta…" autocomplete="off">
+        <button class="menu-btn" id="menu-btn" title="Meniu">☰</button>
+        <input id="input" placeholder="Scrie un mesaj…" autocomplete="off">
         <button class="send" id="send">➤</button>
       </div>
     </section>
@@ -167,7 +196,7 @@
 
 <script>
 /* ============================================================
-   EȘANTION DE CATALOG  (prețuri pe nivel + origine + stoc)
+   CATALOG + CATEGORII
    ============================================================ */
 const CATALOG = {
   ridomil:{emoji:"🧴", cat:{ro:"Fungicid",ru:"Фунгицид"},
@@ -192,7 +221,7 @@ const CATALOG = {
     dosePer100m2:3000, water:null, phi:0},
   seminte:{emoji:"🍅", cat:{ro:"Semințe",ru:"Семена"},
     price:{retail:28,fermier:25,angro:22}, origin:{type:"ro"}, inStock:true, lead:null,
-    name:{ro:"Semințe roșii „Marmande”",ru:"Семена томатов «Маранд»"},
+    name:{ro:"Semințe roșii Marmande",ru:"Семена томатов Маранд"},
     dosePer100m2:null, water:null, phi:0},
   trend:{emoji:"💧", cat:{ro:"Adjuvant",ru:"Прилипатель"},
     price:{retail:55,fermier:48,angro:42}, origin:{type:"import",country:"DE"}, inStock:true, lead:null,
@@ -203,36 +232,52 @@ const CATALOG = {
     name:{ro:"Set protecție (mască + mănuși)",ru:"Набор защиты (маска + перчатки)"},
     dosePer100m2:null, water:null, phi:0}
 };
+const CATS = {
+  seminte:{ic:"🌱", name:{ro:"Semințe",ru:"Семена"}, items:["seminte"]},
+  ingrasaminte:{ic:"💎", name:{ro:"Îngrășăminte",ru:"Удобрения"}, items:["npk"]},
+  pesticide:{ic:"🧴", name:{ro:"Protecția plantelor",ru:"Защита растений"}, items:["ridomil","cupru","aktara","titus"]},
+  adjuvanti:{ic:"💧", name:{ro:"Adjuvanți",ru:"Прилипатели"}, items:["trend"]},
+  echipament:{ic:"🧤", name:{ro:"Echipament",ru:"Оборудование"}, items:["protectie"]}
+};
 
 /* ============================================================
-   TRADUCERI UI
+   TRADUCERI
    ============================================================ */
 const T = {
   ro:{
-    placeholder:"Scrie problema ta…", name:"Agronomul Diolsem", status:"online · răspunde instant",
-    badge:"DEMO", tnote:"Prototip pentru pitch — în producție: LLM (Claude) + RAG pe catalogul real, fișele tehnice și profilul agro-climatic.",
-    h1:"Agronom AI cu conștiență climatică",
-    lead:"Botul nu listează produse — alege varianta optimă pentru cultura, problema și regiunea clientului, ține cont de rotația anti-rezistență, de stoc vs. import și afișează prețul nivelului corect (Retail/Fermier/Angro).",
-    f1b:"Conștiență climatică", f1s:"Nord/Centru/Sud al Moldovei — recomandarea optimă diferă după regiune și sezon.",
-    f2b:"Varianta optimă, cu motivare", f2s:"Din mai multe produse care merg, îl alege pe cel mai bun și explică de ce + alternativă.",
-    f3b:"Autohton vs. import", f3s:"Marchează originea, omologarea și termenul; propune alternativă din stoc dacă te grăbești.",
-    f4b:"Preț pe nivel, blocat la editare", f4s:"Retail/Fermier/Angro automat. Prețul îl modifică doar directorul de vânzări.",
-    foot:"Demo cu eșantion de catalog și logică simulată. În producție răspunsurile sunt ancorate strict în datele oficiale Diolsem, cu escaladare la agronom uman când e nevoie.",
+    placeholder:"Scrie un mesaj…", name:"Diolsem · Asistent", status:"online · răspunde instant",
+    badge:"DEMO", tnote:"Prototip pentru pitch — logo de probă în identitatea Diolsem; în producție: logo oficial + LLM (Claude) + RAG pe catalogul real.",
+    h1:"Bot complet pentru magazinul agricol",
+    lead:"Cu meniu principal ca orice bot serios: catalog, comenzi, oferte, livrare, contact — plus un consultant agronom care alege varianta optimă pentru zona clientului.",
+    f1b:"Meniu principal", f1s:"Catalog · Agronom · Comenzile mele · Oferte · Livrare · Contact — totul la un clic.",
+    f2b:"Consultant agronom climatic", f2s:"Recomandă varianta optimă după regiune (Nord/Centru/Sud) și sezon.",
+    f3b:"Comenzi & oferte în fișa ta", f3s:"Vezi comenzile și ofertele cu statusul plății — confirmare automată a achitării.",
+    f4b:"Preț pe nivel, blocat", f4s:"Retail/Fermier/Angro automat. Prețul îl modifică doar directorul de vânzări.",
+    foot:"Demo cu eșantion de catalog și logică simulată. Logo de probă în identitatea Diolsem — se înlocuiește cu cel oficial. În producție răspunsurile sunt ancorate în datele oficiale Diolsem.",
     lblClient:"Client:", lblZone:"Zonă:", lockTxt:"preț fixat",
-    greet:"Bună ziua! 👋 Sunt agronomul digital Diolsem. Spune-mi cultura și ce problemă observi — îți recomand varianta optimă pentru zona ta și o pun în coș. Cu ce te ajut?",
-    chips:["🍅 Pete pe roșii","🍇 Mană la vie","🥔 Gândaci la cartof","🌽 Buruieni la porumb","📦 Unde e comanda mea?"],
+    greet:"Bună ziua! 👋 Sunt asistentul Diolsem. Te pot ajuta cu catalogul, comenzile, ofertele și sfaturi de agronom. Alege din meniu 👇",
+    menuTitle:"Meniu principal:",
+    mCatalog:"Catalog produse", mAgronom:"Consultant agronom", mOrders:"Comenzile mele",
+    mOffers:"Ofertele mele", mDelivery:"Livrare & plată", mContact:"Contact & program", mMenu:"Meniu",
+    catTitle:"Alege o categorie:", backMenu:"⬅ Meniu principal",
+    agronomPrompt:"Spune-mi cultura și ce observi (ex. 'mană la vie', 'gândaci la cartof') sau alege o problemă frecventă:",
+    agronomChips:["🍅 Pete pe roșii","🍇 Mană la vie","🥔 Gândaci la cartof","🌽 Buruieni la porumb"],
+    ordersText:"Comanda ta activă:",
+    orderLine:"<b>#DL-48217</b> · 3 produse · expediată 🚚<br>livrare azi 14:00–18:00, Chișinău",
+    offersText:"Ofertele tale (toate rămân în fișa ta de client):",
+    offerNote:"💡 La confirmarea plății, statusul devine automat 'achitată' și comanda intră la livrare.",
+    deliveryText:"🚚 <b>Livrare</b> în Chișinău și în toată Moldova.<br>💳 <b>Plată:</b> card online, transfer bancar sau numerar.<br>Prețurile se afișează conform nivelului tău (Retail/Fermier/Angro).",
+    contactText:"📍 Magazin agricol lângă Chișinău<br>🕒 Program: Luni–Sâmbătă<br>💬 Comenzi online 24/7 prin acest bot<br><span style='color:#6b7a70;font-size:11px'>(date demo — se completează cu cele reale)</span>",
     addCart:"Adaugă în coș", added:"✅ Adăugat", priceL:"lei",
     tierName:{retail:"Retail",fermier:"Fermier",angro:"Angro"},
     regionName:{nord:"Nord",centru:"Centru",sud:"Sud"},
     lockTip:"Preț fixat pe nivelul clientului. Îl poate modifica doar directorul de vânzări.",
-    originRO:"🇲🇩 Autohton", originIMP:(c)=>`✈️ Import (${c})`,
-    inStock:"În stoc",
+    originRO:"🇲🇩 Autohton", originIMP:(c)=>`✈️ Import (${c})`, inStock:"În stoc",
     phiNote:(p)=>`⚠️ Pauză până la recoltare: ${p} zile. Folosește echipament de protecție.`,
     crossF:"💡 Recomandare: adaugă un adeziv-umectant — ține tratamentul pe frunză și crește eficiența.",
-    askArea:"Pe ce suprafață aplici? Scrie câți m² (ex. „150 m²” sau „2 ari”).",
+    askArea:"Pe ce suprafață aplici? Scrie câți m² (ex. '150 m²' sau '2 ari').",
     doseRes:(prod,area,qty,water)=>`Pentru ${area} m² ai nevoie de ~<b>${qty}</b> din ${prod}, în ${water}. Cantitatea potrivită:`,
-    order:"Comanda #DL-48217 este expediată 🚚 — curier Diolsem, livrare azi 14:00–18:00 în Chișinău. Vrei notificare pe Viber?",
-    rotate:"🔁 La tratamentul următor, alternează grupa de substanță activă — așa eviți rezistența. (sfat de agronom)",
+    rotate:"🔁 La tratamentul următor, alternează grupa de substanță activă — eviți rezistența. (sfat de agronom)",
     alt:"Alternativă:",
     tierChanged:(t)=>`Preț recalculat pentru nivel: ${t}`,
     regionChanged:(r)=>`Zonă setată: ${r} — ajustez recomandările`,
@@ -247,34 +292,43 @@ const T = {
       sud:"De ce: în Sud presiunea bolii e mai mică → cuprul, mai ieftin, e suficient ca primă opțiune."
     },
     seedRec:"Pentru roșii de câmp îți recomand un soi productiv. La semănat merge un îngrășământ de pornire:",
-    fallback:"Bună întrebare! Ca să-ți dau un răspuns corect (domeniu reglementat), te conectez cu un agronom Diolsem. Între timp pot căuta în catalog dacă îmi spui cultura și problema. 🌿",
-    notUnderstand:"Spune-mi <b>cultura</b> (roșii, vie, cartof, porumb…) și <b>ce observi</b> (pete, dăunători, buruieni). Sau alege mai jos 👇"
+    fallback:"Bună întrebare! Ca să-ți răspund corect (domeniu reglementat), te conectez cu un agronom Diolsem. Sau alege din meniu 👇",
+    notUnderstand:"Pot ajuta cu: catalog, comenzi, oferte, sfat de agronom. Alege din meniu sau scrie cultura și problema 👇"
   },
   ru:{
-    placeholder:"Опишите проблему…", name:"Агроном Diolsem", status:"онлайн · отвечает сразу",
-    badge:"ДЕМО", tnote:"Прототип для презентации — в продакшене: LLM (Claude) + RAG по каталогу, техкартам и агроклиматическому профилю.",
-    h1:"AI-агроном с учётом климата",
-    lead:"Бот не просто перечисляет товары — выбирает оптимальный вариант под культуру, проблему и регион клиента, учитывает ротацию против устойчивости, наличие vs импорт и показывает цену нужного уровня (Retail/Fermier/Angro).",
-    f1b:"Учёт климата", f1s:"Север/Центр/Юг Молдовы — оптимальная рекомендация зависит от региона и сезона.",
-    f2b:"Оптимальный вариант + обоснование", f2s:"Из нескольких подходящих выбирает лучший и объясняет почему + альтернатива.",
-    f3b:"Местное vs импорт", f3s:"Отмечает происхождение, регистрацию и срок; предложит замену со склада, если срочно.",
+    placeholder:"Напишите сообщение…", name:"Diolsem · Ассистент", status:"онлайн · отвечает сразу",
+    badge:"ДЕМО", tnote:"Прототип для презентации — пробный логотип в стиле Diolsem; в продакшене: официальный логотип + LLM (Claude) + RAG по каталогу.",
+    h1:"Полноценный бот агромагазина",
+    lead:"С главным меню, как у любого серьёзного бота: каталог, заказы, предложения, доставка, контакты — плюс агроном, который выбирает оптимальный вариант для зоны клиента.",
+    f1b:"Главное меню", f1s:"Каталог · Агроном · Мои заказы · Предложения · Доставка · Контакты — в один клик.",
+    f2b:"Агроном с учётом климата", f2s:"Рекомендует оптимум по региону (Север/Центр/Юг) и сезону.",
+    f3b:"Заказы и предложения в вашей карточке", f3s:"Заказы и предложения со статусом оплаты — автоподтверждение оплаты.",
     f4b:"Цена по уровню, без правки", f4s:"Retail/Fermier/Angro автоматически. Цену меняет только директор по продажам.",
-    foot:"Демо с образцом каталога и имитацией логики. В продакшене ответы строго по официальным данным Diolsem, с передачей агроному при необходимости.",
+    foot:"Демо с образцом каталога и имитацией логики. Пробный логотип в стиле Diolsem — заменяется официальным. В продакшене ответы строго по данным Diolsem.",
     lblClient:"Клиент:", lblZone:"Зона:", lockTxt:"цена фикс.",
-    greet:"Здравствуйте! 👋 Я цифровой агроном Diolsem. Назовите культуру и проблему — порекомендую оптимальный вариант для вашей зоны и добавлю в корзину. Чем помочь?",
-    chips:["🍅 Пятна на томатах","🍇 Милдью на винограде","🥔 Жук на картофеле","🌽 Сорняки в кукурузе","📦 Где мой заказ?"],
+    greet:"Здравствуйте! 👋 Я ассистент Diolsem. Помогу с каталогом, заказами, предложениями и советами агронома. Выберите в меню 👇",
+    menuTitle:"Главное меню:",
+    mCatalog:"Каталог товаров", mAgronom:"Агроном-консультант", mOrders:"Мои заказы",
+    mOffers:"Мои предложения", mDelivery:"Доставка и оплата", mContact:"Контакты и режим", mMenu:"Меню",
+    catTitle:"Выберите категорию:", backMenu:"⬅ Главное меню",
+    agronomPrompt:"Назовите культуру и что замечаете (например 'милдью на винограде', 'жук на картофеле') или выберите частую проблему:",
+    agronomChips:["🍅 Пятна на томатах","🍇 Милдью на винограде","🥔 Жук на картофеле","🌽 Сорняки в кукурузе"],
+    ordersText:"Ваш активный заказ:",
+    orderLine:"<b>#DL-48217</b> · 3 товара · отправлен 🚚<br>доставка сегодня 14:00–18:00, Кишинёв",
+    offersText:"Ваши предложения (все хранятся в вашей карточке):",
+    offerNote:"💡 При подтверждении оплаты статус автоматически становится «оплачено», и заказ идёт в доставку.",
+    deliveryText:"🚚 <b>Доставка</b> по Кишинёву и всей Молдове.<br>💳 <b>Оплата:</b> карта онлайн, банковский перевод или наличные.<br>Цены показываются по вашему уровню (Retail/Fermier/Angro).",
+    contactText:"📍 Агромагазин под Кишинёвом<br>🕒 Режим: Пн–Сб<br>💬 Заказы онлайн 24/7 через этого бота<br><span style='color:#6b7a70;font-size:11px'>(демо-данные — заменяются реальными)</span>",
     addCart:"В корзину", added:"✅ Добавлено", priceL:"лей",
     tierName:{retail:"Retail",fermier:"Fermier",angro:"Angro"},
     regionName:{nord:"Север",centru:"Центр",sud:"Юг"},
     lockTip:"Цена зафиксирована по уровню клиента. Менять может только директор по продажам.",
-    originRO:"🇲🇩 Местное", originIMP:(c)=>`✈️ Импорт (${c})`,
-    inStock:"В наличии",
+    originRO:"🇲🇩 Местное", originIMP:(c)=>`✈️ Импорт (${c})`, inStock:"В наличии",
     phiNote:(p)=>`⚠️ Срок ожидания до сбора: ${p} дн. Используйте средства защиты.`,
     crossF:"💡 Совет: добавьте прилипатель — удержит препарат на листе и повысит эффективность.",
-    askArea:"На какую площадь? Напишите м² (например «150 м²» или «2 сотки»).",
+    askArea:"На какую площадь? Напишите м² (например '150 м²' или '2 сотки').",
     doseRes:(prod,area,qty,water)=>`На ${area} м² нужно ~<b>${qty}</b> препарата ${prod}, в ${water}. Нужное количество:`,
-    order:"Заказ #DL-48217 отправлен 🚚 — курьер Diolsem, доставка сегодня 14:00–18:00 в Кишинёве. Прислать уведомление в Viber?",
-    rotate:"🔁 На следующей обработке чередуйте группу действующего вещества — так избежите устойчивости. (совет агронома)",
+    rotate:"🔁 На следующей обработке чередуйте группу действующего вещества — избежите устойчивости. (совет агронома)",
     alt:"Альтернатива:",
     tierChanged:(t)=>`Цена пересчитана для уровня: ${t}`,
     regionChanged:(r)=>`Зона: ${r} — корректирую рекомендации`,
@@ -289,83 +343,103 @@ const T = {
       sud:"Почему: на Юге давление болезни ниже → более дешёвая медь достаточна как первый выбор."
     },
     seedRec:"Для томатов открытого грунта рекомендую урожайный сорт. К посеву подойдёт стартовое удобрение:",
-    fallback:"Хороший вопрос! Чтобы ответить точно (регулируемая сфера), соединю с агрономом Diolsem. А пока могу искать в каталоге: назовите культуру и проблему. 🌿",
-    notUnderstand:"Назовите <b>культуру</b> (томаты, виноград, картофель, кукуруза…) и <b>что замечаете</b> (пятна, вредители, сорняки). Или выберите ниже 👇"
+    fallback:"Хороший вопрос! Чтобы ответить точно (регулируемая сфера), соединю с агрономом Diolsem. Или выберите в меню 👇",
+    notUnderstand:"Помогу с: каталог, заказы, предложения, совет агронома. Выберите в меню или напишите культуру и проблему 👇"
   }
 };
 
-/* ============================================================
-   STARE
-   ============================================================ */
+/* ============================================================ */
 let lang='ro', tier='retail', region='centru', cart=0, pendingDose=null;
 const $ = s=>document.querySelector(s);
 const msgs=$('#msgs'), chipsEl=$('#chips'), input=$('#input');
 
-/* ============================================================
-   UI HELPERS
-   ============================================================ */
 function scrollDown(){ msgs.scrollTop=msgs.scrollHeight; }
 function addUser(text){const r=document.createElement('div');r.className='row user';r.innerHTML='<div class="bub"></div>';r.querySelector('.bub').textContent=text;msgs.appendChild(r);scrollDown();}
 function botRow(html){const r=document.createElement('div');r.className='row bot';r.innerHTML='<div class="mini-av">🌾</div><div class="bub">'+html+'</div>';msgs.appendChild(r);scrollDown();return r;}
 function sysMsg(text){const r=document.createElement('div');r.className='sys';r.textContent=text;msgs.appendChild(r);scrollDown();}
 function typing(){const r=document.createElement('div');r.className='row bot';r.innerHTML='<div class="mini-av">🌾</div><div class="bub"><div class="typing"><i></i><i></i><i></i></div></div>';msgs.appendChild(r);scrollDown();return r;}
-function bot(html, delay=750){const t=typing();return new Promise(res=>setTimeout(()=>{t.remove();res(botRow(html));},delay));}
+function bot(html, delay=650){const t=typing();return new Promise(res=>setTimeout(()=>{t.remove();res(botRow(html));},delay));}
 
 function priceOf(key){ return CATALOG[key].price[tier]; }
-function originBadge(p){
-  const tr=T[lang];
-  return p.origin.type==='ro' ? `<span class="b ro">${tr.originRO}</span>` : `<span class="b imp">${tr.originIMP(p.origin.country)}</span>`;
-}
-function stockBadge(p){
-  const tr=T[lang];
-  return p.inStock ? `<span class="b stock">● ${tr.inStock}</span>` : `<span class="b lead">${p.lead[lang]}</span>`;
-}
+function originBadge(p){const tr=T[lang];return p.origin.type==='ro'?`<span class="b ro">${tr.originRO}</span>`:`<span class="b imp">${tr.originIMP(p.origin.country)}</span>`;}
+function stockBadge(p){const tr=T[lang];return p.inStock?`<span class="b stock">● ${tr.inStock}</span>`:`<span class="b lead">${p.lead[lang]}</span>`;}
 function productCard(key){
   const p=CATALOG[key], tr=T[lang];
-  return `<div class="prod" data-key="${key}">
-    <div class="pic">${p.emoji}</div>
-    <div class="info">
-      <b>${p.name[lang]}</b>
-      <div class="badges"><span class="b cat">${p.cat[lang]}</span>${originBadge(p)}${stockBadge(p)}</div>
-      <div class="price">
-        <span class="amount">${priceOf(key)} ${tr.priceL}</span>
-        <span class="tier">${tr.tierName[tier]}</span>
-        <span class="lock" title="${tr.lockTip}">🔒</span>
-      </div>
-      <button class="add" onclick="addToCart(this)">${tr.addCart}</button>
-    </div></div>`;
+  return `<div class="prod" data-key="${key}"><div class="pic">${p.emoji}</div><div class="info">
+    <b>${p.name[lang]}</b>
+    <div class="badges"><span class="b cat">${p.cat[lang]}</span>${originBadge(p)}${stockBadge(p)}</div>
+    <div class="price"><span class="amount">${priceOf(key)} ${tr.priceL}</span><span class="tier">${tr.tierName[tier]}</span><span class="lock" title="${tr.lockTip}">🔒</span></div>
+    <button class="add" onclick="addToCart(this)">${tr.addCart}</button></div></div>`;
 }
-function addToCart(btn){ cart++; $('#cart-badge').textContent=cart; btn.textContent=T[lang].added; btn.style.background='#1b5e20'; btn.disabled=true; }
+function addToCart(btn){cart++;$('#cart-badge').textContent=cart;btn.textContent=T[lang].added;btn.style.background='#1b5e20';btn.disabled=true;}
 window.addToCart=addToCart;
+function updateAllPrices(){const tr=T[lang];document.querySelectorAll('.prod').forEach(c=>{const k=c.dataset.key;if(!CATALOG[k])return;const a=c.querySelector('.amount'),g=c.querySelector('.tier');if(a)a.textContent=`${priceOf(k)} ${tr.priceL}`;if(g)g.textContent=tr.tierName[tier];});}
 
-// re-aplică prețul nivelului pe toate cardurile vizibile
-function updateAllPrices(){
-  const tr=T[lang];
-  document.querySelectorAll('.prod').forEach(card=>{
-    const key=card.dataset.key; if(!CATALOG[key]) return;
-    const a=card.querySelector('.amount'), tg=card.querySelector('.tier');
-    if(a) a.textContent=`${priceOf(key)} ${tr.priceL}`;
-    if(tg) tg.textContent=tr.tierName[tier];
-  });
+/* ---------- MENIU ---------- */
+function menuBtns(items, single){
+  return `<div class="menu${single?' single':''}">`+items.map(i=>`<button onclick="${i.fn}"><span class="mi">${i.ic}</span>${i.label}</button>`).join('')+`</div>`;
 }
+async function menuMain(){
+  const tr=T[lang];
+  chipsEl.innerHTML='';
+  await bot(tr.menuTitle+menuBtns([
+    {ic:"🛍️",label:tr.mCatalog,fn:"catCats()"},
+    {ic:"🌾",label:tr.mAgronom,fn:"agronomStart()"},
+    {ic:"📦",label:tr.mOrders,fn:"myOrders()"},
+    {ic:"📄",label:tr.mOffers,fn:"myOffers()"},
+    {ic:"🚚",label:tr.mDelivery,fn:"deliveryInfo()"},
+    {ic:"📍",label:tr.mContact,fn:"contactInfo()"}
+  ]), 350);
+}
+window.menuMain=menuMain;
+function backBtn(){ return menuBtns([{ic:"⬅",label:T[lang].backMenu,fn:"menuMain()"}], true); }
 
-/* ============================================================
-   „CREIERUL" SIMULAT
-   ============================================================ */
+async function catCats(){
+  const tr=T[lang];
+  const items=Object.keys(CATS).map(k=>({ic:CATS[k].ic,label:CATS[k].name[lang],fn:`catShow('${k}')`}));
+  await bot(tr.catTitle+menuBtns(items), 350);
+}
+window.catCats=catCats;
+async function catShow(catKey){
+  const c=CATS[catKey];
+  await bot(`<b>${c.ic} ${c.name[lang]}</b>`, 300);
+  for(const key of c.items){ await bot(productCard(key), 320); }
+  await bot(backBtn(), 250);
+}
+window.catShow=catShow;
+
+async function myOrders(){const tr=T[lang];await bot(tr.ordersText+`<div class="offer"><span>${tr.orderLine}</span></div>`+backBtn());}
+window.myOrders=myOrders;
+async function myOffers(){
+  const tr=T[lang];
+  const lei=tr.priceL;
+  const rows=`<div class="offer"><span><b>#OF-1039</b> · 980 ${lei}</span><span class="st paid">${lang==='ro'?'achitată':'оплачено'}</span></div>`+
+             `<div class="offer"><span><b>#OF-1043</b> · 1 234 ${lei}</span><span class="st wait">${lang==='ro'?'în așteptare':'ожидает'}</span></div>`;
+  await bot(tr.offersText+rows+`<div class="why">${tr.offerNote}</div>`+backBtn());
+}
+window.myOffers=myOffers;
+async function deliveryInfo(){await bot(T[lang].deliveryText+backBtn());}
+window.deliveryInfo=deliveryInfo;
+async function contactInfo(){await bot(T[lang].contactText+backBtn());}
+window.contactInfo=contactInfo;
+async function agronomStart(){await bot(T[lang].agronomPrompt);setAgronomChips();}
+window.agronomStart=agronomStart;
+
+/* ---------- AGRONOM ---------- */
 const KW={
   rosii:['rosi','roșii','роши','tomat','помидор','томат'],
   vita:['vie','viț','vita','viță','vino','виноград','лоза'],
-  cartof:['cartof','картоф','картош'],
-  porumb:['porumb','кукуруз'],
+  cartof:['cartof','картоф','картош'], porumb:['porumb','кукуруз'],
   mana:['pete','pata','mana','mană','mildiu','milde','fitoftor','фитофтор','пятн','бур','милдь'],
   gandac:['gandac','gândac','жук','daunator','dăunător','вредител','колорад'],
   buruieni:['buruien','buruiana','сорня','сорняк'],
   seminte:['semint','semințe','семен','семечк','posad','посад','посев'],
   order:['comand','comanda','unde e','livrare','заказ','где мой','достав'],
-  greet:['salut','buna','bună','noroc','здрав','привет','добр']
+  catalog:['catalog','produse','каталог','товар'],
+  greet:['salut','buna','bună','noroc','здрав','привет','добр'],
+  menu:['meniu','menu','меню']
 };
-const has=(t,arr)=>arr.some(k=>t.includes(k));
-
+const has=(t,a)=>a.some(k=>t.includes(k));
 function parseArea(t){
   let m=t.match(/(\d+[.,]?\d*)\s*(ha|hectar|гект|га)/i); if(m) return Math.round(parseFloat(m[1].replace(',','.'))*10000);
   m=t.match(/(\d+[.,]?\d*)\s*(ar|сотк|сот)/i);            if(m) return Math.round(parseFloat(m[1].replace(',','.'))*100);
@@ -373,87 +447,65 @@ function parseArea(t){
   m=t.match(/^\s*(\d+[.,]?\d*)\s*$/);                      if(m) return Math.round(parseFloat(m[1].replace(',','.')));
   return null;
 }
-
-function phiBlock(key){ const p=CATALOG[key]; return p.phi? `<div class="note">${T[lang].phiNote(p.phi)}</div>`:''; }
-
+function phiBlock(key){const p=CATALOG[key];return p.phi?`<div class="note">${T[lang].phiNote(p.phi)}</div>`:'';}
 async function doseFlow(area){
   const tr=T[lang], key=pendingDose; pendingDose=null; const p=CATALOG[key];
   const units=area/100*p.dosePer100m2;
-  const qty=units>=1000? (units/1000).toFixed(1)+' kg' : Math.round(units)+' '+(lang==='ro'?'g':'г');
+  const qty=units>=1000?(units/1000).toFixed(1)+' kg':Math.round(units)+' '+(lang==='ro'?'g':'г');
   await bot(tr.doseRes(p.name[lang],area,qty,p.water?p.water[lang]:'—'));
-  await bot(productCard(key)+phiBlock(key),500);
-  await bot(tr.crossF+productCard('trend'),600);
+  await bot(productCard(key)+phiBlock(key),450);
+  await bot(tr.crossF+productCard('trend'),550);
+  await bot(backBtn(),300);
 }
-
-// recomandare OPTIMĂ pentru mană, în funcție de regiune
 async function recommendMana(){
-  const tr=T[lang];
-  let primary, alt;
-  if(region==='sud'){ primary='cupru'; alt='ridomil'; }
-  else { primary='ridomil'; alt='cupru'; }
+  const tr=T[lang]; let primary,alt;
+  if(region==='sud'){primary='cupru';alt='ridomil';} else {primary='ridomil';alt='cupru';}
   await bot(tr.mana[region]);
-  await bot(productCard(primary)+`<div class="why">✅ ${tr.whyMana[region]}</div>`+phiBlock(primary),550);
-  await bot(tr.alt+productCard(alt),500);
-  await bot(tr.rotate,550);
-  pendingDose=primary; await bot(tr.askArea,550);
+  await bot(productCard(primary)+`<div class="why">✅ ${tr.whyMana[region]}</div>`+phiBlock(primary),500);
+  await bot(tr.alt+productCard(alt),450);
+  await bot(tr.rotate,500);
+  pendingDose=primary; await bot(tr.askArea,500);
 }
-
-async function recommend(key, intro){
+async function recommend(key,intro){
   const tr=T[lang];
   if(intro) await bot(intro);
-  await bot(productCard(key)+phiBlock(key),500);
-  if(CATALOG[key].dosePer100m2){ pendingDose=key; await bot(tr.askArea,550); }
+  await bot(productCard(key)+phiBlock(key),450);
+  if(CATALOG[key].dosePer100m2){pendingDose=key;await bot(tr.askArea,500);} else await bot(backBtn(),300);
 }
-
 async function handle(text){
   const t=text.toLowerCase().trim(), tr=T[lang];
-  if(pendingDose){ const a=parseArea(t); if(a){ await doseFlow(a); return; } }
-  if(has(t,KW.order)){ await bot(tr.order); return; }
-  if(has(t,KW.greet)&&t.length<14){ await bot(tr.greet); setChips(); return; }
-
+  if(pendingDose){const a=parseArea(t);if(a){await doseFlow(a);return;}}
+  if(has(t,KW.menu)){ await menuMain(); return; }
+  if(has(t,KW.order)){ await myOrders(); return; }
+  if(has(t,KW.catalog)){ await catCats(); return; }
+  if(has(t,KW.greet)&&t.length<14){ await bot(tr.greet); await menuMain(); return; }
   if(has(t,KW.gandac)){ await recommend('aktara'); return; }
   if(has(t,KW.buruieni)){ await recommend('titus'); return; }
   if(has(t,KW.mana)||(has(t,KW.vita)&&!has(t,KW.seminte))||(has(t,KW.rosii)&&has(t,KW.mana))){ await recommendMana(); return; }
-  if(has(t,KW.seminte)){ await bot(tr.seedRec); await bot(productCard('seminte'),450); await bot(productCard('npk'),450); return; }
+  if(has(t,KW.seminte)){ await bot(tr.seedRec); await bot(productCard('seminte'),420); await bot(productCard('npk'),420); await bot(backBtn(),300); return; }
   if(has(t,KW.rosii)){ await recommendMana(); return; }
   if(has(t,KW.cartof)){ await recommend('aktara'); return; }
-
-  if(t.length>40){ await bot(tr.fallback); return; }
-  await bot(tr.notUnderstand); setChips();
+  if(t.length>40){ await bot(tr.fallback); await menuMain(); return; }
+  await bot(tr.notUnderstand); await menuMain();
 }
 
-/* ============================================================
-   CHIPS, INPUT, SELECTOARE
-   ============================================================ */
-function setChips(){
+/* ---------- CHIPS / INPUT / SELECTOARE ---------- */
+function setAgronomChips(){
   chipsEl.innerHTML='';
-  T[lang].chips.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.onclick=()=>send(c.replace(/^[^\wа-яА-Я]+/,'').trim());chipsEl.appendChild(b);});
+  T[lang].agronomChips.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.onclick=()=>send(c.replace(/^[^\wа-яА-Я]+/,'').trim());chipsEl.appendChild(b);});
 }
 async function send(text){
   if(!text) text=input.value.trim(); if(!text) return;
   input.value=''; addUser(text); chipsEl.innerHTML=''; await handle(text);
 }
 $('#send').onclick=()=>send();
+$('#menu-btn').onclick=()=>{ chipsEl.innerHTML=''; menuMain(); };
 input.addEventListener('keydown',e=>{ if(e.key==='Enter') send(); });
 
-document.querySelectorAll('#seg-tier button').forEach(b=>{
-  b.onclick=()=>{
-    document.querySelectorAll('#seg-tier button').forEach(x=>x.classList.remove('on'));
-    b.classList.add('on'); tier=b.dataset.t;
-    updateAllPrices(); sysMsg(T[lang].tierChanged(T[lang].tierName[tier]));
-  };
-});
-document.querySelectorAll('#seg-region button').forEach(b=>{
-  b.onclick=()=>{
-    document.querySelectorAll('#seg-region button').forEach(x=>x.classList.remove('on'));
-    b.classList.add('on'); region=b.dataset.r;
-    sysMsg(T[lang].regionChanged(T[lang].regionName[region]));
-  };
-});
+document.querySelectorAll('#seg-tier button').forEach(b=>{b.onclick=()=>{document.querySelectorAll('#seg-tier button').forEach(x=>x.classList.remove('on'));b.classList.add('on');tier=b.dataset.t;updateAllPrices();sysMsg(T[lang].tierChanged(T[lang].tierName[tier]));};});
+document.querySelectorAll('#seg-region button').forEach(b=>{b.onclick=()=>{document.querySelectorAll('#seg-region button').forEach(x=>x.classList.remove('on'));b.classList.add('on');region=b.dataset.r;sysMsg(T[lang].regionChanged(T[lang].regionName[region]));};});
 
-/* ============================================================
-   LIMBĂ
-   ============================================================ */
+/* ---------- LIMBĂ ---------- */
 function applyLang(){
   const tr=T[lang]; document.documentElement.lang=lang;
   input.placeholder=tr.placeholder;
@@ -465,15 +517,11 @@ function applyLang(){
   $('#f3b').textContent=tr.f3b; $('#f3s').textContent=tr.f3s;
   $('#f4b').textContent=tr.f4b; $('#f4s').textContent=tr.f4s;
   $('#p-foot').textContent=tr.foot;
-  $('#lbl-client').textContent=tr.lblClient; $('#lbl-zone').textContent=tr.lblZone;
-  $('#lock-txt').textContent=tr.lockTxt;
+  $('#lbl-client').textContent=tr.lblClient; $('#lbl-zone').textContent=tr.lblZone; $('#lock-txt').textContent=tr.lockTxt;
 }
-document.querySelectorAll('.lang button').forEach(b=>{
-  b.onclick=()=>{document.querySelectorAll('.lang button').forEach(x=>x.classList.remove('on'));b.classList.add('on');lang=b.dataset.l;pendingDose=null;applyLang();msgs.innerHTML='';boot();};
-});
+document.querySelectorAll('.lang button').forEach(b=>{b.onclick=()=>{document.querySelectorAll('.lang button').forEach(x=>x.classList.remove('on'));b.classList.add('on');lang=b.dataset.l;pendingDose=null;applyLang();msgs.innerHTML='';boot();};});
 
-/* ============================================================ */
-async function boot(){ applyLang(); await bot(T[lang].greet,400); setChips(); }
+async function boot(){ applyLang(); await bot(T[lang].greet,400); await menuMain(); }
 boot();
 </script>
 </body>
