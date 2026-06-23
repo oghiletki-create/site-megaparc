@@ -347,6 +347,10 @@ const T = {
     menuTitle:"Meniu principal:",
     mCatalog:"Catalog produse", mAgronom:"Consultant agronom", mOrders:"Comenzile mele",
     mOffers:"Ofertele mele", mDelivery:"Livrare & plată", mContact:"Contact & program", mMenu:"Meniu",
+    mFeedback:"Idei / ce mai dorești?",
+    fbPrompt:"Acesta e un demo 🙂 Spune-mi ce ți-ar plăcea să mai poată face botul (ex. integrare cu 1C, plată online, fișa fermierului, comenzi repetate…) și transmit echipei.",
+    fbThanks:"Mulțumim! 🌱 Am notat ideea ta. O poți trimite și echipei printr-un clic:",
+    fbSend:"✉️ Trimite ideea echipei",
     catTitle:"Alege o categorie:", backMenu:"⬅ Meniu principal",
     agronomPrompt:"Întreabă-mă orice despre cultura ta, ca pe un agronom: spune cultura și simptomul, iar eu îți dau soluția din catalogul Diolsem. Câteva exemple:",
     agronomChips:["🍇 Făinare la vie","🕷️ Păianjen la castraveți","🍎 Rapăn la măr","🌾 Buruieni perene","🐛 Omizi la pomi","🌱 Îngălbenire / carență"],
@@ -399,6 +403,10 @@ const T = {
     menuTitle:"Главное меню:",
     mCatalog:"Каталог товаров", mAgronom:"Агроном-консультант", mOrders:"Мои заказы",
     mOffers:"Мои предложения", mDelivery:"Доставка и оплата", mContact:"Контакты и режим", mMenu:"Меню",
+    mFeedback:"Идеи / что добавить?",
+    fbPrompt:"Это демо 🙂 Напишите, что бы вы хотели, чтобы бот ещё умел (например интеграция с 1С, онлайн-оплата, карточка фермера, повторные заказы…) — передам команде.",
+    fbThanks:"Спасибо! 🌱 Записал вашу идею. Можно отправить её команде в один клик:",
+    fbSend:"✉️ Отправить идею команде",
     catTitle:"Выберите категорию:", backMenu:"⬅ Главное меню",
     agronomPrompt:"Спрашивайте что угодно о вашей культуре, как у агронома: назовите культуру и симптом — дам решение из каталога Diolsem. Примеры:",
     agronomChips:["🍇 Оидиум на винограде","🕷️ Клещ на огурцах","🍎 Парша на яблоне","🌾 Многолетние сорняки","🐛 Гусеницы на деревьях","🌱 Пожелтение / дефицит"],
@@ -439,7 +447,7 @@ const T = {
 };
 
 /* ============================================================ */
-let lang='ro', tier='retail', region='centru', cart=0, pendingDose=null;
+let lang='ro', tier='retail', region='centru', cart=0, pendingDose=null, pendingFeedback=false;
 const $ = s=>document.querySelector(s);
 const msgs=$('#msgs'), chipsEl=$('#chips'), input=$('#input');
 
@@ -478,7 +486,8 @@ async function menuMain(){
     {ic:"📦",label:tr.mOrders,fn:"myOrders()"},
     {ic:"📄",label:tr.mOffers,fn:"myOffers()"},
     {ic:"🚚",label:tr.mDelivery,fn:"deliveryInfo()"},
-    {ic:"📍",label:tr.mContact,fn:"contactInfo()"}
+    {ic:"📍",label:tr.mContact,fn:"contactInfo()"},
+    {ic:"💡",label:tr.mFeedback,fn:"feedbackFlow()"}
   ]), 350);
 }
 window.menuMain=menuMain;
@@ -514,6 +523,14 @@ async function contactInfo(){await bot(T[lang].contactText+backBtn());}
 window.contactInfo=contactInfo;
 async function agronomStart(){await bot(T[lang].agronomPrompt);setAgronomChips();}
 window.agronomStart=agronomStart;
+async function feedbackFlow(){ chipsEl.innerHTML=''; pendingFeedback=true; await bot(T[lang].fbPrompt); }
+window.feedbackFlow=feedbackFlow;
+async function sendFeedback(text){
+  const tr=T[lang];
+  const href="mailto:oghiletki@gmail.com?subject="+encodeURIComponent("Idee pentru botul Diolsem")+"&body="+encodeURIComponent(text);
+  const link=`<div class="menu single"><a href="${href}" style="display:flex;align-items:center;gap:8px;border:1px solid var(--green);background:var(--green-l);border-radius:10px;padding:9px 11px;font-size:12.5px;font-weight:600;color:var(--green-d);text-decoration:none"><span class="mi">✉️</span>${tr.fbSend}</a></div>`;
+  await bot(tr.fbThanks+link+backBtn());
+}
 
 /* ---------- AGRONOM ---------- */
 const KW={
@@ -582,6 +599,7 @@ async function answerKB(e){
 
 async function handle(text){
   const t=text.toLowerCase().trim(), tr=T[lang];
+  if(pendingFeedback){ pendingFeedback=false; await sendFeedback(text); return; }
   if(pendingDose){const a=parseArea(t);if(a){await doseFlow(a);return;}}
   if(has(t,KW.menu)){ await menuMain(); return; }
   if(has(t,KW.order)){ await myOrders(); return; }
