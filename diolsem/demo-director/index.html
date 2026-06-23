@@ -85,6 +85,20 @@
   .store .row:first-of-type{margin-top:10px}
   .tag-ok{color:var(--green-d);font-weight:700}.tag-warn{color:var(--amber);font-weight:700}
 
+  .agent{display:flex;align-items:center;gap:11px;padding:11px 0;border-top:1px solid var(--line)}
+  .agent:first-of-type{border-top:0}
+  .rank{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:14px;background:var(--green-l);color:var(--green-d);flex:0 0 30px}
+  .rank.top{background:var(--accent);color:#3a2c00}
+  .agent .who2{flex:1;min-width:0}
+  .agent .who2 b{font-size:13.5px}
+  .agent .who2 .z{font-size:11px;color:var(--muted)}
+  .agent .bar{height:6px;background:var(--line);border-radius:999px;margin-top:5px;overflow:hidden;max-width:170px}
+  .agent .bar i{display:block;height:100%;border-radius:999px}
+  .agent .nums{text-align:right;flex:0 0 auto;font-size:12px;line-height:1.5}
+  .agent .nums .s{font-weight:700}
+  .agent .nums .com{color:var(--green-d);font-weight:800;display:block}
+  .pct{font-weight:700}
+
   .wish{background:linear-gradient(135deg,#1b5e20,#2e7d32);color:#fff;border-radius:14px;padding:18px;box-shadow:var(--shadow);margin-bottom:16px}
   .wish h3{margin:0 0 4px;font-size:16px;display:flex;align-items:center;gap:8px}
   .wish p.sub{margin:0 0 12px;font-size:12.5px;opacity:.9}
@@ -175,6 +189,15 @@ const DEPTS={
       ["Alerte valabilitate / omologare","nimic nu expiră pe neașteptate"]]}
 };
 
+const AGENTS=[
+  {name:"A. Ciobanu",zone:"Nord · Bălți",sales:312400,target:124,com:9372},
+  {name:"V. Rusu",zone:"Centru · Chișinău",sales:298100,target:109,com:8943},
+  {name:"I. Moraru",zone:"Sud · Cahul",sales:245800,target:98,com:7374},
+  {name:"D. Postică",zone:"Centru · Chișinău",sales:210300,target:88,com:6309},
+  {name:"M. Cazacu",zone:"Nord · Bălți",sales:176900,target:79,com:5307},
+  {name:"S. Bejan",zone:"Online · telesales",sales:154200,target:71,com:4626}
+];
+
 const WISH=[
   ["Oferte automate pe nivelul corect de preț","— eu doar aprob excepțiile"],
   ["Toate comenzile (telefon/WhatsApp/site) într-un singur ecran","— fără re-tastare"],
@@ -192,6 +215,7 @@ const NAV=[
   ["stores","🏬","Magazine"],
   ["sep"],
   ["vanzari","💼","Vânzări"],
+  ["agenti","🏆","Agenți (clasament)"],
   ["achizitii","📦","Achiziții"],
   ["logistica","🚚","Logistică"],
   ["contabilitate","💰","Contabilitate"],
@@ -261,6 +285,35 @@ function renderMain(){
         </div>`).join('')}</div>
       <div class="card" style="margin-top:16px"><h3>⚙️ Ce s-ar automatiza la nivel de magazine</h3>
         ${autoList([["Stoc și prețuri sincronizate între magazine și online","un produs epuizat dispare automat din online"],["Comparație vânzări între magazine, în timp real","vezi care merge și care nu"],["Reaprovizionare per magazin","fiecare magazin primește ce-i trebuie, la timp"],["Prețuri pe nivel de client, aplicate peste tot","modificabile doar de directorul de vânzări"]])}
+      </div>
+    `;
+  } else if(view==="agenti"){
+    const sorted=[...AGENTS].sort((a,b)=>b.sales-a.sales);
+    const totCom=AGENTS.reduce((s,a)=>s+a.com,0);
+    const totSales=AGENTS.reduce((s,a)=>s+a.sales,0);
+    const medal=["🥇","🥈","🥉"];
+    const tcol=p=>p>=100?"#2e7d32":(p>=85?"#ef6c00":"#c62828");
+    const fmt=n=>n.toLocaleString("ro-RO");
+    m.innerHTML=`
+      <div class="h"><div class="ic">🏆</div><div><h1>Agenți — clasament & comisioane</h1><p>Luna curentă · comision 3% din vânzări · date demo</p></div></div>
+      <div class="kpis">
+        <div class="kpi"><b>${AGENTS.length}</b><span>agenți activi</span></div>
+        <div class="kpi"><b>${fmt(totSales)} lei</b><span>vânzări agenți (lună)</span></div>
+        <div class="kpi"><b>${fmt(totCom)} lei</b><span>comisioane de plată</span></div>
+        <div class="kpi"><b>${sorted[0].name}</b><span>top vânzător 🏆</span></div>
+      </div>
+      <div class="card"><h3>📈 Clasament <span class="c">după vânzări</span></h3>
+        ${sorted.map((a,i)=>`
+          <div class="agent">
+            <div class="rank ${i<3?'top':''}">${i<3?medal[i]:(i+1)}</div>
+            <div class="who2"><b>${a.name}</b><div class="z">${a.zone}</div>
+              <div class="bar"><i style="width:${Math.min(a.target,100)}%;background:${tcol(a.target)}"></i></div>
+            </div>
+            <div class="nums"><span class="s">${fmt(a.sales)} lei</span> · <span class="pct" style="color:${tcol(a.target)}">${a.target}%</span><span class="com">+${fmt(a.com)} lei comision</span></div>
+          </div>`).join('')}
+      </div>
+      <div class="card" style="margin-top:16px"><h3>⚙️ Ce automatizăm aici <span class="c">AI</span></h3>
+        ${autoList([["Comisioane calculate automat","din vânzările confirmate — fără Excel, fără erori"],["Clasament în timp real","fiecare agent își vede poziția și targetul"],["Alerte agenți sub target","intervii din timp, nu la final de lună"],["Obiective și bonusuri urmărite automat","transparent pentru echipă și pentru tine"]])}
       </div>
     `;
   } else {
