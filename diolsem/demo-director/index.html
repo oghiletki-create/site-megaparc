@@ -284,7 +284,7 @@ function renderMain(){
           <div class="row"><span>Stoc</span><span class="${s.ok?'tag-ok':'tag-warn'}">${s.stock}</span></div>
         </div>`).join('')}</div>
       <div class="card" style="margin-top:16px"><h3>⚙️ Ce s-ar automatiza la nivel de magazine</h3>
-        ${autoList([["Stoc și prețuri sincronizate între magazine și online","un produs epuizat dispare automat din online"],["Comparație vânzări între magazine, în timp real","vezi care merge și care nu"],["Reaprovizionare per magazin","fiecare magazin primește ce-i trebuie, la timp"],["Prețuri pe nivel de client, aplicate peste tot","modificabile doar de directorul de vânzări"]])}
+        ${autoList([["Aceeași politică de preț pe TOATE canalele, inclusiv magazinul online","Retail/Fermier/Angro, persistă identic pe site — modificabilă doar de directorul de vânzări"],["Stoc și prețuri sincronizate între magazine și online","un produs epuizat dispare automat din online; un preț schimbat se reflectă instant peste tot"],["Comparație vânzări între magazine, în timp real","vezi care merge și care nu"],["Reaprovizionare per magazin","fiecare magazin primește ce-i trebuie, la timp"]])}
       </div>
     `;
   } else if(view==="agenti"){
