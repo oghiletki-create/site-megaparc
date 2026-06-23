@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diolsem — Bot magazin agricol (demo)</title>
+<!--
+  PROTOTIP DEMONSTRATIV pentru pitch — Diolsem.md
+  ---------------------------------------------------------------
+  Bot complet, cu MENIU PRINCIPAL (nu doar consultant agronom):
+   • Catalog pe categorii   • Consultant agronom (climă + variantă optimă)
+   • Comenzile mele         • Ofertele mele (fișa clientului, status plată)
+   • Livrare & plată        • Contact & program
+  Plus: niveluri de preț Retail/Fermier/Angro (preț blocat — doar directorul
+  de vânzări îl modifică), produse autohton vs. import, RO/RU.
+
+  LOGO: marcaj SVG în identitatea Diolsem (verde, lăstar). În producție se
+  înlocuiește cu logo-ul oficial al clientului (un singur fișier).
+  CREIER: în producție LLM (Claude) + RAG pe catalogul real + fișe tehnice.
+-->
+<style>
+  :root{
+    --green:#2e7d32; --green-d:#1b5e20; --green-l:#e8f5e9;
+    --earth:#6d4c41; --bg:#f4f6f3; --card:#ffffff; --ink:#1f2a24;
+    --muted:#6b7a70; --line:#e2e8e2; --accent:#f9a825; --amber:#ef6c00;
+    --shadow:0 10px 30px rgba(27,94,32,.12); --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;
+    background:linear-gradient(160deg,#eef3ec 0%,#e3efe2 100%);color:var(--ink);
+    min-height:100%;display:flex;align-items:center;justify-content:center;padding:24px}
+  .wrap{width:100%;max-width:1060px}
+  .topnote{text-align:center;margin:0 0 16px;color:var(--green-d);font-size:13px}
+  .topnote b{background:var(--accent);color:#3a2c00;padding:2px 8px;border-radius:999px;font-size:11px;letter-spacing:.5px}
+  .layout{display:grid;grid-template-columns:1.02fr .98fr;gap:22px;align-items:start}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}}
+
+  .pitch{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px;border:1px solid var(--line)}
+  .logo{display:flex;align-items:center;gap:12px}
+  .logo .mark{width:46px;height:46px;flex:0 0 46px;color:var(--green-d)}
+  .logo .wm{line-height:1}
+  .logo .wm b{font-size:25px;font-weight:800;color:var(--green-d);letter-spacing:.2px;display:block}
+  .logo .wm span{font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+  .pitch h1{font-size:21px;margin:18px 0 6px;line-height:1.25}
+  .pitch p.lead{color:var(--muted);margin:0 0 16px;font-size:14.5px;line-height:1.5}
+  .feat{display:flex;gap:11px;padding:11px 0;border-top:1px solid var(--line)}
+  .feat .ic{flex:0 0 34px;height:34px;border-radius:9px;background:var(--green-l);display:grid;place-items:center;font-size:17px}
+  .feat b{display:block;font-size:14.5px}
+  .feat span{color:var(--muted);font-size:13px;line-height:1.45}
+  .pitch .foot{margin-top:16px;font-size:12px;color:var(--muted);line-height:1.5;border-top:1px solid var(--line);padding-top:12px}
+
+  .chat{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line);display:flex;flex-direction:column;height:700px;overflow:hidden}
+  .chat-head{background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px}
+  .chat-head .mark{width:38px;height:38px;flex:0 0 38px;color:#fff}
+  .chat-head .who{flex:1}
+  .chat-head .who b{font-size:15px;display:block}
+  .chat-head .who span{font-size:12px;opacity:.9;display:flex;align-items:center;gap:6px}
+  .dot{width:8px;height:8px;border-radius:50%;background:#7CFC9B;animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,252,155,.6)}70%{box-shadow:0 0 0 7px rgba(124,252,155,0)}100%{box-shadow:0 0 0 0 rgba(124,252,155,0)}}
+  .lang{display:flex;gap:4px}
+  .lang button{border:1px solid rgba(255,255,255,.5);background:transparent;color:#fff;border-radius:7px;padding:4px 8px;font-size:12px;font-weight:700;cursor:pointer}
+  .lang button.on{background:#fff;color:var(--green-d)}
+
+  .ctxbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding:9px 14px;background:#f0f5ef;border-bottom:1px solid var(--line);font-size:12px}
+  .ctx{display:flex;align-items:center;gap:7px}
+  .ctx>label{color:var(--muted);font-weight:600}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+  .seg button{border:0;background:#fff;padding:5px 9px;font-size:12px;cursor:pointer;color:var(--ink);font-weight:600}
+  .seg button.on{background:var(--green);color:#fff}
+  .lockhint{display:flex;align-items:center;gap:5px;color:var(--earth);font-size:11px;margin-left:auto}
+
+  .msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:11px;background:var(--bg)}
+  .row{display:flex;gap:9px;max-width:92%}
+  .row.user{align-self:flex-end;flex-direction:row-reverse}
+  .bub{padding:10px 13px;border-radius:14px;font-size:14px;line-height:1.5;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+  .row.bot .bub{background:#fff;border:1px solid var(--line);border-top-left-radius:4px}
+  .row.user .bub{background:var(--green);color:#fff;border-top-right-radius:4px}
+  .mini-av{width:30px;height:30px;border-radius:50%;background:var(--green-l);display:grid;place-items:center;font-size:16px;flex:0 0 30px}
+  .sys{align-self:center;background:#eef3ec;border:1px dashed #cdddc9;color:var(--green-d);font-size:11.5px;padding:4px 11px;border-radius:999px}
+
+  .typing{display:flex;gap:4px;padding:12px 14px}
+  .typing i{width:7px;height:7px;border-radius:50%;background:#bcc9bf;animation:bounce 1.3s infinite}
+  .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+  @keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
+
+  /* MENIU principal (butoane în mesaj) */
+  .menu{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
+  .menu.single{grid-template-columns:1fr}
+  .menu button{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 11px;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;text-align:left}
+  .menu button:hover{border-color:var(--green);background:var(--green-l)}
+  .menu button .mi{font-size:16px;flex:0 0 18px;text-align:center}
+
+  .prod{background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px;margin-top:8px;display:flex;gap:11px;align-items:flex-start}
+  .prod .pic{width:46px;height:46px;border-radius:10px;background:var(--green-l);display:grid;place-items:center;font-size:24px;flex:0 0 46px}
+  .prod .info{flex:1;min-width:0}
+  .prod .info b{font-size:13.5px;display:block}
+  .badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+  .b{font-size:10px;padding:1px 7px;border-radius:999px;font-weight:600}
+  .b.cat{background:var(--green-l);color:var(--green-d)}
+  .b.ro{background:#e3f2fd;color:#1565c0}
+  .b.imp{background:#fff3e0;color:var(--amber)}
+  .b.stock{background:#e8f5e9;color:#2e7d32}
+  .b.lead{background:#fff3e0;color:var(--amber)}
+  .prod .price{font-weight:800;color:var(--green-d);font-size:14.5px;margin-top:6px;display:flex;align-items:center;gap:6px}
+  .prod .price .tier{font-size:10px;font-weight:600;color:var(--muted);background:#f0f5ef;padding:1px 6px;border-radius:999px}
+  .prod .price .lock{font-size:11px;color:var(--earth);cursor:help}
+  .prod button.add{margin-top:7px;border:0;background:var(--green);color:#fff;border-radius:8px;padding:6px 11px;font-size:12.5px;font-weight:700;cursor:pointer}
+  .prod button.add:hover{background:var(--green-d)}
+  .note{font-size:11.5px;color:var(--earth);background:#fff7e6;border:1px solid #ffe2a8;border-radius:9px;padding:7px 10px;margin-top:8px;line-height:1.45}
+  .why{font-size:12px;color:var(--green-d);background:#f1f8e9;border-left:3px solid var(--green);border-radius:6px;padding:6px 10px;margin-top:7px;line-height:1.45}
+  .offer{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-top:7px;font-size:13px}
+  .offer .st{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px}
+  .st.paid{background:#e8f5e9;color:#2e7d32}.st.wait{background:#fff3e0;color:var(--amber)}
+
+  .chips{display:flex;flex-wrap:wrap;gap:7px;padding:10px 14px;border-top:1px solid var(--line);background:#fff;min-height:0}
+  .chips button{border:1px solid var(--green);color:var(--green-d);background:#fff;border-radius:999px;padding:6px 12px;font-size:12.5px;cursor:pointer;font-weight:600}
+  .chips button:hover{background:var(--green-l)}
+  .composer{display:flex;gap:8px;padding:11px 12px;border-top:1px solid var(--line);background:#fff}
+  .composer .menu-btn{border:1px solid var(--line);background:#fff;color:var(--green-d);width:44px;border-radius:11px;font-size:17px;cursor:pointer}
+  .composer .menu-btn:hover{background:var(--green-l);border-color:var(--green)}
+  .composer input{flex:1;border:1px solid var(--line);border-radius:11px;padding:11px 13px;font-size:14px;outline:none}
+  .composer input:focus{border-color:var(--green)}
+  .composer .send{border:0;background:var(--green);color:#fff;width:44px;border-radius:11px;font-size:18px;cursor:pointer}
+  .cart{position:relative}
+  .cart .badge{position:absolute;top:-6px;right:-6px;background:var(--accent);color:#3a2c00;font-size:10px;font-weight:800;min-width:17px;height:17px;border-radius:999px;display:grid;place-items:center;padding:0 4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="topnote"><b id="t-badge">DEMO</b> &nbsp;<span id="t-note">Prototip pentru pitch cu logo-ul Diolsem; în producție: LLM (Claude) + RAG pe catalogul real.</span></p>
+
+  <div class="layout">
+    <section class="pitch">
+      <div class="logo">
+        <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><g fill="currentColor">
+          <circle cx="31.9" cy="16.1" r="7.8"/>
+          <circle cx="16.1" cy="16.1" r="7.8"/>
+          <circle cx="31.9" cy="31.9" r="7.8"/>
+          <circle cx="16.1" cy="31.9" r="7.8"/>
+          <rect x="21.6" y="21.6" width="4.8" height="4.8" rx="1.4"/>
+        </g></svg>
+        <div class="wm"><b>Diolsem</b><span>Magazin agricol · Moldova</span></div>
+      </div>
+      <h1 id="p-h1">Bot complet pentru magazinul agricol</h1>
+      <p class="lead" id="p-lead">Cu meniu principal ca orice bot serios: catalog, comenzi, oferte, livrare, contact — plus un consultant agronom care alege varianta optimă pentru zona clientului.</p>
+      <div class="feat"><div class="ic">🧭</div><div><b id="f1b">Meniu principal</b><span id="f1s">Catalog · Agronom · Comenzile mele · Oferte · Livrare · Contact — totul la un clic.</span></div></div>
+      <div class="feat"><div class="ic">🌍</div><div><b id="f2b">Consultant agronom climatic</b><span id="f2s">Recomandă varianta optimă după regiune (Nord/Centru/Sud) și sezon.</span></div></div>
+      <div class="feat"><div class="ic">📄</div><div><b id="f3b">Comenzi & oferte în fișa ta</b><span id="f3s">Vezi comenzile și ofertele cu statusul plății — confirmare automată a achitării.</span></div></div>
+      <div class="feat"><div class="ic">🔒</div><div><b id="f4b">Preț pe nivel, blocat</b><span id="f4s">Retail/Fermier/Angro automat. Prețul îl modifică doar directorul de vânzări.</span></div></div>
+      <p class="foot" id="p-foot">Demo cu eșantion de catalog și logică simulată. Logo de probă în identitatea Diolsem — se înlocuiește cu cel oficial. În producție răspunsurile sunt ancorate în datele oficiale Diolsem.</p>
+    </section>
+
+    <section class="chat">
+      <div class="chat-head">
+        <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><g fill="currentColor">
+          <circle cx="31.9" cy="16.1" r="7.8"/>
+          <circle cx="16.1" cy="16.1" r="7.8"/>
+          <circle cx="31.9" cy="31.9" r="7.8"/>
+          <circle cx="16.1" cy="31.9" r="7.8"/>
+          <rect x="21.6" y="21.6" width="4.8" height="4.8" rx="1.4"/>
+        </g></svg>
+        <div class="who"><b id="c-name">Diolsem · Asistent</b><span><i class="dot"></i> <span id="c-status">online · răspunde instant</span></span></div>
+        <div class="cart">🛒<span class="badge" id="cart-badge">0</span></div>
+        <div class="lang"><button data-l="ro" class="on">RO</button><button data-l="ru">RU</button></div>
+      </div>
+
+      <div class="ctxbar">
+        <div class="ctx"><label id="lbl-client">Client:</label>
+          <div class="seg" id="seg-tier">
+            <button data-t="retail" class="on">Retail</button>
+            <button data-t="fermier">Fermier</button>
+            <button data-t="angro">Angro</button>
+          </div>
+        </div>
+        <div class="ctx"><label id="lbl-zone">Zonă:</label>
+          <div class="seg" id="seg-region">
+            <button data-r="nord">Nord</button>
+            <button data-r="centru" class="on">Centru</button>
+            <button data-r="sud">Sud</button>
+          </div>
+        </div>
+        <div class="lockhint" title="Doar directorul de vânzări poate modifica prețul"><span>🔒</span><span id="lock-txt">preț fixat</span></div>
+      </div>
+
+      <div class="msgs" id="msgs"></div>
+      <div class="chips" id="chips"></div>
+      <div class="composer">
+        <button class="menu-btn" id="menu-btn" title="Meniu">☰</button>
+        <input id="input" placeholder="Scrie un mesaj…" autocomplete="off">
+        <button class="send" id="send">➤</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CATALOG + CATEGORII
+   ============================================================ */
+const CATALOG = {
+  ridomil:{emoji:"🧴", cat:{ro:"Fungicid",ru:"Фунгицид"},
+    price:{retail:215,fermier:189,angro:168}, origin:{type:"import",country:"CH"}, inStock:true, lead:null,
+    name:{ro:"Ridomil Gold (fungicid sistemic)",ru:"Ридомил Голд (системный фунгицид)"},
+    dosePer100m2:25, water:{ro:"5 L apă",ru:"5 л воды"}, phi:14},
+  cupru:{emoji:"🫧", cat:{ro:"Fungicid",ru:"Фунгицид"},
+    price:{retail:95,fermier:82,angro:72}, origin:{type:"ro"}, inStock:true, lead:null,
+    name:{ro:"Zeamă bordeleză (cupru)",ru:"Бордоская смесь (медь)"},
+    dosePer100m2:60, water:{ro:"5 L apă",ru:"5 л воды"}, phi:20},
+  aktara:{emoji:"🐞", cat:{ro:"Insecticid",ru:"Инсектицид"},
+    price:{retail:169,fermier:145,angro:128}, origin:{type:"import",country:"CH"}, inStock:true, lead:null,
+    name:{ro:"Aktara (gândac de Colorado)",ru:"Актара (колорадский жук)"},
+    dosePer100m2:1.2, water:{ro:"4 L apă",ru:"4 л воды"}, phi:20},
+  titus:{emoji:"🌿", cat:{ro:"Erbicid",ru:"Гербицид"},
+    price:{retail:360,fermier:320,angro:285}, origin:{type:"import",country:"US"}, inStock:false, lead:{ro:"import ~2 săpt.",ru:"импорт ~2 нед."},
+    name:{ro:"Titus (erbicid porumb/cartof)",ru:"Титус (гербицид кукуруза/картофель)"},
+    dosePer100m2:0.5, water:{ro:"3 L apă",ru:"3 л воды"}, phi:0},
+  npk:{emoji:"💎", cat:{ro:"Îngrășământ",ru:"Удобрение"},
+    price:{retail:75,fermier:65,angro:58}, origin:{type:"ro"}, inStock:true, lead:null,
+    name:{ro:"Nitroammofoska 16:16:16 (Diolsem)",ru:"Нитроаммофоска 16:16:16 (Diolsem)"},
+    dosePer100m2:3000, water:null, phi:0},
+  seminte:{emoji:"🍅", cat:{ro:"Semințe",ru:"Семена"},
+    price:{retail:28,fermier:25,angro:22}, origin:{type:"ro"}, inStock:true, lead:null,
+    name:{ro:"Semințe roșii Marmande",ru:"Семена томатов Маранд"},
+    dosePer100m2:null, water:null, phi:0},
+  trend:{emoji:"💧", cat:{ro:"Adjuvant",ru:"Прилипатель"},
+    price:{retail:55,fermier:48,angro:42}, origin:{type:"import",country:"DE"}, inStock:true, lead:null,
+    name:{ro:"Trend (adeziv-umectant)",ru:"Тренд (прилипатель)"},
+    dosePer100m2:null, water:null, phi:0},
+  protectie:{emoji:"🧤", cat:{ro:"Echipament",ru:"Защита"},
+    price:{retail:110,fermier:99,angro:89}, origin:{type:"ro"}, inStock:true, lead:null,
+    name:{ro:"Set protecție (mască + mănuși)",ru:"Набор защиты (маска + перчатки)"},
+    dosePer100m2:null, water:null, phi:0},
+  topas:{emoji:"🌫️", cat:{ro:"Fungicid",ru:"Фунгицид"},
+    price:{retail:240,fermier:210,angro:188}, origin:{type:"import",country:"CH"}, inStock:true, lead:null,
+    name:{ro:"Topas (fungicid făinare/rugină)",ru:"Топаз (мучнистая роса/ржавчина)"},
+    dosePer100m2:5, water:{ro:"5 L apă",ru:"5 л воды"}, phi:14},
+  vertimec:{emoji:"🕷️", cat:{ro:"Acaricid",ru:"Акарицид"},
+    price:{retail:285,fermier:250,angro:222}, origin:{type:"import",country:"CH"}, inStock:true, lead:null,
+    name:{ro:"Vertimec (păianjen / tripși)",ru:"Вертимек (клещ / трипс)"},
+    dosePer100m2:8, water:{ro:"5 L apă",ru:"5 л воды"}, phi:3},
+  decis:{emoji:"🐛", cat:{ro:"Insecticid",ru:"Инсектицид"},
+    price:{retail:130,fermier:112,angro:99}, origin:{type:"import",country:"FR"}, inStock:true, lead:null,
+    name:{ro:"Decis (contact – omizi/molii)",ru:"Децис (контакт – гусеницы)"},
+    dosePer100m2:5, water:{ro:"5 L apă",ru:"5 л воды"}, phi:7},
+  uragan:{emoji:"🚫", cat:{ro:"Erbicid total",ru:"Тотальный гербицид"},
+    price:{retail:180,fermier:158,angro:140}, origin:{type:"import",country:"CH"}, inStock:true, lead:null,
+    name:{ro:"Uragan (glifosat – buruieni perene)",ru:"Ураган (глифосат – многолетние)"},
+    dosePer100m2:40, water:{ro:"3 L apă",ru:"3 л воды"}, phi:0},
+  foliar:{emoji:"🌿", cat:{ro:"Îngrășământ foliar",ru:"Листовое удобрение"},
+    price:{retail:60,fermier:52,angro:46}, origin:{type:"ro"}, inStock:true, lead:null,
+    name:{ro:"Îngrășământ foliar (Diolsem)",ru:"Листовое удобрение (Diolsem)"},
+    dosePer100m2:20, water:{ro:"5 L apă",ru:"5 л воды"}, phi:0}
+};
+const CATS = {
+  seminte:{ic:"🌱", name:{ro:"Semințe",ru:"Семена"}, items:["seminte"]},
+  ingrasaminte:{ic:"💎", name:{ro:"Îngrășăminte",ru:"Удобрения"}, items:["npk","foliar"]},
+  fungicide:{ic:"🧴", name:{ro:"Fungicide",ru:"Фунгициды"}, items:["ridomil","cupru","topas"]},
+  insecticide:{ic:"🐞", name:{ro:"Insecticide / acaricide",ru:"Инсектициды / акарициды"}, items:["aktara","vertimec","decis"]},
+  erbicide:{ic:"🌿", name:{ro:"Erbicide",ru:"Гербициды"}, items:["titus","uragan"]},
+  adjuvanti:{ic:"💧", name:{ro:"Adjuvanți",ru:"Прилипатели"}, items:["trend"]},
+  echipament:{ic:"🧤", name:{ro:"Echipament",ru:"Оборудование"}, items:["protectie"]}
+};
+
+/* ============================================================
+   BAZĂ DE CUNOȘTINȚE AGRONOMICE (demo)
+   În producție: LLM (Claude) + RAG pe fișele tehnice + profil
+   agro-climatic → răspunde la ORICE întrebare. Aici acoperim cele
+   mai frecvente probleme pe culturi din R. Moldova, fiecare cu
+   soluția din catalogul Diolsem.
+   ============================================================ */
+const KB = [
+  {kw:["rapan","răpăn","venturia","парша","măr ","mar ","яблон"],
+   ans:{ro:"Rapănul mărului (pete brune-măslinii pe frunze și fructe) e favorizat de primăverile umede din Moldova. Program: cupru la dezmugurit, apoi un fungicid sistemic în perioadele de risc. Repetă la 10–12 zile.",
+        ru:"Парша яблони (бурo-оливковые пятна на листьях и плодах) развивается во влажную весну. Схема: медь по зелёному конусу, затем системный фунгицид в периоды риска. Повтор каждые 10–12 дней."},
+   prods:["cupru","topas"], dose:true, rotate:true},
+  {kw:["fainar","făinar","oidium","oidiu","mucegai alb","alb pe frunz","мучнист","оидиум","белый налет"],
+   ans:{ro:"Făinarea (oidiu) apare ca un strat albicios pe frunze și boabe — frecventă vara la viță, castraveți, dovlecei, măr și trandafir, pe timp cald. Tratează preventiv și la primele semne cu un fungicid sistemic (triazol).",
+        ru:"Мучнистая роса (оидиум) — белёсый налёт на листьях и ягодах, часто летом на винограде, огурцах, кабачках, яблоне. Обрабатывайте профилактически и при первых признаках системным фунгицидом (триазол)."},
+   prods:["topas","cupru"], dose:true, rotate:true},
+  {kw:["rugina","rugină","ржавчин"],
+   ans:{ro:"Rugina (pustule ruginii pe frunze — grâu, usturoi, prun, trandafir) se combate cu fungicide triazole, aplicate preventiv și la primele pustule.",
+        ru:"Ржавчина (рыжие пустулы на листьях — пшеница, чеснок, слива, роза) контролируется триазольными фунгицидами, профилактически и при первых пустулах."},
+   prods:["topas"], dose:true, rotate:true},
+  {kw:["colorado","gandac","gândac","жук"],
+   ans:{ro:"Gândacul de Colorado atacă cartoful și vânăta. Cel mai eficient e tratamentul la apariția larvelor tinere. Folosește un insecticid sistemic și alternează grupele între generații, ca să eviți rezistența.",
+        ru:"Колорадский жук поражает картофель и баклажан. Эффективнее всего обработка по молодым личинкам. Системный инсектицид + чередование групп между поколениями от устойчивости."},
+   prods:["aktara"], dose:true, rotate:true},
+  {kw:["acarian","acarien","paianjen","păianjen","клещ","паутин"],
+   ans:{ro:"Acarienii (păianjenul roșu) apar pe timp cald și uscat — frecvent vara în sudul Moldovei — și dau frunze bronzate cu pânză fină. Au nevoie de un acaricid specific; insecticidele obișnuite și cuprul nu îi opresc.",
+        ru:"Клещи (паутинный) появляются в жару и засуху — часто летом на юге Молдовы — лист бронзовеет, тонкая паутина. Нужен специальный акарицид; обычные инсектициды и медь не помогают."},
+   prods:["vertimec"], dose:true},
+  {kw:["trips","трипс","тripс"],
+   ans:{ro:"Tripșii dau pete argintii și deformează frunzele și florile (ceapă, castraveți, ardei). Tratează repetat la ~7 zile și alternează un acaricid-insecticid cu unul sistemic.",
+        ru:"Трипс оставляет серебристые пятна и деформирует листья/цветки (лук, огурцы, перец). Обработка повторно ~каждые 7 дней, чередуя акарицид-инсектицид с системным."},
+   prods:["vertimec","aktara"], dose:true},
+  {kw:["omid","omizi","molie","molia","omid","larve","viermi","гусениц","листоверт","плодожорк"],
+   ans:{ro:"Omizile (molia strugurilor, molia mărului, omizi defoliatoare) rod frunzele și fructele. Tratează la apariția larvelor, ideal pe baza capcanelor de avertizare; un insecticid de contact dă rezultat rapid.",
+        ru:"Гусеницы (листовёртка винограда, плодожорка яблони, листогрызущие) повреждают листья и плоды. Обработка по выходу личинок, лучше по феромонным ловушкам; контактный инсектицид действует быстро."},
+   prods:["decis"], dose:true, rotate:true},
+  {kw:["afid","paduch","păduch","тля"],
+   ans:{ro:"Afidele (păduchii de frunză) sug seva și transmit viroze; apar primăvara–vara pe multe culturi. Un insecticid sistemic le controlează rapid — tratează dimineața, pe vreme fără vânt.",
+        ru:"Тля высасывает сок и переносит вирусы; появляется весной–летом на многих культурах. Системный инсектицид быстро решает — обрабатывайте утром, в безветрие."},
+   prods:["aktara"], dose:true},
+  {kw:["palamida","pălămid","pir","costrei","volbura","perene","curatare","curățare","parloag","pârloag","глифос","пырей","осот","многолетн"],
+   ans:{ro:"Pentru buruieni perene (pir, pălămidă, volbură) sau curățarea unui teren necultivat, folosește un erbicid total (glifosat), pe buruieni în creștere activă. Atenție: nu pe cultură — distruge tot ce e verde.",
+        ru:"Против многолетних сорняков (пырей, осот, вьюнок) или для очистки участка — тотальный гербицид (глифосат) по активно растущим сорнякам. Внимание: не по культуре — уничтожает всё зелёное."},
+   prods:["uragan"], dose:true},
+  {kw:["buruien","buruiana","sorni","сорня","сорняк"],
+   ans:{ro:"Pentru buruieni într-o cultură (porumb, cartof) folosește un erbicid selectiv, aplicat postemergent pe buruieni tinere, respectând cultura și faza ei.",
+        ru:"Против сорняков в культуре (кукуруза, картофель) — селективный гербицид, послевсходово по молодым сорнякам, с учётом культуры и её фазы."},
+   prods:["titus"], dose:true},
+  {kw:["ingalbenire","îngălbenire","galben","желте","carenta","carență","питание","подкорм","ingras","îngrăș","удобр","rod slab","nu creste","nu cresc","slab","weak"],
+   ans:{ro:"Îngălbenirea și creșterea slabă indică des o carență de nutriție. Pe cernoziomurile Moldovei, un îngrășământ complex NPK la sol plus unul foliar pentru corecție rapidă dau rezultat. Doza se stabilește după cultură.",
+        ru:"Пожелтение и слабый рост часто означают дефицит питания. На чернозёмах Молдовы помогает комплексное NPK в почву плюс листовое для быстрой коррекции. Доза — по культуре."},
+   prods:["npk","foliar"], dose:false},
+  {kw:["program","schema","schemă","calendar","tratament vie","tratamente","stropir","stropit","schema vie"],
+   ans:{ro:"Program de bază la viță în Moldova: cupru/contact la început, fungicid sistemic în perioadele de risc (mană, făinare), cu rotația grupelor la 10–14 zile. Îți pot detalia pe fenofaze.",
+        ru:"Базовая схема на винограде в Молдове: медь/контакт в начале, системный фунгицид в периоды риска (милдью, оидиум), с чередованием групп каждые 10–14 дней. Могу расписать по фенофазам."},
+   prods:["cupru","ridomil","topas"], dose:false, rotate:true},
+  {kw:["masca","mască","manusi","mănuși","protectie","protecție","respirator","echipament","защит","маска","перчатк"],
+   ans:{ro:"Lucrul cu pesticide cere echipament de protecție: mască/respirator, mănuși, ochelari. Îl avem ca set complet.",
+        ru:"Работа с пестицидами требует средств защиты: маска/респиратор, перчатки, очки. У нас есть полный набор."},
+   prods:["protectie"], dose:false},
+  {kw:["seminte","semințe","rasad","răsad","семен","рассад","посев","посад","soi","sort","сорт"],
+   ans:{ro:"Pentru un start bun, alege semințe de soi productiv, adaptat zonei, plus un îngrășământ de pornire la plantare. Spune-mi cultura ca să-ți recomand soiul potrivit.",
+        ru:"Для хорошего старта выбирайте семена урожайного, районированного сорта плюс стартовое удобрение при посадке. Назовите культуру — подберу сорт."},
+   prods:["seminte","npk"], dose:false}
+];
+
+/* ============================================================
+   TRADUCERI
+   ============================================================ */
+const T = {
+  ro:{
+    placeholder:"Scrie un mesaj…", name:"Diolsem · Asistent", status:"online · răspunde instant",
+    badge:"DEMO", tnote:"Prototip pentru pitch cu logo-ul Diolsem; în producție: LLM (Claude) + RAG pe catalogul real.",
+    h1:"Bot complet pentru magazinul agricol",
+    lead:"Cu meniu principal ca orice bot serios: catalog, comenzi, oferte, livrare, contact — plus un consultant agronom care alege varianta optimă pentru zona clientului.",
+    f1b:"Meniu principal", f1s:"Catalog · Agronom · Comenzile mele · Oferte · Livrare · Contact — totul la un clic.",
+    f2b:"Consultant agronom climatic", f2s:"Recomandă varianta optimă după regiune (Nord/Centru/Sud) și sezon.",
+    f3b:"Comenzi & oferte în fișa ta", f3s:"Vezi comenzile și ofertele cu statusul plății — confirmare automată a achitării.",
+    f4b:"Preț pe nivel, blocat", f4s:"Retail/Fermier/Angro automat. Prețul îl modifică doar directorul de vânzări.",
+    foot:"Demo cu eșantion de catalog și logică simulată, cu logo-ul Diolsem (reprodus SVG). În producție răspunsurile sunt ancorate în datele oficiale Diolsem.",
+    lblClient:"Client:", lblZone:"Zonă:", lockTxt:"preț fixat",
+    greet:"Bună ziua! 👋 Sunt asistentul Diolsem. Te pot ajuta cu catalogul, comenzile, ofertele și sfaturi de agronom. Alege din meniu 👇",
+    menuTitle:"Meniu principal:",
+    mCatalog:"Catalog produse", mAgronom:"Consultant agronom", mOrders:"Comenzile mele",
+    mOffers:"Ofertele mele", mDelivery:"Livrare & plată", mContact:"Contact & program", mMenu:"Meniu",
+    mFeedback:"Idei / ce mai dorești?",
+    fbPrompt:"Acesta e un demo 🙂 Spune-mi ce ți-ar plăcea să mai poată face botul (ex. integrare cu 1C, plată online, fișa fermierului, comenzi repetate…) și transmit echipei.",
+    fbThanks:"Mulțumim! 🌱 Am notat ideea ta. O poți trimite și echipei printr-un clic:",
+    fbSend:"✉️ Trimite ideea echipei",
+    catTitle:"Alege o categorie:", backMenu:"⬅ Meniu principal",
+    agronomPrompt:"Întreabă-mă orice despre cultura ta, ca pe un agronom: spune cultura și simptomul, iar eu îți dau soluția din catalogul Diolsem. Câteva exemple:",
+    agronomChips:["🍇 Făinare la vie","🕷️ Păianjen la castraveți","🍎 Rapăn la măr","🌾 Buruieni perene","🐛 Omizi la pomi","🌱 Îngălbenire / carență"],
+    askMore:"Ca să-ți dau soluția exactă, ca agronom: spune-mi <b>cultura</b> (vie, roșii, măr, cartof, grâu…) și <b>simptomul</b> (pete, mucegai alb, dăunător, îngălbenire). Îți recomand apoi produsul potrivit din catalogul Diolsem; la nevoie te conectez cu un agronom al companiei. 🌿",
+    ordersText:"Comanda ta activă:",
+    orderLine:"<b>#DL-48217</b> · 3 produse · expediată 🚚<br>livrare azi 14:00–18:00, Chișinău",
+    offersText:"Ofertele tale (toate rămân în fișa ta de client):",
+    offerNote:"💡 La confirmarea plății, statusul devine automat 'achitată' și comanda intră la livrare.",
+    deliveryText:"🚚 <b>Livrare</b> în Chișinău și în toată Moldova.<br>💳 <b>Plată:</b> card online, transfer bancar sau numerar.<br>Prețurile se afișează conform nivelului tău (Retail/Fermier/Angro).",
+    contactText:"📍 Magazin agricol lângă Chișinău<br>🕒 Program: Luni–Sâmbătă<br>💬 Comenzi online 24/7 prin acest bot<br><span style='color:#6b7a70;font-size:11px'>(date demo — se completează cu cele reale)</span>",
+    addCart:"Adaugă în coș", added:"✅ Adăugat", priceL:"lei",
+    tierName:{retail:"Retail",fermier:"Fermier",angro:"Angro"},
+    regionName:{nord:"Nord",centru:"Centru",sud:"Sud"},
+    lockTip:"Preț fixat pe nivelul clientului. Îl poate modifica doar directorul de vânzări.",
+    originRO:"🇲🇩 Autohton", originIMP:(c)=>`✈️ Import (${c})`, inStock:"În stoc",
+    phiNote:(p)=>`⚠️ Pauză până la recoltare: ${p} zile. Folosește echipament de protecție.`,
+    crossF:"💡 Recomandare: adaugă un adeziv-umectant — ține tratamentul pe frunză și crește eficiența.",
+    askArea:"Pe ce suprafață aplici? Scrie câți m² (ex. '150 m²' sau '2 ari').",
+    doseRes:(prod,area,qty,water)=>`Pentru ${area} m² ai nevoie de ~<b>${qty}</b> din ${prod}, în ${water}. Cantitatea potrivită:`,
+    rotate:"🔁 La tratamentul următor, alternează grupa de substanță activă — eviți rezistența. (sfat de agronom)",
+    alt:"Alternativă:",
+    tierChanged:(t)=>`Preț recalculat pentru nivel: ${t}`,
+    regionChanged:(r)=>`Zonă setată: ${r} — ajustez recomandările`,
+    mana:{
+      centru:"În zona <b>Centru</b> (umed, presiune mare de boală) varianta optimă e un fungicid <b>sistemic, rezistent la spălare de ploaie</b>:",
+      nord:"În zona <b>Nord</b> (umed) varianta optimă e un fungicid <b>sistemic, rezistent la spălare</b>:",
+      sud:"În zona <b>Sud</b> (secetos, presiune mai mică) varianta optimă din cost e un fungicid <b>de contact pe bază de cupru</b>:"
+    },
+    whyMana:{
+      centru:"De ce: în Centru plouă des → cuprul de contact se spală; sistemicul rămâne eficient.",
+      nord:"De ce: umiditate ridicată → e nevoie de protecție sistemică, nu doar de contact.",
+      sud:"De ce: în Sud presiunea bolii e mai mică → cuprul, mai ieftin, e suficient ca primă opțiune."
+    },
+    seedRec:"Pentru roșii de câmp îți recomand un soi productiv. La semănat merge un îngrășământ de pornire:",
+    fallback:"Bună întrebare! Ca să-ți răspund corect (domeniu reglementat), te conectez cu un agronom Diolsem. Sau alege din meniu 👇",
+    notUnderstand:"Pot ajuta cu: catalog, comenzi, oferte, sfat de agronom. Alege din meniu sau scrie cultura și problema 👇"
+  },
+  ru:{
+    placeholder:"Напишите сообщение…", name:"Diolsem · Ассистент", status:"онлайн · отвечает сразу",
+    badge:"ДЕМО", tnote:"Прототип для презентации с логотипом Diolsem; в продакшене: LLM (Claude) + RAG по каталогу.",
+    h1:"Полноценный бот агромагазина",
+    lead:"С главным меню, как у любого серьёзного бота: каталог, заказы, предложения, доставка, контакты — плюс агроном, который выбирает оптимальный вариант для зоны клиента.",
+    f1b:"Главное меню", f1s:"Каталог · Агроном · Мои заказы · Предложения · Доставка · Контакты — в один клик.",
+    f2b:"Агроном с учётом климата", f2s:"Рекомендует оптимум по региону (Север/Центр/Юг) и сезону.",
+    f3b:"Заказы и предложения в вашей карточке", f3s:"Заказы и предложения со статусом оплаты — автоподтверждение оплаты.",
+    f4b:"Цена по уровню, без правки", f4s:"Retail/Fermier/Angro автоматически. Цену меняет только директор по продажам.",
+    foot:"Демо с образцом каталога и имитацией логики, с логотипом Diolsem (воспроизведён в SVG). В продакшене ответы строго по данным Diolsem.",
+    lblClient:"Клиент:", lblZone:"Зона:", lockTxt:"цена фикс.",
+    greet:"Здравствуйте! 👋 Я ассистент Diolsem. Помогу с каталогом, заказами, предложениями и советами агронома. Выберите в меню 👇",
+    menuTitle:"Главное меню:",
+    mCatalog:"Каталог товаров", mAgronom:"Агроном-консультант", mOrders:"Мои заказы",
+    mOffers:"Мои предложения", mDelivery:"Доставка и оплата", mContact:"Контакты и режим", mMenu:"Меню",
+    mFeedback:"Идеи / что добавить?",
+    fbPrompt:"Это демо 🙂 Напишите, что бы вы хотели, чтобы бот ещё умел (например интеграция с 1С, онлайн-оплата, карточка фермера, повторные заказы…) — передам команде.",
+    fbThanks:"Спасибо! 🌱 Записал вашу идею. Можно отправить её команде в один клик:",
+    fbSend:"✉️ Отправить идею команде",
+    catTitle:"Выберите категорию:", backMenu:"⬅ Главное меню",
+    agronomPrompt:"Спрашивайте что угодно о вашей культуре, как у агронома: назовите культуру и симптом — дам решение из каталога Diolsem. Примеры:",
+    agronomChips:["🍇 Оидиум на винограде","🕷️ Клещ на огурцах","🍎 Парша на яблоне","🌾 Многолетние сорняки","🐛 Гусеницы на деревьях","🌱 Пожелтение / дефицит"],
+    askMore:"Чтобы дать точное решение, как агроном: назовите <b>культуру</b> (виноград, томаты, яблоня, картофель, пшеница…) и <b>симптом</b> (пятна, белый налёт, вредитель, пожелтение). Затем порекомендую товар из каталога Diolsem; при необходимости соединю с агрономом компании. 🌿",
+    ordersText:"Ваш активный заказ:",
+    orderLine:"<b>#DL-48217</b> · 3 товара · отправлен 🚚<br>доставка сегодня 14:00–18:00, Кишинёв",
+    offersText:"Ваши предложения (все хранятся в вашей карточке):",
+    offerNote:"💡 При подтверждении оплаты статус автоматически становится «оплачено», и заказ идёт в доставку.",
+    deliveryText:"🚚 <b>Доставка</b> по Кишинёву и всей Молдове.<br>💳 <b>Оплата:</b> карта онлайн, банковский перевод или наличные.<br>Цены показываются по вашему уровню (Retail/Fermier/Angro).",
+    contactText:"📍 Агромагазин под Кишинёвом<br>🕒 Режим: Пн–Сб<br>💬 Заказы онлайн 24/7 через этого бота<br><span style='color:#6b7a70;font-size:11px'>(демо-данные — заменяются реальными)</span>",
+    addCart:"В корзину", added:"✅ Добавлено", priceL:"лей",
+    tierName:{retail:"Retail",fermier:"Fermier",angro:"Angro"},
+    regionName:{nord:"Север",centru:"Центр",sud:"Юг"},
+    lockTip:"Цена зафиксирована по уровню клиента. Менять может только директор по продажам.",
+    originRO:"🇲🇩 Местное", originIMP:(c)=>`✈️ Импорт (${c})`, inStock:"В наличии",
+    phiNote:(p)=>`⚠️ Срок ожидания до сбора: ${p} дн. Используйте средства защиты.`,
+    crossF:"💡 Совет: добавьте прилипатель — удержит препарат на листе и повысит эффективность.",
+    askArea:"На какую площадь? Напишите м² (например '150 м²' или '2 сотки').",
+    doseRes:(prod,area,qty,water)=>`На ${area} м² нужно ~<b>${qty}</b> препарата ${prod}, в ${water}. Нужное количество:`,
+    rotate:"🔁 На следующей обработке чередуйте группу действующего вещества — избежите устойчивости. (совет агронома)",
+    alt:"Альтернатива:",
+    tierChanged:(t)=>`Цена пересчитана для уровня: ${t}`,
+    regionChanged:(r)=>`Зона: ${r} — корректирую рекомендации`,
+    mana:{
+      centru:"В <b>Центре</b> (влажно, высокое давление болезни) оптимален <b>системный фунгицид, устойчивый к смыву дождём</b>:",
+      nord:"В <b>Севере</b> (влажно) оптимален <b>системный фунгицид, устойчивый к смыву</b>:",
+      sud:"В <b>Юге</b> (засушливо, давление ниже) оптимален по цене <b>контактный медьсодержащий фунгицид</b>:"
+    },
+    whyMana:{
+      centru:"Почему: в Центре часто дожди → контактная медь смывается; системный остаётся эффективным.",
+      nord:"Почему: высокая влажность → нужна системная защита, не только контактная.",
+      sud:"Почему: на Юге давление болезни ниже → более дешёвая медь достаточна как первый выбор."
+    },
+    seedRec:"Для томатов открытого грунта рекомендую урожайный сорт. К посеву подойдёт стартовое удобрение:",
+    fallback:"Хороший вопрос! Чтобы ответить точно (регулируемая сфера), соединю с агрономом Diolsem. Или выберите в меню 👇",
+    notUnderstand:"Помогу с: каталог, заказы, предложения, совет агронома. Выберите в меню или напишите культуру и проблему 👇"
+  }
+};
+
+/* ============================================================ */
+let lang='ro', tier='retail', region='centru', cart=0, pendingDose=null, pendingFeedback=false;
+const $ = s=>document.querySelector(s);
+const msgs=$('#msgs'), chipsEl=$('#chips'), input=$('#input');
+
+function scrollDown(){ msgs.scrollTop=msgs.scrollHeight; }
+function addUser(text){const r=document.createElement('div');r.className='row user';r.innerHTML='<div class="bub"></div>';r.querySelector('.bub').textContent=text;msgs.appendChild(r);scrollDown();}
+function botRow(html){const r=document.createElement('div');r.className='row bot';r.innerHTML='<div class="mini-av">🌾</div><div class="bub">'+html+'</div>';msgs.appendChild(r);scrollDown();return r;}
+function sysMsg(text){const r=document.createElement('div');r.className='sys';r.textContent=text;msgs.appendChild(r);scrollDown();}
+function typing(){const r=document.createElement('div');r.className='row bot';r.innerHTML='<div class="mini-av">🌾</div><div class="bub"><div class="typing"><i></i><i></i><i></i></div></div>';msgs.appendChild(r);scrollDown();return r;}
+function bot(html, delay=650){const t=typing();return new Promise(res=>setTimeout(()=>{t.remove();res(botRow(html));},delay));}
+
+function priceOf(key){ return CATALOG[key].price[tier]; }
+function originBadge(p){const tr=T[lang];return p.origin.type==='ro'?`<span class="b ro">${tr.originRO}</span>`:`<span class="b imp">${tr.originIMP(p.origin.country)}</span>`;}
+function stockBadge(p){const tr=T[lang];return p.inStock?`<span class="b stock">● ${tr.inStock}</span>`:`<span class="b lead">${p.lead[lang]}</span>`;}
+function productCard(key){
+  const p=CATALOG[key], tr=T[lang];
+  return `<div class="prod" data-key="${key}"><div class="pic">${p.emoji}</div><div class="info">
+    <b>${p.name[lang]}</b>
+    <div class="badges"><span class="b cat">${p.cat[lang]}</span>${originBadge(p)}${stockBadge(p)}</div>
+    <div class="price"><span class="amount">${priceOf(key)} ${tr.priceL}</span><span class="tier">${tr.tierName[tier]}</span><span class="lock" title="${tr.lockTip}">🔒</span></div>
+    <button class="add" onclick="addToCart(this)">${tr.addCart}</button></div></div>`;
+}
+function addToCart(btn){cart++;$('#cart-badge').textContent=cart;btn.textContent=T[lang].added;btn.style.background='#1b5e20';btn.disabled=true;}
+window.addToCart=addToCart;
+function updateAllPrices(){const tr=T[lang];document.querySelectorAll('.prod').forEach(c=>{const k=c.dataset.key;if(!CATALOG[k])return;const a=c.querySelector('.amount'),g=c.querySelector('.tier');if(a)a.textContent=`${priceOf(k)} ${tr.priceL}`;if(g)g.textContent=tr.tierName[tier];});}
+
+/* ---------- MENIU ---------- */
+function menuBtns(items, single){
+  return `<div class="menu${single?' single':''}">`+items.map(i=>`<button onclick="${i.fn}"><span class="mi">${i.ic}</span>${i.label}</button>`).join('')+`</div>`;
+}
+async function menuMain(){
+  const tr=T[lang];
+  chipsEl.innerHTML='';
+  await bot(tr.menuTitle+menuBtns([
+    {ic:"🛍️",label:tr.mCatalog,fn:"catCats()"},
+    {ic:"🌾",label:tr.mAgronom,fn:"agronomStart()"},
+    {ic:"📦",label:tr.mOrders,fn:"myOrders()"},
+    {ic:"📄",label:tr.mOffers,fn:"myOffers()"},
+    {ic:"🚚",label:tr.mDelivery,fn:"deliveryInfo()"},
+    {ic:"📍",label:tr.mContact,fn:"contactInfo()"},
+    {ic:"💡",label:tr.mFeedback,fn:"feedbackFlow()"}
+  ]), 350);
+}
+window.menuMain=menuMain;
+function backBtn(){ return menuBtns([{ic:"⬅",label:T[lang].backMenu,fn:"menuMain()"}], true); }
+
+async function catCats(){
+  const tr=T[lang];
+  const items=Object.keys(CATS).map(k=>({ic:CATS[k].ic,label:CATS[k].name[lang],fn:`catShow('${k}')`}));
+  await bot(tr.catTitle+menuBtns(items), 350);
+}
+window.catCats=catCats;
+async function catShow(catKey){
+  const c=CATS[catKey];
+  await bot(`<b>${c.ic} ${c.name[lang]}</b>`, 300);
+  for(const key of c.items){ await bot(productCard(key), 320); }
+  await bot(backBtn(), 250);
+}
+window.catShow=catShow;
+
+async function myOrders(){const tr=T[lang];await bot(tr.ordersText+`<div class="offer"><span>${tr.orderLine}</span></div>`+backBtn());}
+window.myOrders=myOrders;
+async function myOffers(){
+  const tr=T[lang];
+  const lei=tr.priceL;
+  const rows=`<div class="offer"><span><b>#OF-1039</b> · 980 ${lei}</span><span class="st paid">${lang==='ro'?'achitată':'оплачено'}</span></div>`+
+             `<div class="offer"><span><b>#OF-1043</b> · 1 234 ${lei}</span><span class="st wait">${lang==='ro'?'în așteptare':'ожидает'}</span></div>`;
+  await bot(tr.offersText+rows+`<div class="why">${tr.offerNote}</div>`+backBtn());
+}
+window.myOffers=myOffers;
+async function deliveryInfo(){await bot(T[lang].deliveryText+backBtn());}
+window.deliveryInfo=deliveryInfo;
+async function contactInfo(){await bot(T[lang].contactText+backBtn());}
+window.contactInfo=contactInfo;
+async function agronomStart(){await bot(T[lang].agronomPrompt);setAgronomChips();}
+window.agronomStart=agronomStart;
+async function feedbackFlow(){ chipsEl.innerHTML=''; pendingFeedback=true; await bot(T[lang].fbPrompt); }
+window.feedbackFlow=feedbackFlow;
+async function sendFeedback(text){
+  const tr=T[lang];
+  const href="mailto:oghiletki@gmail.com?subject="+encodeURIComponent("Idee pentru botul Diolsem")+"&body="+encodeURIComponent(text);
+  const link=`<div class="menu single"><a href="${href}" style="display:flex;align-items:center;gap:8px;border:1px solid var(--green);background:var(--green-l);border-radius:10px;padding:9px 11px;font-size:12.5px;font-weight:600;color:var(--green-d);text-decoration:none"><span class="mi">✉️</span>${tr.fbSend}</a></div>`;
+  await bot(tr.fbThanks+link+backBtn());
+}
+
+/* ---------- AGRONOM ---------- */
+const KW={
+  rosii:['rosi','roșii','роши','tomat','помидор','томат'],
+  vita:['vie','viț','vita','viță','vino','виноград','лоза'],
+  cartof:['cartof','картоф','картош'], porumb:['porumb','кукуруз'],
+  mana:['pete','pata','mana','mană','mildiu','milde','fitoftor','фитофтор','пятн','бур','милдь'],
+  gandac:['gandac','gândac','жук','daunator','dăunător','вредител','колорад'],
+  buruieni:['buruien','buruiana','сорня','сорняк'],
+  seminte:['semint','semințe','семен','семечк','posad','посад','посев'],
+  order:['comand','comanda','unde e','livrare','заказ','где мой','достав'],
+  catalog:['catalog','produse','каталог','товар'],
+  greet:['salut','buna','bună','noroc','здрав','привет','добр'],
+  menu:['meniu','menu','меню']
+};
+const has=(t,a)=>a.some(k=>t.includes(k));
+function parseArea(t){
+  let m=t.match(/(\d+[.,]?\d*)\s*(ha|hectar|гект|га)/i); if(m) return Math.round(parseFloat(m[1].replace(',','.'))*10000);
+  m=t.match(/(\d+[.,]?\d*)\s*(ar|сотк|сот)/i);            if(m) return Math.round(parseFloat(m[1].replace(',','.'))*100);
+  m=t.match(/(\d+[.,]?\d*)\s*(m²|m2|кв|метр|м²|м2|m\b)/i); if(m) return Math.round(parseFloat(m[1].replace(',','.')));
+  m=t.match(/^\s*(\d+[.,]?\d*)\s*$/);                      if(m) return Math.round(parseFloat(m[1].replace(',','.')));
+  return null;
+}
+function phiBlock(key){const p=CATALOG[key];return p.phi?`<div class="note">${T[lang].phiNote(p.phi)}</div>`:'';}
+async function doseFlow(area){
+  const tr=T[lang], key=pendingDose; pendingDose=null; const p=CATALOG[key];
+  const units=area/100*p.dosePer100m2;
+  const qty=units>=1000?(units/1000).toFixed(1)+' kg':Math.round(units)+' '+(lang==='ro'?'g':'г');
+  await bot(tr.doseRes(p.name[lang],area,qty,p.water?p.water[lang]:'—'));
+  await bot(productCard(key)+phiBlock(key),450);
+  await bot(tr.crossF+productCard('trend'),550);
+  await bot(backBtn(),300);
+}
+async function recommendMana(){
+  const tr=T[lang]; let primary,alt;
+  if(region==='sud'){primary='cupru';alt='ridomil';} else {primary='ridomil';alt='cupru';}
+  await bot(tr.mana[region]);
+  await bot(productCard(primary)+`<div class="why">✅ ${tr.whyMana[region]}</div>`+phiBlock(primary),500);
+  await bot(tr.alt+productCard(alt),450);
+  await bot(tr.rotate,500);
+  pendingDose=primary; await bot(tr.askArea,500);
+}
+async function recommend(key,intro){
+  const tr=T[lang];
+  if(intro) await bot(intro);
+  await bot(productCard(key)+phiBlock(key),450);
+  if(CATALOG[key].dosePer100m2){pendingDose=key;await bot(tr.askArea,500);} else await bot(backBtn(),300);
+}
+// caută cea mai potrivită intrare din baza de cunoștințe (scor după nr. de cuvinte-cheie)
+function findKB(t){
+  let best=null, bestScore=0;
+  for(const e of KB){
+    let s=0; for(const k of e.kw) if(t.includes(k)) s++;
+    if(s>bestScore){ bestScore=s; best=e; }
+  }
+  return best;
+}
+async function answerKB(e){
+  const tr=T[lang];
+  await bot(e.ans[lang]);
+  for(const k of e.prods){ await bot(productCard(k)+phiBlock(k),350); }
+  if(e.rotate) await bot(tr.rotate,400);
+  if(e.dose){ const dk=e.prods.find(k=>CATALOG[k].dosePer100m2); if(dk){ pendingDose=dk; await bot(tr.askArea,450); return; } }
+  await bot(backBtn(),300);
+}
+
+async function handle(text){
+  const t=text.toLowerCase().trim(), tr=T[lang];
+  if(pendingFeedback){ pendingFeedback=false; await sendFeedback(text); return; }
+  if(pendingDose){const a=parseArea(t);if(a){await doseFlow(a);return;}}
+  if(has(t,KW.menu)){ await menuMain(); return; }
+  if(has(t,KW.order)){ await myOrders(); return; }
+  if(has(t,KW.catalog)){ await catCats(); return; }
+  if(has(t,KW.greet)&&t.length<14){ await bot(tr.greet); await menuMain(); return; }
+  // mana/mildiu = recomandare optimă în funcție de zona climatică
+  if(has(t,KW.mana)){ await recommendMana(); return; }
+  // orice altă problemă scrisă → baza de cunoștințe agronomice
+  const e=findKB(t);
+  if(e){ await answerKB(e); return; }
+  // necunoscut → răspuns profesionist care cere cultura + simptomul
+  await bot(tr.askMore); setAgronomChips();
+}
+
+/* ---------- CHIPS / INPUT / SELECTOARE ---------- */
+function setAgronomChips(){
+  chipsEl.innerHTML='';
+  T[lang].agronomChips.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.onclick=()=>send(c.replace(/^[^\wа-яА-Я]+/,'').trim());chipsEl.appendChild(b);});
+}
+async function send(text){
+  if(!text) text=input.value.trim(); if(!text) return;
+  input.value=''; addUser(text); chipsEl.innerHTML=''; await handle(text);
+}
+$('#send').onclick=()=>send();
+$('#menu-btn').onclick=()=>{ chipsEl.innerHTML=''; menuMain(); };
+input.addEventListener('keydown',e=>{ if(e.key==='Enter') send(); });
+
+document.querySelectorAll('#seg-tier button').forEach(b=>{b.onclick=()=>{document.querySelectorAll('#seg-tier button').forEach(x=>x.classList.remove('on'));b.classList.add('on');tier=b.dataset.t;updateAllPrices();sysMsg(T[lang].tierChanged(T[lang].tierName[tier]));};});
+document.querySelectorAll('#seg-region button').forEach(b=>{b.onclick=()=>{document.querySelectorAll('#seg-region button').forEach(x=>x.classList.remove('on'));b.classList.add('on');region=b.dataset.r;sysMsg(T[lang].regionChanged(T[lang].regionName[region]));};});
+
+/* ---------- LIMBĂ ---------- */
+function applyLang(){
+  const tr=T[lang]; document.documentElement.lang=lang;
+  input.placeholder=tr.placeholder;
+  $('#c-name').textContent=tr.name; $('#c-status').textContent=tr.status;
+  $('#t-badge').textContent=tr.badge; $('#t-note').textContent=tr.tnote;
+  $('#p-h1').textContent=tr.h1; $('#p-lead').textContent=tr.lead;
+  $('#f1b').textContent=tr.f1b; $('#f1s').textContent=tr.f1s;
+  $('#f2b').textContent=tr.f2b; $('#f2s').textContent=tr.f2s;
+  $('#f3b').textContent=tr.f3b; $('#f3s').textContent=tr.f3s;
+  $('#f4b').textContent=tr.f4b; $('#f4s').textContent=tr.f4s;
+  $('#p-foot').textContent=tr.foot;
+  $('#lbl-client').textContent=tr.lblClient; $('#lbl-zone').textContent=tr.lblZone; $('#lock-txt').textContent=tr.lockTxt;
+}
+document.querySelectorAll('.lang button').forEach(b=>{b.onclick=()=>{document.querySelectorAll('.lang button').forEach(x=>x.classList.remove('on'));b.classList.add('on');lang=b.dataset.l;pendingDose=null;applyLang();msgs.innerHTML='';boot();};});
+
+async function boot(){ applyLang(); await bot(T[lang].greet,400); await menuMain(); }
+boot();
+</script>
+</body>
+</html>
