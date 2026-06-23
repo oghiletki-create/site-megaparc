@@ -7,6 +7,7 @@ Materiale de pitch pentru **S.C. „DIOLSEM" S.R.L.** (cel mai mare magazin agri
 ## Conținut
 - [`PROPUNERE-DIOLSEM.md`](./PROPUNERE-DIOLSEM.md) — **propunerea unificată pentru conducere**: documentul de pitch principal care leagă Clienți + Vânzări + Producere + Achiziții, cu beneficii, plan pe etape și model de colaborare. *Începe de aici.*
 - [`AUTOMATIZARE-DEPARTAMENTE.md`](./AUTOMATIZARE-DEPARTAMENTE.md) — **automatizarea întregii companii**: departamentele Vânzări · Producere · Achiziții legate într-un singur sistem (cerere → producție → achiziție), cu copiloti AI pe fiecare echipă.
+- [`CONTABILITATE-OFERTE-INCASARI.md`](./CONTABILITATE-OFERTE-INCASARI.md) — fluxul **ofertă → încasare** unit cu **contabilitatea**: confirmarea automată a achitărilor pe oferte, cu toate ofertele și plățile păstrate în **fișa clientului**.
 - [`STRATEGIE-AUTOMATIZARE-AI.md`](./STRATEGIE-AUTOMATIZARE-AI.md) — partea de **front-office**: bot consultant agronom + automatizare pe magazine / produse / clienți, arhitectură, roadmap, KPI/ROI, riscuri.
 - [`REZUMAT-1-PAGINA.md`](./REZUMAT-1-PAGINA.md) — varianta scurtă, de o pagină, pentru prima întâlnire.
 - [`demo/index.html`](./demo/index.html) — **prototip demonstrativ funcțional** al botului (se deschide direct în browser, fără instalare).

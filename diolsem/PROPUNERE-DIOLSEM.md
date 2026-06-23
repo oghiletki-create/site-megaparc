@@ -34,11 +34,15 @@ Principiul nostru pe tot parcursul: **AI-ul pregătește și propune, omul aprob
 Astăzi, informația se re-introduce manual de mai multe ori și fiecare departament decide izolat. Propunerea unește totul:
 
 ```
-   CLIENȚI ──► VÂNZĂRI ──► PRODUCERE ──► ACHIZIȚII
-   (cererea)   (ce se     (ce și cât    (ce materii,
-               vinde)      fabricăm)     când comandăm)
-        ▲__________________________________________│
-              feedback: stoc, termene, prețuri
+   CLIENȚI ─► VÂNZĂRI ─► PRODUCERE ─► ACHIZIȚII
+   (cererea)  (oferte)   (fabricăm)   (materii)
+        ▲         │                        │
+        │         ▼                        │
+        │   CONTABILITATE ◄────────────────┘
+        │   (confirmă achitările pe oferte,
+        │    facturi furnizori, flux numerar)
+        └─────────┘
+     Toate ofertele, facturile și plățile → FIȘA CLIENTULUI
 
          Totul pe un STRAT COMUN DE DATE,
          cu un COPILOT AI pentru fiecare echipă.
@@ -66,7 +70,11 @@ Planificare a producției pornind de la cerere, calcul automat de șarjă și ma
 Reaprovizionare predictivă (ce și **când** să comanzi, ținând cont de termenele de import), necesar de materii generat din planul de producție, comparare de furnizori și citire automată a facturilor și documentelor.
 > **Beneficiu:** fără rupturi de stoc în vârf de sezon, fără comenzi-urgență scumpe.
 
-*(Detalierea fiecărei zone: `STRATEGIE-AUTOMATIZARE-AI.md` și `AUTOMATIZARE-DEPARTAMENTE.md`.)*
+### 💰 Contabilitate și fluxul ofertă → încasare
+Sistemul se unește cu **contabilitatea**: oferta acceptată generează proforma fără re-tastare, iar plata se **confirmă automat** — AI-ul potrivește încasarea (din bancă / online / casă) cu proforma corectă și marchează „achitat", apoi pornește livrarea/producția. **Toate ofertele, facturile și plățile rămân în fișa clientului**, cu soldul la zi.
+> **Beneficiu:** vânzările nu mai sună „au intrat banii?", livrarea pornește la confirmarea plății, nicio ofertă pierdută, creanțe vizibile în timp real.
+
+*(Detalierea fiecărei zone: `STRATEGIE-AUTOMATIZARE-AI.md`, `AUTOMATIZARE-DEPARTAMENTE.md` și `CONTABILITATE-OFERTE-INCASARI.md`.)*
 
 ---
 
@@ -89,6 +97,9 @@ Reaprovizionare predictivă (ce și **când** să comanzi, ținând cont de term
 | Producere | comenzi onorate din stoc în vârf de sezon | mult peste nivelul actual |
 | Producere | timp de regăsire a trasabilității unui lot | de la ore la secunde |
 | Achiziții | rupturi de stoc în sezon | spre zero |
+| Contabilitate | confirmarea unei achitări | de la ore/o zi la minute (automat) |
+| Contabilitate | încasări reconciliate automat | 80–90% |
+| Vânzări | oferte „pierdute" / neurmărite | spre zero (toate în fișa clientului) |
 | Operațional | muncă manuală repetitivă | −40% în vârf |
 
 \* *valori orientative, de calibrat pe datele reale Diolsem în faza de descoperire. Payback estimat: câteva luni.*
@@ -133,7 +144,7 @@ Cifrele exacte se stabilesc după descoperire, pe procesele reale — nu vindem 
 
 Propunem un **workshop de descoperire** (o jumătate de zi, pe cele trei departamente) din care livrăm harta de automatizare și planul cu estimări. În paralel, putem porni imediat **quick-win-ul de Clienți + Vânzări**, ca să vedeți valoare concretă cât construim fundația.
 
-> **Anexe:** `STRATEGIE-AUTOMATIZARE-AI.md` (botul de clienți, detaliat) · `AUTOMATIZARE-DEPARTAMENTE.md` (Vânzări/Producere/Achiziții, detaliat) · `demo/index.html` (prototip funcțional) · `REZUMAT-1-PAGINA.md` (sinteză).
+> **Anexe:** `STRATEGIE-AUTOMATIZARE-AI.md` (botul de clienți, detaliat) · `AUTOMATIZARE-DEPARTAMENTE.md` (Vânzări/Producere/Achiziții, detaliat) · `CONTABILITATE-OFERTE-INCASARI.md` (fluxul ofertă → încasare + contabilitate) · `demo/index.html` (prototip funcțional) · `REZUMAT-1-PAGINA.md` (sinteză).
 
 ---
 

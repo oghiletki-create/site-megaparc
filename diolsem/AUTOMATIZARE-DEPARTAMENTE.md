@@ -148,7 +148,10 @@ Fiecare echipă primește un asistent care „știe" contextul ei și lucrează 
 - **Copilot Vânzări** — „Fă o ofertă pentru ferma X cu produsele uzuale și 5% discount." → ofertă gata.
 - **Copilot Producere** — „Câte tone de îngrășământ Y putem face cu materiile din stoc și ce ne lipsește?" → răspuns + listă de comandat.
 - **Copilot Achiziții** — „Ce trebuie comandat azi ca să avem stoc complet pentru martie?" → listă prioritizată cu furnizori și termene.
+- **Copilot Contabilitate** — „Confirmă achitările de azi și arată-mi ce nu s-a potrivit." → încasări reconciliate + listă de rezolvat. (vezi `CONTABILITATE-OFERTE-INCASARI.md`)
 - **Copilot Conducere** — „Cum stăm față de sezonul trecut și unde e riscul?" → rezumat + cifre.
+
+> **Nod financiar:** ciclul **ofertă → încasare** unește Vânzările cu Contabilitatea — confirmarea automată a achitărilor pe oferte, cu toate ofertele și plățile păstrate în fișa clientului. Detaliat în `CONTABILITATE-OFERTE-INCASARI.md`.
 
 ---
 
