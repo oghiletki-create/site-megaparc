@@ -12,11 +12,11 @@
 
 Diolsem are un avantaj rar în piață: este **producător**, nu doar revânzător, are catalog larg (semințe, îngrășăminte, pesticide, biopreparate, turbă, echipament de protecție, unelte) și o bază de clienți cu nevoi tehnice reale — fermieri și gospodării casnice care nu cumpără „un produs", ci **o soluție la o problemă agronomică** (un dăunător, o boală, o cultură anume, o anumită fază de vegetație).
 
-Aici stă oportunitatea: clientul tipic are întrebări înainte de cumpărare („cu ce stropesc mana la roșii?", „ce doză de erbicid la 1 ha de porumb?", „ce semințe pentru solul meu?"). Astăzi aceste întrebări ajung la telefon, pe Facebook Messenger sau rămân fără răspuns, iar coșul se abandonează. Un **bot AI cu rol de consultant agronom**, conectat la catalogul Diolsem, transformă aceste întrebări în **comenzi** și degrevează echipa de suport.
+Aici stă oportunitatea: clientul tipic are întrebări înainte de cumpărare („cu ce stropesc mana la roșii?", „ce doză de erbicid la 1 ha de porumb?", „ce semințe pentru solul meu?"). Astăzi aceste întrebări ajung la telefon, pe Facebook Messenger sau rămân fără răspuns, iar coșul se abandonează. Un **sistem automatizat AI cu rol de consultant agronom**, conectat la catalogul Diolsem, transformă aceste întrebări în **comenzi** și degrevează echipa de suport.
 
 Propunem un sistem AI în 3 straturi:
 
-1. **Bot consultant (front-office)** — chat AI pe site + WhatsApp/Viber/Telegram/Messenger, în RO și RU, care recomandă produse, calculează doze, urmărește comanda și răspunde 24/7.
+1. **Sistem automatizat consultant (front-office)** — chat AI pe site + WhatsApp/Viber/Telegram/Messenger, în RO și RU, care recomandă produse, calculează doze, urmărește comanda și răspunde 24/7.
 2. **Automatizări operaționale (back-office)** — pe magazine (stoc, prețuri, sincronizare), produse (descrieri, SEO, traduceri, categorisire) și clienți (segmentare, recuperare coș, retenție sezonieră).
 3. **Strat de date & analiză** — un singur loc unde converg comenzile, întrebările clienților și stocul, ca să se ia decizii (ce produse promovăm înainte de sezon, ce lipsește din catalog).
 
@@ -70,28 +70,28 @@ Propunem un sistem AI în 3 straturi:
 
 ---
 
-## 4. Pilonul 1 — Botul AI consultant (front-office)
+## 4. Pilonul 1 — Sistemul automatizat AI consultant (front-office)
 
 Inima proiectului. Un asistent conversațional cu **rol de consultant agronom**, disponibil 24/7, în RO și RU, pe toate canalele unde sunt clienții.
 
 ### 4.1 Capabilități
-1. **Diagnoză → soluție → produs.** Clientul descrie problema („frunzele de roșii au pete maro"), botul pune 1–2 întrebări de clarificare (cultură, simptom, suprafață) și recomandă produsul omologat din catalog + alternative.
+1. **Diagnoză → soluție → produs.** Clientul descrie problema („frunzele de roșii au pete maro"), sistemul automatizat pune 1–2 întrebări de clarificare (cultură, simptom, suprafață) și recomandă produsul omologat din catalog + alternative.
 2. **Calculator de doze.** „Câtă substanță pentru 5 ari de cartof?" → calcul pe baza dozei din fișa oficială, cu cantitate de cumpărat și avertismente (echipament de protecție, perioada de pauză).
 3. **Căutare și comparare produse** în limbaj natural, cu filtre (cultură, dăunător, tip, preț, disponibilitate).
 4. **Cross-sell / up-sell tehnic corect** — „la acest fungicid se asociază un adeziv-umectant" sau „pentru aceste semințe ai nevoie de acest îngrășământ de pornire".
 5. **Plasarea / asistarea comenzii** — adaugă în coș, oferă opțiuni de livrare, status comandă.
 6. **Status comandă & livrare** — „unde e comanda mea?" fără să sune.
 7. **Escaladare inteligentă la agronom uman** când: produs neomologat pentru cultura cerută, întrebare în afara catalogului, comandă mare B2B, sau încredere scăzută a modelului.
-8. **Captură de lead** — dacă clientul nu cumpără acum, botul reține cultura/interesul pentru remarketing sezonier.
+8. **Captură de lead** — dacă clientul nu cumpără acum, sistemul automatizat reține cultura/interesul pentru remarketing sezonier.
 
 ### 4.2 Canale
 - **Widget pe `diolsem.md`** (RO/RU, mobil-first).
 - **WhatsApp / Viber / Telegram** — dominante în Moldova; ideale pentru notificări de comandă și campanii sezoniere.
-- **Facebook / Instagram Messenger** — Diolsem are deja prezență pe Facebook; mesajele intră în același bot.
+- **Facebook / Instagram Messenger** — Diolsem are deja prezență pe Facebook; mesajele intră în același sistem automatizat.
 - Un singur „creier", mai multe canale → istoricul clientului e unificat.
 
-### 4.3 Cum „știe" botul lucrurile (arhitectură RAG)
-Botul **nu** ghicește și **nu** halucinează doze. Funcționează pe principiul *Retrieval-Augmented Generation*:
+### 4.3 Cum „știe" sistemul automatizat lucrurile (arhitectură RAG)
+Sistemul automatizat **nu** ghicește și **nu** halucinează doze. Funcționează pe principiul *Retrieval-Augmented Generation*:
 
 ```
 Întrebare client
@@ -132,10 +132,10 @@ Aceasta garantează că recomandările sunt ancorate în **datele oficiale Diols
 - **Generare/îmbunătățire descrieri** pe șablon agronomic uniform: la ce folosești, cultură, dăunător/boală țintă, mod de aplicare, doză, ambalaje, avertismente — pornind de la fișa tehnică.
 - **Traducere RO ↔ RU** automată și consecventă a întregului catalog (cu terminologie agronomică verificată).
 - **SEO automat** — titluri, meta-descrieri, cuvinte-cheie pe intenții reale de căutare („tratament mană vie", „erbicid porumb postemergent").
-- **Categorisire & etichetare** — fiecare produs primește automat tag-uri (cultură, problemă rezolvată, sezon, tip client) → alimentează filtrele și recomandările botului.
-- **Detectare goluri în catalog** — din întrebările la care botul *nu* a găsit produs → listă de „cereri neacoperite" pentru achiziții.
+- **Categorisire & etichetare** — fiecare produs primește automat tag-uri (cultură, problemă rezolvată, sezon, tip client) → alimentează filtrele și recomandările sistemului automatizat.
+- **Detectare goluri în catalog** — din întrebările la care sistemul automatizat *nu* a găsit produs → listă de „cereri neacoperite" pentru achiziții.
 
-> Acest pilon e și cel mai rapid „win": îmbunătățește SEO și conversia chiar și pentru clienții care **nu** vorbesc cu botul.
+> Acest pilon e și cel mai rapid „win": îmbunătățește SEO și conversia chiar și pentru clienții care **nu** vorbesc cu sistemul automatizat.
 
 ---
 
@@ -152,7 +152,7 @@ AI-ul împarte clienții pe comportament și nevoie: *fermier profesionist* vs *
 - **Campanii pre-sezon** — segment „legumicultori" primește oferta de semințe + îngrășământ de pornire cu 2 săptămâni înainte de semănat.
 
 ### 6.3 Voice of customer
-Toate conversațiile botului devin date: ce probleme au clienții, ce produse caută și nu găsesc, ce obiecții apar la cumpărare. Raport lunar automat pentru echipa Diolsem.
+Toate conversațiile sistemului automatizat devin date: ce probleme au clienții, ce produse caută și nu găsesc, ce obiecții apar la cumpărare. Raport lunar automat pentru echipa Diolsem.
 
 ---
 
@@ -178,7 +178,7 @@ Toate conversațiile botului devin date: ce probleme au clienții, ce produse ca
 - **LLM:** recomandăm modelele Claude (ex. Claude Opus / Sonnet 4.x) pentru calitate de raționament în RO/RU și control bun al „prudenței" — esențial pe domeniu reglementat.
 - **Integrare e-commerce:** depinde de platforma actuală Diolsem (de aflat: e custom, WooCommerce, OpenCart, 1C etc.). Conectare prin API sau export catalog.
 - **Hosting date în UE/MD** unde e relevant (date clienți).
-- **Human-in-the-loop:** dashboard pentru agronomii Diolsem ca să preia conversațiile escaladate și să corecteze botul (feedback care îl îmbunătățește).
+- **Human-in-the-loop:** dashboard pentru agronomii Diolsem ca să preia conversațiile escaladate și să corecteze sistemul automatizat (feedback care îl îmbunătățește).
 
 ---
 
@@ -187,7 +187,7 @@ Toate conversațiile botului devin date: ce probleme au clienții, ce produse ca
 | Fază | Durată orient. | Livrabile | Valoare |
 |---|---|---|---|
 | **0. Descoperire** | 1 săpt. | Audit platformă, export catalog, acces fișe tehnice, definire ton & reguli de siguranță | Bază corectă |
-| **1. MVP bot web** | 2–3 săpt. | Bot pe site (RO/RU): Q&A catalog + recomandare + status comandă, cu RAG pe catalog | Primul impact pe conversie |
+| **1. MVP sistem automatizat web** | 2–3 săpt. | Sistem automatizat pe site (RO/RU): Q&A catalog + recomandare + status comandă, cu RAG pe catalog | Primul impact pe conversie |
 | **2. Conținut produse** | paralel | Descrieri + traduceri + SEO + tag-uri pe catalog | Câștig SEO/conversie imediat |
 | **3. Canale mesagerie** | 1–2 săpt. | WhatsApp/Viber/Telegram/Messenger pe același creier | Acolo unde sunt clienții |
 | **4. Calculator doze + siguranță** | 1–2 săpt. | Calcul doze din fișe + avertismente + escaladare | Diferențiatorul agronomic |
@@ -202,10 +202,10 @@ Toate conversațiile botului devin date: ce probleme au clienții, ce produse ca
 
 Ipoteză conservatoare pentru ilustrare (de calibrat cu cifrele reale Diolsem):
 
-- Dacă din traficul lunar 1.000 de vizitatori interacționează cu botul și conversia lor crește de la 2% la 3% → **+10 comenzi/lună** din această cohortă.
+- Dacă din traficul lunar 1.000 de vizitatori interacționează cu sistemul automatizat și conversia lor crește de la 2% la 3% → **+10 comenzi/lună** din această cohortă.
 - Cross-sell tehnic pe comenzile existente: +12% valoare medie coș.
 - Recuperare coș: 12% din coșurile abandonate revenite.
-- Economie suport: ~40% din întrebările repetitive preluate de bot în vârf de sezon.
+- Economie suport: ~40% din întrebările repetitive preluate de sistem automatizat în vârf de sezon.
 
 Chiar și conservator, combinația *conversie + comandă medie + recuperare coș + economie de timp* aduce de regulă un payback în **2–4 luni** pentru un magazin de acest volum.
 
@@ -219,7 +219,7 @@ Chiar și conservator, combinația *conversie + comandă medie + recuperare coș
 | Halucinații LLM | răspuns ancorat în date (retrieval), nu generare liberă; „nu știu → om" |
 | Calitatea datelor de catalog | Faza 2 curăță și standardizează catalogul înainte de scalare |
 | Bilingvism RO/RU inconsecvent | terminologie agronomică validată, traduceri revizuite o dată |
-| Sezonalitate (vârf de cerere) | infrastructură elastică; botul absoarbe vârful fără cost de personal |
+| Sezonalitate (vârf de cerere) | infrastructură elastică; sistemul automatizat absoarbe vârful fără cost de personal |
 | Confidențialitatea datelor clienților | hosting conform, acces minim, politici clare |
 
 ---
@@ -237,7 +237,7 @@ Chiar și conservator, combinația *conversie + comandă medie + recuperare coș
 
 ## 12. Pasul următor recomandat
 
-O **sesiune de descoperire (Faza 0)** de ~1 oră cu echipa Diolsem pentru: confirmarea platformei, accesul la catalog/fișe și prioritizarea fazelor. În paralel putem livra un **prototip demonstrativ** al botului pe un eșantion de catalog, ca decizia să se ia pe ceva tangibil, nu pe slide-uri.
+O **sesiune de descoperire (Faza 0)** de ~1 oră cu echipa Diolsem pentru: confirmarea platformei, accesul la catalog/fișe și prioritizarea fazelor. În paralel putem livra un **prototip demonstrativ** al sistemului automatizat pe un eșantion de catalog, ca decizia să se ia pe ceva tangibil, nu pe slide-uri.
 
 ---
 
