@@ -12,7 +12,8 @@ Materiale de pitch pentru **S.C. „DIOLSEM" S.R.L.** (cel mai mare magazin agri
 - [`BOT-INTELIGENTA-AGRONOMICA.md`](./BOT-INTELIGENTA-AGRONOMICA.md) — **inteligența de agronom** a botului: conștiență climatică (Moldova, pe regiuni), alegerea **variantei optime** din listă, managementul rezistenței și tratarea **produselor de import**.
 - [`PRETURI-CLIENTI-GUVERNANTA.md`](./PRETURI-CLIENTI-GUVERNANTA.md) — niveluri de preț **Retail / Fermier / Angro** aplicate automat + regula de guvernanță: **prețul îl poate modifica doar directorul de vânzări**.
 - [`REZUMAT-1-PAGINA.md`](./REZUMAT-1-PAGINA.md) — varianta scurtă, de o pagină, pentru prima întâlnire.
-- [`demo/index.html`](./demo/index.html) — **prototip demonstrativ funcțional** al botului (se deschide direct în browser, fără instalare).
+- [`demo/index.html`](./demo/index.html) — **demo bot pentru CLIENȚI** (consultant agronom + meniu + comenzi), se deschide direct în browser.
+- [`demo-director/index.html`](./demo-director/index.html) — **demo PANOU DE MANAGEMENT pentru Directorul de Vânzări**: magazine separate + fiecare departament (angajați, sarcini, automatizări) + „ce aș automatiza ca director de vânzări".
 
 ## Cum rulezi demo-ul
 Deschide `demo/index.html` în orice browser. Încearcă: „pete pe roșii", „gândaci la cartof", „buruieni la porumb", „vreau semințe", „unde e comanda mea?" — sau comută pe **RU**. Botul recomandă produse, calculează doza pe suprafață și face cross-sell. Logica e simulată pentru demo; în producție rulează pe LLM (Claude) + RAG peste catalogul real Diolsem.
