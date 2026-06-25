@@ -404,6 +404,16 @@
     <div class="calc reveal">
       <div class="calc-controls">
         <div class="calc-field">
+          <span class="calc-label" data-i18n="calc.building">Imobil</span>
+          <div class="calc-buildings" role="group" aria-label="Imobil">
+            <button type="button" class="calc-bld active" data-bld="dacia31">Dacia 31</button>
+            <button type="button" class="calc-bld" data-bld="moscova9">Moscova 9</button>
+            <button type="button" class="calc-bld" data-bld="moscova20">Moscova 20</button>
+            <button type="button" class="calc-bld" data-bld="vasilelupu48">Vasile Lupu 48</button>
+          </div>
+          <p class="calc-bld-type"><span data-i18n="calc.bld.type">Tip</span>: <b id="calc-bld-type">—</b></p>
+        </div>
+        <div class="calc-field">
           <label class="calc-label" for="calc-area" data-i18n="calc.area">Suprafață</label>
           <div class="calc-range">
             <input type="range" id="calc-area" min="20" max="1000" step="10" value="120" aria-describedby="calc-area-out">
@@ -413,8 +423,8 @@
         <div class="calc-field">
           <label class="calc-label" for="calc-tariff" data-i18n="calc.tariff">Tarif estimativ (€/m² pe lună)</label>
           <div class="calc-range">
-            <input type="range" id="calc-tariff" min="5" max="35" step="1" value="14" aria-describedby="calc-tariff-out">
-            <output id="calc-tariff-out" for="calc-tariff">€14</output>
+            <input type="range" id="calc-tariff" min="12" max="22" step="0.5" value="15" aria-describedby="calc-tariff-out">
+            <output id="calc-tariff-out" for="calc-tariff">€15</output>
           </div>
         </div>
         <div class="calc-field">

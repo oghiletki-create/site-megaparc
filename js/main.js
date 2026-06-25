@@ -180,6 +180,8 @@ document.getElementById('year').textContent = new Date().getFullYear();
   const areaOut = document.getElementById('calc-area-out');
   const tariffOut = document.getElementById('calc-tariff-out');
   const schemeBtns = document.querySelectorAll('.calc-scheme');
+  const bldBtns = document.querySelectorAll('.calc-bld');
+  const bldType = document.getElementById('calc-bld-type');
   const notes = document.querySelectorAll('.calc-note');
   const result = document.querySelector('.calc-result');
   const out = {
@@ -191,7 +193,38 @@ document.getElementById('year').textContent = new Date().getFullYear();
   };
   let scheme = 'standard';
 
+  // Tarife de chirie orientative pe imobil (€/m² pe lună). De înlocuit cu
+  // valorile reale Megaparc — un singur loc de editat. rate = valoarea
+  // implicită, min/max = intervalul (ex. parter vs. demisol, vitrină vs.
+  // interior). `type` referă cheia i18n a tipului de spațiu.
+  const BUILDINGS = {
+    dacia31:      { rate: 15, min: 12, max: 22, type: 'proj.1t' },
+    moscova9:     { rate: 14, min: 11, max: 20, type: 'proj.2t' },
+    moscova20:    { rate: 9,  min: 6,  max: 13, type: 'proj.3t' },
+    vasilelupu48: { rate: 11, min: 9,  max: 15, type: 'proj.4t' }
+  };
+
   const eur = n => '€ ' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
+  const setType = key => {
+    if (!bldType) return;
+    bldType.dataset.i18n = key;
+    try {
+      const lang = localStorage.getItem('megaparc-lang') || 'ro';
+      const dict = typeof I18N !== 'undefined' ? (I18N[lang] || I18N.ro) : null;
+      if (dict && dict[key]) bldType.innerHTML = dict[key];
+    } catch (e) {}
+  };
+
+  const applyBuilding = id => {
+    const b = BUILDINGS[id];
+    if (!b) return;
+    tariff.min = b.min;
+    tariff.max = b.max;
+    tariff.step = 0.5;
+    tariff.value = b.rate;
+    setType(b.type);
+  };
 
   const render = () => {
     const a = Number(area.value);
@@ -231,7 +264,13 @@ document.getElementById('year').textContent = new Date().getFullYear();
     schemeBtns.forEach(b => b.classList.toggle('active', b === btn));
     render();
   }));
+  bldBtns.forEach(btn => btn.addEventListener('click', () => {
+    bldBtns.forEach(b => b.classList.toggle('active', b === btn));
+    applyBuilding(btn.dataset.bld);
+    render();
+  }));
 
+  applyBuilding('dacia31');
   render();
 })();
 

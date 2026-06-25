@@ -1026,9 +1026,11 @@ body.intro-lock { overflow: hidden; }
   font-variant-numeric: tabular-nums;
 }
 
-.calc-schemes { display: flex; flex-wrap: wrap; gap: 10px; }
+.calc-schemes,
+.calc-buildings { display: flex; flex-wrap: wrap; gap: 10px; }
 
-.calc-scheme {
+.calc-scheme,
+.calc-bld {
   flex: 1 1 auto;
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.22);
@@ -1041,13 +1043,22 @@ body.intro-lock { overflow: hidden; }
   transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
-.calc-scheme:hover { color: var(--white); border-color: rgba(255, 255, 255, 0.45); }
+.calc-scheme:hover,
+.calc-bld:hover { color: var(--white); border-color: rgba(255, 255, 255, 0.45); }
 
-.calc-scheme.active {
+.calc-scheme.active,
+.calc-bld.active {
   background: var(--red);
   border-color: var(--red);
   color: var(--white);
 }
+
+.calc-bld-type {
+  font-size: 13px;
+  color: var(--gray);
+}
+
+.calc-bld-type b { color: var(--paper); font-weight: 600; }
 
 .calc-result {
   background: rgba(16, 11, 14, 0.6);
