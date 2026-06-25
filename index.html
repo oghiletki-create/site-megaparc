@@ -427,34 +427,51 @@
             <output id="calc-tariff-out" for="calc-tariff">€15</output>
           </div>
         </div>
-        <div class="calc-field">
-          <span class="calc-label" data-i18n="calc.scheme">Schemă de plată și garanție</span>
-          <div class="calc-schemes" role="group" aria-label="Schemă de plată">
-            <button type="button" class="calc-scheme active" data-scheme="standard" data-i18n="calc.s1">Standard</button>
-            <button type="button" class="calc-scheme" data-scheme="avans" data-i18n="calc.s2">Plată în avans</button>
-            <button type="button" class="calc-scheme" data-scheme="banca" data-i18n="calc.s3">Garanție bancară</button>
-          </div>
-        </div>
       </div>
 
-      <div class="calc-result" data-scheme="standard">
-        <div class="calc-rows">
-          <div class="calc-row"><span data-i18n="calc.r.month">Chirie lunară</span><b id="calc-month">—</b></div>
-          <div class="calc-row"><span data-i18n="calc.r.year">Chirie pe an</span><b id="calc-year">—</b></div>
-          <div class="calc-row"><span data-i18n="calc.r.discount">Reducere avans (−10%)</span><b id="calc-discount">—</b></div>
-          <div class="calc-row"><span data-i18n="calc.r.deposit">Fond de garanție</span><b id="calc-deposit">—</b></div>
-          <div class="calc-row calc-row-total"><span data-i18n="calc.r.signing">De achitat la semnare</span><b id="calc-signing">—</b></div>
-        </div>
-        <div class="calc-notes">
-          <p class="calc-note" data-scheme="standard" data-i18n="calc.n1">Fond de garanție egal cu 3 luni de chirie: o lună acoperă chiria, una utilitățile, una eventualele reparații. Mărimea se ajustează în funcție de profilul chiriașului. Chiria poate fi indexată anual la inflație.</p>
-          <p class="calc-note" data-scheme="avans" data-i18n="calc.n2">Plata întregului an în avans aduce 3 avantaje: reducere de 10%, fără indexare la inflație timp de un an și fără fond de garanție în numerar.</p>
-          <p class="calc-note" data-scheme="banca" data-i18n="calc.n3">O garanție bancară înlocuiește depozitul în numerar: nu blochezi capital, iar spațiul este rezervat cu aceeași siguranță pentru ambele părți.</p>
-        </div>
-        <a class="btn btn-red" href="#contact" data-magnet data-i18n="calc.cta">Solicită o ofertă</a>
+      <div class="calc-summary">
+        <div class="calc-row"><span data-i18n="calc.r.month">Chirie lunară</span><b id="calc-month">—</b></div>
+        <div class="calc-row calc-row-total"><span data-i18n="calc.r.year">Chirie pe an</span><b id="calc-year">—</b></div>
+        <p class="calc-summary-note" data-i18n="calc.summary">Chiria de bază, înainte de schema de garanție. Mai jos vezi ce schimbă fiecare schemă de plată.</p>
       </div>
     </div>
 
-    <p class="calc-disclaimer reveal" data-i18n="calc.disc">Valori estimative, în scop informativ. Tariful și condițiile finale se stabilesc individual, în funcție de spațiu, durata contractului și profilul chiriașului.</p>
+    <h3 class="calc-compare-head reveal" data-i18n="calc.compare">Compară schemele de plată și garanție</h3>
+    <div class="calc-compare">
+      <article class="scheme-card reveal">
+        <span class="scheme-idx">01</span>
+        <h4 data-i18n="calc.s1">Standard</h4>
+        <p class="scheme-explain" data-i18n="calc.n1">Fond de garanție egal cu 3 luni de chirie: o lună acoperă chiria, una utilitățile, una eventualele reparații. Mărimea se ajustează în funcție de profilul chiriașului. Chiria poate fi indexată anual la inflație.</p>
+        <div class="scheme-figs">
+          <div class="calc-row"><span data-i18n="calc.r.deposit">Fond de garanție</span><b id="calc-std-deposit">—</b></div>
+          <div class="calc-row calc-row-total"><span data-i18n="calc.r.signing">De achitat la semnare</span><b id="calc-std-signing">—</b></div>
+        </div>
+      </article>
+      <article class="scheme-card scheme-card-feat reveal">
+        <span class="scheme-badge" data-i18n="calc.badge">Recomandat</span>
+        <span class="scheme-idx">02</span>
+        <h4 data-i18n="calc.s2">Plată în avans</h4>
+        <p class="scheme-explain" data-i18n="calc.n2">Plata întregului an în avans aduce 3 avantaje: reducere de 10%, fără indexare la inflație timp de un an și fără fond de garanție în numerar.</p>
+        <div class="scheme-figs">
+          <div class="calc-row"><span data-i18n="calc.r.discount">Reducere avans (−10%)</span><b id="calc-av-discount">—</b></div>
+          <div class="calc-row calc-row-total"><span data-i18n="calc.r.signingAvans">De achitat (anul, în avans)</span><b id="calc-av-signing">—</b></div>
+        </div>
+      </article>
+      <article class="scheme-card reveal">
+        <span class="scheme-idx">03</span>
+        <h4 data-i18n="calc.s3">Garanție bancară</h4>
+        <p class="scheme-explain" data-i18n="calc.n3">O garanție bancară înlocuiește depozitul în numerar: nu blochezi capital, iar spațiul este rezervat cu aceeași siguranță pentru ambele părți.</p>
+        <div class="scheme-figs">
+          <div class="calc-row"><span data-i18n="calc.r.depositCash">Depozit în numerar</span><b data-i18n="calc.val.none">Fără</b></div>
+          <div class="calc-row calc-row-total"><span data-i18n="calc.r.signing">De achitat la semnare</span><b id="calc-bk-signing">—</b></div>
+        </div>
+      </article>
+    </div>
+
+    <div class="calc-cta-row reveal">
+      <a class="btn btn-red" href="#contact" data-magnet data-i18n="calc.cta">Solicită o ofertă</a>
+      <p class="calc-disclaimer" data-i18n="calc.disc">Valori estimative, în scop informativ. Tariful și condițiile finale se stabilesc individual, în funcție de spațiu, durata contractului și profilul chiriașului.</p>
+    </div>
   </div>
 </section>
 

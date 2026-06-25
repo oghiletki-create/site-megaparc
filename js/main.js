@@ -179,19 +179,17 @@ document.getElementById('year').textContent = new Date().getFullYear();
   const tariff = document.getElementById('calc-tariff');
   const areaOut = document.getElementById('calc-area-out');
   const tariffOut = document.getElementById('calc-tariff-out');
-  const schemeBtns = document.querySelectorAll('.calc-scheme');
   const bldBtns = document.querySelectorAll('.calc-bld');
   const bldType = document.getElementById('calc-bld-type');
-  const notes = document.querySelectorAll('.calc-note');
-  const result = document.querySelector('.calc-result');
   const out = {
     month: document.getElementById('calc-month'),
     year: document.getElementById('calc-year'),
-    discount: document.getElementById('calc-discount'),
-    deposit: document.getElementById('calc-deposit'),
-    signing: document.getElementById('calc-signing')
+    stdDeposit: document.getElementById('calc-std-deposit'),
+    stdSigning: document.getElementById('calc-std-signing'),
+    avDiscount: document.getElementById('calc-av-discount'),
+    avSigning: document.getElementById('calc-av-signing'),
+    bkSigning: document.getElementById('calc-bk-signing')
   };
-  let scheme = 'standard';
 
   // Tarife de chirie orientative pe imobil (€/m² pe lună). De înlocuit cu
   // valorile reale Megaparc — un singur loc de editat. rate = valoarea
@@ -234,36 +232,24 @@ document.getElementById('year').textContent = new Date().getFullYear();
     areaOut.textContent = a + ' m²';
     tariffOut.textContent = '€' + t;
 
-    let discount = 0;
-    let deposit = 0;
-    let signing = 0;
-    if (scheme === 'standard') {
-      deposit = month * 3;          // chirie + utilități + reparații
-      signing = month + deposit;    // prima lună + fond de garanție
-    } else if (scheme === 'avans') {
-      discount = annual * 0.10;     // reducere pentru plata anuală în avans
-      signing = annual - discount;  // tot anul în avans, fără fond de garanție
-    } else {                        // garanție bancară
-      signing = month;             // prima lună; garanția bancară înlocuiește numerarul
-    }
-
     out.month.textContent = eur(month);
     out.year.textContent = eur(annual);
-    out.discount.textContent = discount ? '− ' + eur(discount) : '—';
-    out.deposit.textContent = deposit ? eur(deposit) : '—';
-    out.signing.textContent = eur(signing);
 
-    notes.forEach(n => n.classList.toggle('show', n.dataset.scheme === scheme));
-    if (result) result.dataset.scheme = scheme;
+    // Standard: fond de garanție = 3 luni; la semnare = prima lună + fond
+    out.stdDeposit.textContent = eur(month * 3);
+    out.stdSigning.textContent = eur(month * 4);
+
+    // Plată în avans: reducere 10%, fără fond de garanție, tot anul în avans
+    const discount = annual * 0.10;
+    out.avDiscount.textContent = '− ' + eur(discount);
+    out.avSigning.textContent = eur(annual - discount);
+
+    // Garanție bancară: fără depozit în numerar, la semnare = prima lună
+    out.bkSigning.textContent = eur(month);
   };
 
   area.addEventListener('input', render);
   tariff.addEventListener('input', render);
-  schemeBtns.forEach(btn => btn.addEventListener('click', () => {
-    scheme = btn.dataset.scheme;
-    schemeBtns.forEach(b => b.classList.toggle('active', b === btn));
-    render();
-  }));
   bldBtns.forEach(btn => btn.addEventListener('click', () => {
     bldBtns.forEach(b => b.classList.toggle('active', b === btn));
     applyBuilding(btn.dataset.bld);
@@ -274,39 +260,21 @@ document.getElementById('year').textContent = new Date().getFullYear();
   render();
 })();
 
-const pages = document.querySelectorAll('.page');
-const pageNames = new Set(Array.from(pages, p => p.dataset.page));
-const navLinks = nav.querySelectorAll('a[href^="#"]');
-
-const showPage = (name, animate) => {
-  const target = document.querySelector('.page[data-page="' + name + '"]');
-  if (!target) return;
-  pages.forEach(p => p.classList.remove('active', 'enter'));
-  target.classList.add('active');
-  if (animate && !reduceMotion) target.classList.add('enter');
-  window.scrollTo(0, 0);
-  navLinks.forEach(a => a.classList.toggle('current', a.getAttribute('href') === '#' + name));
-  requestAnimationFrame(() => {
-    revealInView();
-    startCounters();
-  });
-};
-
-const routeFromHash = animate => {
-  const name = location.hash.replace(/^#\/?/, '') || 'acasa';
-  showPage(pageNames.has(name) ? name : 'acasa', animate);
-};
-
-document.addEventListener('click', e => {
-  const link = e.target.closest('a[href^="#"]');
-  if (!link) return;
-  const raw = link.getAttribute('href').slice(1);
-  const dest = raw === 'top' ? 'acasa' : raw;
-  if (!pageNames.has(dest)) return;
-  e.preventDefault();
-  if (location.hash !== '#' + dest) history.pushState(null, '', '#' + dest);
-  showPage(dest, true);
+// Scroll-spy: highlight the nav link of the section currently in view.
+const navLinks = nav.querySelectorAll('a[href^="#"]:not(.nav-cta)');
+const spyTargets = [];
+navLinks.forEach(a => {
+  const el = document.getElementById(a.getAttribute('href').slice(1));
+  if (el) spyTargets.push(el);
 });
 
-window.addEventListener('popstate', () => routeFromHash(true));
-routeFromHash(false);
+if ('IntersectionObserver' in window && spyTargets.length) {
+  const spy = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const id = entry.target.id;
+      navLinks.forEach(a => a.classList.toggle('current', a.getAttribute('href') === '#' + id));
+    });
+  }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+  spyTargets.forEach(el => spy.observe(el));
+}
