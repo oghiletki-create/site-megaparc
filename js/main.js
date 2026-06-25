@@ -172,6 +172,69 @@ if (finePointer && !reduceMotion) {
 
 document.getElementById('year').textContent = new Date().getFullYear();
 
+/* ---- Rent & guarantee calculator ---- */
+(() => {
+  const area = document.getElementById('calc-area');
+  if (!area) return;
+  const tariff = document.getElementById('calc-tariff');
+  const areaOut = document.getElementById('calc-area-out');
+  const tariffOut = document.getElementById('calc-tariff-out');
+  const schemeBtns = document.querySelectorAll('.calc-scheme');
+  const notes = document.querySelectorAll('.calc-note');
+  const result = document.querySelector('.calc-result');
+  const out = {
+    month: document.getElementById('calc-month'),
+    year: document.getElementById('calc-year'),
+    discount: document.getElementById('calc-discount'),
+    deposit: document.getElementById('calc-deposit'),
+    signing: document.getElementById('calc-signing')
+  };
+  let scheme = 'standard';
+
+  const eur = n => '€ ' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
+  const render = () => {
+    const a = Number(area.value);
+    const t = Number(tariff.value);
+    const month = a * t;
+    const annual = month * 12;
+    areaOut.textContent = a + ' m²';
+    tariffOut.textContent = '€' + t;
+
+    let discount = 0;
+    let deposit = 0;
+    let signing = 0;
+    if (scheme === 'standard') {
+      deposit = month * 3;          // chirie + utilități + reparații
+      signing = month + deposit;    // prima lună + fond de garanție
+    } else if (scheme === 'avans') {
+      discount = annual * 0.10;     // reducere pentru plata anuală în avans
+      signing = annual - discount;  // tot anul în avans, fără fond de garanție
+    } else {                        // garanție bancară
+      signing = month;             // prima lună; garanția bancară înlocuiește numerarul
+    }
+
+    out.month.textContent = eur(month);
+    out.year.textContent = eur(annual);
+    out.discount.textContent = discount ? '− ' + eur(discount) : '—';
+    out.deposit.textContent = deposit ? eur(deposit) : '—';
+    out.signing.textContent = eur(signing);
+
+    notes.forEach(n => n.classList.toggle('show', n.dataset.scheme === scheme));
+    if (result) result.dataset.scheme = scheme;
+  };
+
+  area.addEventListener('input', render);
+  tariff.addEventListener('input', render);
+  schemeBtns.forEach(btn => btn.addEventListener('click', () => {
+    scheme = btn.dataset.scheme;
+    schemeBtns.forEach(b => b.classList.toggle('active', b === btn));
+    render();
+  }));
+
+  render();
+})();
+
 const pages = document.querySelectorAll('.page');
 const pageNames = new Set(Array.from(pages, p => p.dataset.page));
 const navLinks = nav.querySelectorAll('a[href^="#"]');
