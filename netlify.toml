@@ -1,0 +1,13 @@
+# Configurare Netlify pentru prezentarea Art Granit.
+# Publică folderul „artgranit" ca rădăcină a site-ului, ca link-ul să fie curat
+# (nume.netlify.app/...), fără numele repozitoriului în adresă.
+[build]
+  publish = "artgranit"
+
+# Rădăcina site-ului ("/") afișează pagina-copertă a candidaturii, păstrând URL-ul curat.
+# (rescriere internă status=200 — bara de adresă rămâne „nume.netlify.app/")
+[[redirects]]
+  from = "/"
+  to = "/candidatura/index.html"
+  status = 200
+  force = true
