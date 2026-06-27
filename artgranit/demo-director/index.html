@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Art Granit — Panou Director Comercial (demo)</title>
+<meta name="robots" content="noindex,nofollow">
+<!--
+  DEMO INTERN pentru DIRECTORUL COMERCIAL — Art Granit (piatră naturală).
+  Compania pe showroom-uri și departamente (angajați, sarcini, automatizări),
+  plus consultanți de vânzări (clasament + comisioane) și fluxul ofertă→producție→montaj.
+  Date DEMO. Concept confidențial, proprietatea dezvoltatorului.
+-->
+<style>
+  :root{
+    --green:#546170;--green-d:#2e3a46;--green-l:#eceef2;--bg:#eef1f4;--card:#fff;
+    --ink:#222a31;--muted:#71808c;--line:#e1e5ea;--amber:#ef6c00;--blue:#3d6a99;--accent:#c9a227;--pos:#2e7d32;
+    --shadow:0 8px 24px rgba(46,58,70,.10);
+  }
+  *{box-sizing:border-box} html,body{margin:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+  .topbar{background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;padding:12px 20px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:10}
+  .logo{width:38px;height:38px;flex:0 0 38px}
+  .brand b{font-size:18px;font-weight:800;display:block;line-height:1}
+  .brand span{font-size:11px;opacity:.9;letter-spacing:1px;text-transform:uppercase}
+  .role{margin-left:auto;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:7px}
+  .demo-badge{background:var(--accent);color:#3a2c00;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.5px}
+
+  .shell{display:grid;grid-template-columns:230px 1fr;gap:18px;max-width:1180px;margin:18px auto;padding:0 18px}
+  @media(max-width:820px){.shell{grid-template-columns:1fr}}
+  .nav{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px;height:max-content;box-shadow:var(--shadow);position:sticky;top:74px}
+  @media(max-width:820px){.nav{position:static;display:flex;flex-wrap:wrap;gap:6px}}
+  .nav button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;color:var(--ink);padding:10px 12px;border-radius:10px;font-size:13.5px;font-weight:600;cursor:pointer;text-align:left}
+  @media(max-width:820px){.nav button{width:auto}}
+  .nav button:hover{background:var(--green-l)} .nav button.on{background:var(--green);color:#fff}
+  .nav .mi{font-size:17px;flex:0 0 20px;text-align:center} .nav .sep{height:1px;background:var(--line);margin:6px 8px}
+
+  .main{min-width:0}
+  .h{display:flex;align-items:center;gap:12px;margin:2px 0 14px}
+  .h .ic{width:46px;height:46px;border-radius:12px;background:var(--green-l);display:grid;place-items:center;font-size:24px;flex:0 0 46px}
+  .h h1{font-size:21px;margin:0} .h p{margin:2px 0 0;color:var(--muted);font-size:13px}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+  @media(max-width:680px){.kpis{grid-template-columns:1fr 1fr}}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+  .kpi b{font-size:20px;color:var(--green-d);display:block} .kpi span{font-size:12px;color:var(--muted)}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px} @media(max-width:680px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+  .card h3{margin:0 0 11px;font-size:14.5px;display:flex;align-items:center;gap:8px}
+  .card h3 .c{font-size:11px;font-weight:700;color:var(--muted);background:var(--green-l);padding:1px 8px;border-radius:999px;margin-left:auto}
+
+  .emp{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:13px} .emp:first-of-type{border-top:0}
+  .emp .av{width:30px;height:30px;border-radius:50%;background:var(--green-l);color:var(--green-d);display:grid;place-items:center;font-size:12px;font-weight:700;flex:0 0 30px}
+  .emp .n{flex:1} .emp .ct{font-size:11px;color:var(--muted)}
+
+  .task{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-top:1px solid var(--line);font-size:13px;line-height:1.4} .task:first-of-type{border-top:0}
+  .st{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap;flex:0 0 auto}
+  .st.man{background:#fff3e0;color:var(--amber)} .st.prog{background:#e7eef6;color:var(--blue)} .st.auto{background:#e8f5e9;color:var(--pos)}
+
+  .auto{display:flex;gap:9px;padding:9px 0;border-top:1px dashed var(--line);font-size:13px;line-height:1.45} .auto:first-of-type{border-top:0}
+  .auto .b{flex:0 0 22px;height:22px;border-radius:6px;background:var(--green);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700}
+  .auto .benefit{color:var(--muted);font-size:11.5px;display:block;margin-top:1px}
+
+  .stores{display:grid;grid-template-columns:repeat(2,1fr);gap:14px} @media(max-width:680px){.stores{grid-template-columns:1fr}}
+  .store{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+  .store .top{display:flex;align-items:center;gap:10px} .store .pin{width:34px;height:34px;border-radius:9px;background:var(--green-l);display:grid;place-items:center;font-size:18px}
+  .store b{font-size:14.5px} .store .city{font-size:11.5px;color:var(--muted)}
+  .store .row{display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;border-top:1px solid var(--line);margin-top:8px} .store .row:first-of-type{margin-top:10px}
+  .tag-ok{color:var(--pos);font-weight:700}.tag-warn{color:var(--amber);font-weight:700}
+
+  .agent{display:flex;align-items:center;gap:11px;padding:11px 0;border-top:1px solid var(--line)} .agent:first-of-type{border-top:0}
+  .rank{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:14px;background:var(--green-l);color:var(--green-d);flex:0 0 30px} .rank.top{background:var(--accent);color:#3a2c00}
+  .agent .who2{flex:1;min-width:0} .agent .who2 b{font-size:13.5px} .agent .who2 .z{font-size:11px;color:var(--muted)}
+  .agent .bar{height:6px;background:var(--line);border-radius:999px;margin-top:5px;overflow:hidden;max-width:170px} .agent .bar i{display:block;height:100%;border-radius:999px}
+  .agent .nums{text-align:right;flex:0 0 auto;font-size:12px;line-height:1.5} .agent .nums .s{font-weight:700} .agent .nums .com{color:var(--green-d);font-weight:800;display:block} .pct{font-weight:700}
+
+  .legal{max-width:1180px;margin:8px auto 26px;padding:0 18px;color:var(--muted);font-size:11px;text-align:center;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#fff"/><polygon points="24,9 37,17 24,25 11,17" fill="#c9a227"/><polygon points="11,17 24,25 24,39 11,31" fill="#7c8893"/><polygon points="37,17 24,25 24,39 37,31" fill="#aeb8c1"/></svg>
+  <div class="brand"><b>Art Granit</b><span>Panou de management</span></div>
+  <div class="role">👤 Director Comercial <span class="demo-badge">DEMO</span></div>
+</div>
+
+<div class="shell">
+  <nav class="nav" id="nav"></nav>
+  <main class="main" id="main"></main>
+</div>
+<p class="legal" id="legal"></p>
+
+<script>
+/* ===== DATE DEMO — se completează cu cele reale Art Granit ===== */
+const STORES=[
+  {pin:"🏛️",name:"Centru Art-Granit",city:"bd. Grigore Vieru 19, Chișinău",manager:"V. Cojocaru",staff:9,sales:"32 400 lei",stock:"OK",ok:true},
+  {pin:"💎",name:"Stone Gallery",city:"str. Uzinelor 171/2, Chișinău",manager:"A. Popescu",staff:6,sales:"21 800 lei",stock:"OK",ok:true},
+  {pin:"⚙️",name:"Atelier producție (CNC)",city:"Debitare, prelucrare, finisaj",manager:"S. Donică",staff:18,sales:"54 proiecte active",stock:"3 plăci sub prag",ok:false},
+  {pin:"🛒",name:"Online artgranit.md",city:"Cereri de ofertă · livrare națională",manager:"Echipă digital",staff:3,sales:"19 lead-uri/zi",stock:"OK",ok:true}
+];
+const AGENTS=[
+  {name:"M. Rusu",zone:"Proiecte developeri · Chișinău",sales:412000,target:122,com:12360},
+  {name:"D. Ciobanu",zone:"Bucătării persoane fizice",sales:318500,target:108,com:9555},
+  {name:"E. Popa",zone:"Arhitecți & designeri (parteneri)",sales:286700,target:99,com:8601},
+  {name:"V. Lungu",zone:"HoReCa & retail",sales:241300,target:91,com:7239},
+  {name:"A. Moraru",zone:"Showroom Stone Gallery",sales:198600,target:84,com:5958},
+  {name:"I. Bivol",zone:"Online / lead-uri artgranit.md",sales:164200,target:76,com:4926}
+];
+const DEPTS={
+  vanzari:{ic:"🏛️",name:"Vânzări & ofertare",sub:"showroom, persoane fizice, proiecte B2B, parteneri",
+    employees:[["Director comercial",1,"DC"],["Consultanți showroom",6,"CS"],["Manageri proiecte",2,"MP"],["Operator lead-uri online",2,"OL"]],
+    tasks:[["Oferte de blat de întocmit azi: 14","man"],["Proiecte developeri în negociere: 7","prog"],["Lead-uri artgranit.md de procesat: 19","prog"],["Target lunar: 88% atins","prog"]],
+    autos:[["Cotare automată a blaturilor","material × m² × prelucrări (debitare, profil margine, decupaj chiuvetă/plită) → ofertă în minute"],
+      ["Lead-uri de pe artgranit.md captate automat în CRM","nicio cerere de ofertă pierdută"],
+      ["Relansare automată a ofertelor fără răspuns",""],
+      ["CRM viu pe fiecare client/proiect","istoric, material ales, stadiu, sold"],
+      ["Garanția Cosentino 25 ani inclusă automat în oferte Silestone/Dekton",""],
+      ["Comisioane consultanți calculate automat","fără Excel"]]},
+  masuratori:{ic:"📐",name:"Măsurători & proiectare",sub:"șabloane la client, debitare pe desen",
+    employees:[["Șef proiectare",1,"ȘP"],["Tehnicieni măsurători",3,"TM"],["Desenatori CAD",2,"CD"]],
+    tasks:[["Măsurători programate azi: 6","prog"],["Șabloane de transformat în desen de debitare: 9","man"],["Decupaje speciale (chiuvete sub-blat): 4","prog"]],
+    autos:[["Șablon digital → desen de debitare automat",""],["Nesting automat pe placă","layout optim, deșeu minim din plăcile scumpe"],
+      ["Verificare automată a decupajelor","chiuvetă, plită, baterie — fără erori"],["Vizualizare 3D a blatului pentru client",""]]},
+  productie:{ic:"⚙️",name:"Atelier producție (CNC/waterjet)",sub:"debitare, prelucrare margine, finisaj",
+    employees:[["Șef atelier",1,"ȘA"],["Operatori CNC / waterjet",6,"CN"],["Prelucrare margine & finisaj",7,"FN"],["Control calitate",2,"CC"],["Manipulare plăci",2,"MN"]],
+    tasks:[["Proiecte în producție: 54","prog"],["Debitări programate azi: 11","prog"],["Plăci-cheie sub prag de stoc: 3","man"]],
+    autos:[["Planificarea atelierului pe capacitate","comenzi vs. mașini, fără suprapuneri"],
+      ["Status producție live pentru client","„blatul tău se taie azi"],
+      ["Predicție întârzieri","alertă când un proiect riscă termenul de montaj"],
+      ["Trasabilitatea plăcii","de la container la blatul finit"]]},
+  montaj:{ic:"🚚",name:"Montaj (echipe pe teren)",sub:"transport, montaj, recepție la client",
+    employees:[["Coordonator montaj",1,"CM"],["Echipe montaj",8,"EM"],["Șoferi / transport plăci",3,"TR"]],
+    tasks:[["Montaje programate săptămâna asta: 9","prog"],["Transporturi de planificat: 5","prog"],["Recepții/semnături garanție: 6","man"]],
+    autos:[["Planificare montaje pe echipe și zone","grupare automată, mai puține drumuri"],
+      ["Confirmare programare cu clientul (SMS/automat)",""],["Proces-verbal de recepție + garanție 25 ani, digital",""],
+      ["Optimizare rute de transport","plăci fragile, traseu sigur"]]},
+  aprovizionare:{ic:"📦",name:"Aprovizionare & import plăci",sub:"reprezentant oficial Cosentino + furnizori piatră",
+    employees:[["Șef achiziții",1,"ȘA"],["Specialist import",2,"IM"],["Operator depozit plăci",2,"DP"]],
+    tasks:[["Containere în tranzit: 6","prog"],["Plăci-cheie de comandat: 3","man"],["Facturi furnizori de introdus: 11","man"]],
+    autos:[["Reaprovizionare predictivă pe culorile best-seller","plăcile cerute des nu se epuizează"],
+      ["Urmărire comenzi Cosentino + termene + curs valutar",""],["Comparare furnizori de piatră","preț, calitate, termen"],
+      ["Citire automată a facturilor și documentelor de import",""]]},
+  marketing:{ic:"📣",name:"Marketing",sub:"showroom, online, social, parteneri arhitecți",
+    employees:[["Marketing manager",1,"MM"],["Social media / foto proiecte",2,"SM"],["Content & SEO",1,"CT"]],
+    tasks:[["Proiecte de fotografiat pentru portofoliu: 5","man"],["Campanie „blat la comandă" de pregătit","man"],["Postări Instagram (artgranit.md)","prog"]],
+    autos:[["Portofoliu auto din proiectele finalizate","foto → galerie pe site, automat"],
+      ["Segmentare: persoane fizice vs. developeri vs. arhitecți",""],["Program de parteneriat pentru arhitecți & designeri","lead-uri recomandate, urmărite"],
+      ["Conținut + SEO pe materiale (Silestone, Dekton, granit)",""]]}
+};
+
+const NAV=[
+  ["overview","📊","Privire de ansamblu"],
+  ["stores","🏛️","Showroom-uri & atelier"],
+  ["agenti","🏆","Consultanți (clasament)"],
+  ["sep"],
+  ["vanzari","🏛️","Vânzări & ofertare"],
+  ["masuratori","📐","Măsurători & proiectare"],
+  ["productie","⚙️","Atelier producție"],
+  ["montaj","🚚","Montaj"],
+  ["aprovizionare","📦","Aprovizionare & import"],
+  ["marketing","📣","Marketing"]
+];
+const WISH=[
+  ["Cotare automată a blaturilor — ofertă în minute, nu în zile","material × m² × prelucrări"],
+  ["Lead-urile de pe artgranit.md captate automat în CRM","— niciuna pierdută"],
+  ["Fiecare proiect urmărit ofertă → măsurare → debitare → montaj","într-un singur ecran"],
+  ["Nesting automat pe placă","— deșeu minim din plăcile scumpe"],
+  ["Garanția Cosentino 25 ani inclusă automat în oferte",""],
+  ["Clasament consultanți + comisioane calculate automat",""]
+];
+let view="overview";
+const $=s=>document.querySelector(s);
+function renderNav(){ $('#nav').innerHTML=NAV.map(n=>{ if(n[0]==="sep")return '<div class="sep"></div>'; return `<button class="${view===n[0]?'on':''}" onclick="go('${n[0]}')"><span class="mi">${n[1]}</span>${n[2]}</button>`; }).join(''); }
+function go(v){ view=v; renderNav(); renderMain(); window.scrollTo({top:0,behavior:'smooth'}); }
+window.go=go;
+function empList(a){ return a.map(e=>`<div class="emp"><div class="av">${e[2]}</div><div class="n">${e[0]}</div><div class="ct">×${e[1]}</div></div>`).join(''); }
+function taskList(a){ const l={man:"manual",prog:"în lucru",auto:"automatizat"}; return a.map(t=>`<div class="task"><span class="st ${t[1]}">${l[t[1]]}</span><span>${t[0]}</span></div>`).join(''); }
+function autoList(a){ return a.map(x=>`<div class="auto"><span class="b">✓</span><span><b>${x[0]}</b>${x[1]?`<span class="benefit">${x[1]}</span>`:''}</span></div>`).join(''); }
+
+function renderMain(){
+  const m=$('#main');
+  if(view==="overview"){
+    const totalStaff=STORES.reduce((s,x)=>s+x.staff,0);
+    m.innerHTML=`
+      <div class="h"><div class="ic">📊</div><div><h1>Privire de ansamblu</h1><p>Compania pe showroom-uri și departamente — date demo</p></div></div>
+      <div class="kpis">
+        <div class="kpi"><b>2 + atelier</b><span>showroom-uri</span></div>
+        <div class="kpi"><b>54</b><span>proiecte active</span></div>
+        <div class="kpi"><b>48%</b><span>din vânzări = proiecte B2B</span></div>
+        <div class="kpi"><b>88%</b><span>target lunar atins</span></div>
+      </div>
+      <div style="background:linear-gradient(135deg,var(--green-d),var(--green));color:#fff;border-radius:14px;padding:18px;box-shadow:var(--shadow);margin-bottom:16px">
+        <h3 style="margin:0 0 4px;font-size:16px">🎯 Ce aș automatiza întâi — ca director comercial</h3>
+        <p style="margin:0 0 12px;font-size:12.5px;opacity:.9">Lucrurile care îmi iau cel mai mult timp și le-aș automatiza primele:</p>
+        <ol style="margin:0;padding-left:20px">${WISH.map(w=>`<li style="padding:5px 0;font-size:13.5px">${w[0]} ${w[1]?`<b style="background:rgba(255,255,255,.18);padding:0 6px;border-radius:5px">${w[1].replace(/^— /,'')}</b>`:''}</li>`).join('')}</ol>
+      </div>
+      <div class="grid">
+        <div class="card"><h3>🏛️ Puncte de lucru <span class="c">${STORES.length}</span></h3>
+          ${STORES.map(s=>`<div class="task"><span class="st ${s.ok?'auto':'man'}">${s.ok?'OK':'alertă'}</span><span><b>${s.name}</b> — ${s.city} · ${s.sales}</span></div>`).join('')}
+        </div>
+        <div class="card"><h3>👥 Echipă <span class="c">${totalStaff} pers.</span></h3>
+          ${Object.values(DEPTS).map(d=>`<div class="task"><span class="st prog">${d.employees.reduce((s,e)=>s+e[1],0)}</span><span>${d.ic} ${d.name}</span></div>`).join('')}
+        </div>
+      </div>
+    `;
+  } else if(view==="stores"){
+    m.innerHTML=`
+      <div class="h"><div class="ic">🏛️</div><div><h1>Showroom-uri & atelier</h1><p>Fiecare punct de lucru separat — date demo</p></div></div>
+      <div class="stores">${STORES.map(s=>`
+        <div class="store"><div class="top"><div class="pin">${s.pin}</div><div><b>${s.name}</b><div class="city">${s.city}</div></div></div>
+          <div class="row"><span>Responsabil</span><span><b>${s.manager}</b></span></div>
+          <div class="row"><span>Angajați</span><span>${s.staff}</span></div>
+          <div class="row"><span>Activitate azi</span><span><b>${s.sales}</b></span></div>
+          <div class="row"><span>Stoc</span><span class="${s.ok?'tag-ok':'tag-warn'}">${s.stock}</span></div>
+        </div>`).join('')}</div>
+      <div class="card" style="margin-top:16px"><h3>⚙️ Ce s-ar automatiza la nivel de rețea</h3>
+        ${autoList([["Stoc de plăci sincronizat între showroom-uri și atelier","ce-ai în depozit vezi din ambele showroom-uri"],["Cotare cu același preț pe toate punctele",""],["Comparație activitate între showroom-uri, în timp real",""],["Lead-urile online direcționate către showroom-ul potrivit",""]])}
+      </div>`;
+  } else if(view==="agenti"){
+    const sorted=[...AGENTS].sort((a,b)=>b.sales-a.sales);
+    const totCom=AGENTS.reduce((s,a)=>s+a.com,0), totSales=AGENTS.reduce((s,a)=>s+a.sales,0);
+    const medal=["🥇","🥈","🥉"], tcol=p=>p>=100?"#2e7d32":(p>=85?"#ef6c00":"#c62828"), fmt=n=>n.toLocaleString("ro-RO");
+    m.innerHTML=`
+      <div class="h"><div class="ic">🏆</div><div><h1>Consultanți — clasament & comisioane</h1><p>Luna curentă · comision 3% din vânzări confirmate · date demo</p></div></div>
+      <div class="kpis">
+        <div class="kpi"><b>${AGENTS.length}</b><span>consultanți de vânzări</span></div>
+        <div class="kpi"><b>${fmt(totSales)} lei</b><span>vânzări consultanți (lună)</span></div>
+        <div class="kpi"><b>${fmt(totCom)} lei</b><span>comisioane de plată</span></div>
+        <div class="kpi"><b>${sorted[0].name}</b><span>top vânzător 🏆</span></div>
+      </div>
+      <div class="card"><h3>📈 Clasament <span class="c">după vânzări</span></h3>
+        ${sorted.map((a,i)=>`<div class="agent"><div class="rank ${i<3?'top':''}">${i<3?medal[i]:(i+1)}</div>
+          <div class="who2"><b>${a.name}</b><div class="z">${a.zone}</div><div class="bar"><i style="width:${Math.min(a.target,100)}%;background:${tcol(a.target)}"></i></div></div>
+          <div class="nums"><span class="s">${fmt(a.sales)} lei</span> · <span class="pct" style="color:${tcol(a.target)}">${a.target}%</span><span class="com">+${fmt(a.com)} lei comision</span></div></div>`).join('')}
+      </div>
+      <div class="card" style="margin-top:16px"><h3>⚙️ Ce automatizăm aici <span class="c">AI</span></h3>
+        ${autoList([["Comisioane calculate automat","din vânzările confirmate, pe material"],["Clasament în timp real",""],["Alerte consultanți sub target",""],["Obiective și bonusuri urmărite automat",""]])}
+      </div>`;
+  } else {
+    const d=DEPTS[view];
+    m.innerHTML=`
+      <div class="h"><div class="ic">${d.ic}</div><div><h1>${d.name}</h1><p>${d.sub} — date demo</p></div></div>
+      <div class="grid">
+        <div class="card"><h3>👥 Angajați <span class="c">${d.employees.reduce((s,e)=>s+e[1],0)} pers.</span></h3>${empList(d.employees)}</div>
+        <div class="card"><h3>📋 Sarcini curente</h3>${taskList(d.tasks)}</div>
+      </div>
+      <div class="card" style="margin-top:16px"><h3>⚙️ Ce automatizăm în ${d.name} <span class="c">AI</span></h3>${autoList(d.autos)}</div>`;
+  }
+}
+$('#legal').textContent="© 2026 · Demo confidențial, realizat la comandă pentru Art Granit. Date ilustrative — se completează cu cele reale. Concept, design și implementare = proprietatea dezvoltatorului; reproducerea fără acord interzisă.";
+renderNav(); renderMain();
+</script>
+</body>
+</html>
