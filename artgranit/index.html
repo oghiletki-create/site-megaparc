@@ -24,8 +24,20 @@
   a.card b{font-size:17px;display:block;margin-bottom:6px}
   a.card span{color:var(--muted);font-size:13px;line-height:1.5;display:block}
   a.card .go{display:inline-block;margin-top:14px;background:var(--stone);color:#fff;border-radius:10px;padding:9px 18px;font-size:13px;font-weight:700}
-  .legal{margin-top:26px;color:var(--muted);font-size:11px;line-height:1.5}
+  .legal{margin-top:22px;color:var(--muted);font-size:11px;line-height:1.5}
   .badge{background:var(--accent);color:#3a2c00;padding:2px 9px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.5px}
+  .pitch{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin:0 0 22px;box-shadow:0 10px 30px rgba(46,58,70,.08);text-align:left;font-size:13.5px;line-height:1.6;color:#3a4753}
+  .pitch b{color:var(--stone-d)}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 22px}
+  .tag{background:var(--stone-l);color:var(--stone-d);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12px;font-weight:600}
+  .tag b{color:var(--accent)}
+  .contact{margin-top:22px;background:var(--stone-d);color:#fff;border-radius:16px;padding:18px 20px;text-align:left}
+  .contact h4{margin:0 0 12px;font-size:13px;letter-spacing:1px;text-transform:uppercase;opacity:.8;font-weight:700}
+  .contact .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px 22px}
+  @media(max-width:560px){.contact .grid2{grid-template-columns:1fr}}
+  .contact .item{font-size:12.5px;line-height:1.5}
+  .contact .item span{display:block;opacity:.65;font-size:10.5px;text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px}
+  .contact a{color:#f0d77a;text-decoration:none}
 </style>
 </head>
 <body>
@@ -37,10 +49,22 @@
       <polygon points="11,17 24,25 24,39 11,31" fill="#9aa6b1"/>
       <polygon points="37,17 24,25 24,39 37,31" fill="#cfd6dd"/>
     </svg>
-    <div><b>Art Granit</b><span>Piatră naturală · Moldova</span></div>
+    <div><b>Art Granit</b><span>Producător de blaturi din piatră naturală · Moldova</span></div>
   </div>
   <h1>Demo automatizare AI <span class="badge">DEMO</span></h1>
-  <p class="sub">Panouri de management interactive, gândite pentru Art Granit. Alege ce vrei să vezi:</p>
+  <p class="sub">Pentru conducerea Art Granit. Panouri de management interactive — alege ce vrei să vezi:</p>
+
+  <div class="pitch">
+    Demo gândit special pentru <b>Art Granit</b> — producător de blaturi din piatră naturală la comandă și <b>reprezentant oficial Cosentino</b> (Silestone &amp; Dekton) în Moldova. Panourile de mai jos arată cum ar arăta conducerea companiei pe date în timp real: de la <b>cotarea automată a blaturilor</b> și fluxul <b>ofertă → măsurare → debitare CNC → montaj</b>, până la profitabilitate pe material și clasamentul consultanților.
+  </div>
+  <div class="tags">
+    <div class="tag">🪨 Granit · Marmură</div>
+    <div class="tag">💎 Quartz <b>Silestone</b></div>
+    <div class="tag">⬛ <b>Dekton</b> ultracompact</div>
+    <div class="tag">🏆 Reprezentant oficial Cosentino</div>
+    <div class="tag">🛡️ Garanție <b>25 ani</b></div>
+  </div>
+
   <div class="cards">
     <a class="card" href="demo-ceo/">
       <div class="ic">📊</div>
@@ -55,7 +79,19 @@
       <span class="go">Deschide panoul →</span>
     </a>
   </div>
-  <p class="legal">© 2026 · Demo confidențial, realizat la comandă pentru Art Granit. Date ilustrative. Concept, design și implementare = proprietatea dezvoltatorului; reproducerea fără acord interzisă.</p>
+  <div class="contact">
+    <h4>Art Granit · date de contact</h4>
+    <div class="grid2">
+      <div class="item"><span>Showroom Centru</span>bd. Grigore Vieru 19, Chișinău</div>
+      <div class="item"><span>Stone Gallery</span>str. Uzinelor 171/2, Chișinău</div>
+      <div class="item"><span>Telefon</span><a href="tel:+37379040205">+373 79 040 205</a></div>
+      <div class="item"><span>Email · Web</span><a href="mailto:info@artgranit.md">info@artgranit.md</a> · <a href="https://artgranit.md" target="_blank" rel="noopener">artgranit.md</a></div>
+      <div class="item"><span>Program</span>L–V 09:00–18:30 · Sâmbătă 09:00–15:00</div>
+      <div class="item"><span>Profil</span>Piatră naturală &amp; compozite · partener Cosentino</div>
+    </div>
+  </div>
+
+  <p class="legal">© 2026 · Demo confidențial, realizat la comandă pentru Art Granit. Datele operaționale sunt ilustrative și se completează cu cele reale. Concept, design și implementare = proprietatea dezvoltatorului; reproducerea fără acord interzisă.</p>
 </div>
 </body>
 </html>
