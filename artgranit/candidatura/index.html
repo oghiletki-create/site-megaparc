@@ -7,8 +7,8 @@
 <meta name="robots" content="noindex,nofollow">
 <!--
   PAGINĂ-COPERTĂ personalizată a candidaturii pentru funcția de Director General la Art Granit.
-  Un singur link de transmis conducerii — adună: strategia, panourile demo (CEO + Director Comercial)
-  și prezentarea GO CRM. Numele și contactul candidatului se completează în câmpurile marcate.
+  Un singur link de transmis conducerii. Bilingv RO/RU (comutator în colț).
+  Numele și contactul candidatului se completează în câmpurile marcate.
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,6 +22,12 @@
   a{color:inherit;text-decoration:none}
   .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
   .eyebrow{font-family:'League Spartan',sans-serif;font-weight:700;letter-spacing:.22em;text-transform:uppercase;font-size:12px;color:var(--gold)}
+  .hl{color:#fff}
+
+  /* LANG TOGGLE */
+  .lang{position:fixed;top:16px;right:16px;z-index:60;display:flex;background:rgba(16,22,28,.7);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:3px}
+  .lang-btn{border:0;background:transparent;color:#c4ccd4;font-family:'League Spartan',sans-serif;font-weight:800;font-size:12.5px;letter-spacing:.06em;padding:6px 13px;border-radius:999px;cursor:pointer}
+  .lang-btn.on{background:var(--gold);color:#241c00}
 
   /* HERO / IDENTITY */
   .top{position:relative;overflow:hidden;color:#fff;padding:60px 0 44px}
@@ -67,11 +73,16 @@
   footer{background:var(--paper);color:var(--stone);padding:10px 0 40px;font-size:13px}
   footer .wrap{border-top:1px solid var(--line);padding-top:22px;display:flex;flex-wrap:wrap;gap:14px 28px;justify-content:space-between}
   footer .c b{color:#1d262e}
-  footer a{color:#3a4753;font-weight:600}
   footer .legal{max-width:52ch;color:#94806b;font-size:11.5px;line-height:1.5}
 </style>
 </head>
 <body>
+
+<!-- Comutator de limbă RO / RU -->
+<div class="lang" role="group" aria-label="Limbă / Язык">
+  <button class="lang-btn on" data-l="ro" type="button" onclick="__setLang('ro')">RO</button>
+  <button class="lang-btn" data-l="ru" type="button" onclick="__setLang('ru')">RU</button>
+</div>
 
 <header class="top">
   <svg class="vein" viewBox="0 0 1440 460" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -81,14 +92,14 @@
   <div class="wrap">
     <div class="brand">
       <svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="11" fill="#fff"/><polygon points="24,9 37,17 24,25 11,17" fill="#c9a227"/><polygon points="11,17 24,25 24,39 11,31" fill="#7c8893"/><polygon points="37,17 24,25 24,39 37,31" fill="#aeb8c1"/></svg>
-      <div><b>Art Granit</b><span>Candidatură · Director General</span></div>
+      <div><b>Art Granit</b><span data-ru="Кандидатура · Генеральный директор">Candidatură · Director General</span></div>
     </div>
-    <div class="eyebrow">Dosar confidențial de candidatură</div>
-    <h1>Candidatura mea pentru funcția de <em>Director General</em> al Art Granit.</h1>
-    <p class="lead">Pe lângă CV-ul deja transmis, am pregătit ceva ce niciun CV nu poate arăta: <b style="color:#fff">strategia cu care aș conduce compania</b> și <b style="color:#fff">sistemele pe care le-am construit deja</b>. Totul, într-un singur loc.</p>
+    <div class="eyebrow" data-ru="Конфиденциальное досье кандидата">Dosar confidențial de candidatură</div>
+    <h1 data-ru="Моя кандидатура на должность <em>Генерального директора</em> Art Granit.">Candidatura mea pentru funcția de <em>Director General</em> al Art Granit.</h1>
+    <p class="lead" data-ru="Помимо уже отправленного резюме, я подготовил то, что не покажет ни одно резюме: <b class='hl'>стратегию, с которой я буду управлять компанией</b>, и <b class='hl'>системы, которые я уже построил</b>. Всё в одном месте.">Pe lângă CV-ul deja transmis, am pregătit ceva ce niciun CV nu poate arăta: <b class="hl">strategia cu care aș conduce compania</b> și <b class="hl">sistemele pe care le-am construit deja</b>. Totul, într-un singur loc.</p>
     <div class="idcard">
-      <span>Candidat: <b>[Nume Prenume]</b><span class="ed">de completat</span></span>
-      <span>Contact: <b>[telefon · email]</b><span class="ed">de completat</span></span>
+      <span data-ru="Кандидат: <b>[Имя Фамилия]</b><span class='ed'>заполнить</span>">Candidat: <b>[Nume Prenume]</b><span class="ed">de completat</span></span>
+      <span data-ru="Контакт: <b>[телефон · email]</b><span class='ed'>заполнить</span>">Contact: <b>[telefon · email]</b><span class="ed">de completat</span></span>
     </div>
   </div>
 </header>
@@ -96,55 +107,75 @@
 <main class="body">
   <div class="wrap">
     <div class="sec-lead">
-      <div class="eyebrow">Ce veți găsi aici</div>
-      <h2>Trei lucruri, în ordinea în care contează</h2>
-      <p>Începeți cu strategia — apoi intrați în panourile pe care aș conduce afacerea și în sistemul de automatizare pe care îl aduc.</p>
+      <div class="eyebrow" data-ru="Что вы здесь найдёте">Ce veți găsi aici</div>
+      <h2 data-ru="Три вещи, в порядке важности">Trei lucruri, în ordinea în care contează</h2>
+      <p data-ru="Начните со стратегии — затем откройте панели, которыми я буду управлять бизнесом, и систему автоматизации, которую я приношу.">Începeți cu strategia — apoi intrați în panourile pe care aș conduce afacerea și în sistemul de automatizare pe care îl aduc.</p>
     </div>
 
     <div class="cards">
       <a class="card primary" href="../strategie-director/">
         <div class="ic">🎯</div>
-        <div class="k">Începeți aici</div>
-        <h3>Strategia mea de Director General</h3>
-        <p>Diagnoza companiei, viziunea pe 12–24 luni, cei 4 piloni de activitate, planul pe 90 de zile și KPI pe care mi-i asum — plus implementarea GO CRM ca avantaj pe care îl aduc personal.</p>
-        <span class="go">Vezi strategia →</span>
+        <div class="k" data-ru="Начните здесь">Începeți aici</div>
+        <h3 data-ru="Моя стратегия Генерального директора">Strategia mea de Director General</h3>
+        <p data-ru="Диагностика компании, видение на 12–24 месяца, 4 опоры деятельности, план на 90 дней и KPI, которые я беру на себя, — плюс внедрение GO CRM как преимущество, которое я приношу лично.">Diagnoza companiei, viziunea pe 12–24 luni, cei 4 piloni de activitate, planul pe 90 de zile și KPI pe care mi-i asum — plus implementarea GO CRM ca avantaj pe care îl aduc personal.</p>
+        <span class="go" data-ru="Смотреть стратегию →">Vezi strategia →</span>
       </a>
 
       <a class="card" href="../demo-ceo/">
         <div class="ic">📊</div>
-        <div class="k">Dovadă · panou live</div>
-        <h3>Panoul Directorului General</h3>
-        <p>Tabloul executiv pe care aș conduce Art Granit: finanțe, vânzări, atelier CNC, materiale, reprezentanța Cosentino, radar de risc.</p>
-        <span class="go">Deschide panoul →</span>
+        <div class="k" data-ru="Доказательство · живая панель">Dovadă · panou live</div>
+        <h3 data-ru="Панель Генерального директора">Panoul Directorului General</h3>
+        <p data-ru="Панель управления, с которой я буду руководить Art Granit: финансы, продажи, цех ЧПУ, материалы, представительство Cosentino, радар рисков.">Tabloul executiv pe care aș conduce Art Granit: finanțe, vânzări, atelier CNC, materiale, reprezentanța Cosentino, radar de risc.</p>
+        <span class="go" data-ru="Открыть панель →">Deschide panoul →</span>
       </a>
 
       <a class="card" href="../demo-director/">
         <div class="ic">💼</div>
-        <div class="k">Dovadă · panou live</div>
-        <h3>Panoul Directorului Comercial</h3>
-        <p>Showroom-uri, consultanți (clasament + comisioane) și fluxul ofertă → măsurare → producție → montaj.</p>
-        <span class="go">Deschide panoul →</span>
+        <div class="k" data-ru="Доказательство · живая панель">Dovadă · panou live</div>
+        <h3 data-ru="Панель Коммерческого директора">Panoul Directorului Comercial</h3>
+        <p data-ru="Шоурумы, консультанты (рейтинг + комиссии) и поток: предложение → замер → производство → монтаж.">Showroom-uri, consultanți (clasament + comisioane) și fluxul ofertă → măsurare → producție → montaj.</p>
+        <span class="go" data-ru="Открыть панель →">Deschide panoul →</span>
       </a>
 
       <a class="card" href="../">
         <div class="ic">⚙️</div>
-        <div class="k">Sistemul</div>
-        <h3>Prezentarea GO CRM</h3>
-        <p>Sistemul de automatizare în detaliu: cotare automată, chatbot AI, missed-call text-back, recenzii Google, mentenanță recurentă și un dashboard care leagă totul.</p>
-        <span class="go">Vezi sistemul →</span>
+        <div class="k" data-ru="Система">Sistemul</div>
+        <h3 data-ru="Презентация GO CRM">Prezentarea GO CRM</h3>
+        <p data-ru="Система автоматизации в деталях: автоматический расчёт, AI-чат-бот, ответ на пропущенный звонок, отзывы Google, регулярное обслуживание и дашборд, который связывает всё.">Sistemul de automatizare în detaliu: cotare automată, chatbot AI, missed-call text-back, recenzii Google, mentenanță recurentă și un dashboard care leagă totul.</p>
+        <span class="go" data-ru="Смотреть систему →">Vezi sistemul →</span>
       </a>
     </div>
 
-    <div class="note">
+    <div class="note" data-ru="<b>Зачем это досье?</b> Резюме показывает, где я был. Это досье показывает, <b>куда я веду Art Granit</b> — и что я не говорю общими словами, а уже построил инструменты. Я готов начать с аудита и первых быстрых результатов в первый же месяц.">
       <b>De ce acest dosar?</b> Un CV arată unde am fost. Acest dosar arată <b>unde duc Art Granit</b> — și că nu vorbesc în general, ci am construit deja instrumentele. Sunt gata să încep cu auditul și primele câștiguri rapide din prima lună.
     </div>
   </div>
 </main>
 
 <footer><div class="wrap">
-  <div class="c">Candidatură pentru <b>Director General · Art Granit</b> · prezentat de <b>[Nume Prenume]</b></div>
-  <div class="legal">Dosar confidențial, destinat exclusiv conducerii Art Granit. Datele operaționale din panouri și prezentări sunt ilustrative și se calibrează cu cele reale. Reproducerea fără acord nu este permisă.</div>
+  <div class="c" data-ru="Кандидатура на должность <b>Генерального директора · Art Granit</b> · представил <b>[Имя Фамилия]</b>">Candidatură pentru <b>Director General · Art Granit</b> · prezentat de <b>[Nume Prenume]</b></div>
+  <div class="legal" data-ru="Конфиденциальное досье, предназначено исключительно для руководства Art Granit. Операционные данные в панелях и презентациях иллюстративны и калибруются по реальным. Воспроизведение без согласия не допускается.">Dosar confidențial, destinat exclusiv conducerii Art Granit. Datele operaționale din panouri și prezentări sunt ilustrative și se calibrează cu cele reale. Reproducerea fără acord nu este permisă.</div>
 </div></footer>
 
+<script>
+  /* i18n RO/RU — captează RO din innerHTML, comută pe data-ru. Persistă în localStorage. */
+  (function(){
+    var KEY='ag_lang';
+    var TITLES={ro:'Candidatură · Director General · Art Granit', ru:'Кандидатура · Генеральный директор · Art Granit'};
+    var els=[].slice.call(document.querySelectorAll('[data-ru]'));
+    els.forEach(function(el){ el.setAttribute('data-ro', el.innerHTML); });
+    function set(lang){
+      if(lang!=='ru') lang='ro';
+      document.documentElement.lang=lang;
+      els.forEach(function(el){ el.innerHTML = el.getAttribute(lang==='ru'?'data-ru':'data-ro'); });
+      document.title=TITLES[lang];
+      [].slice.call(document.querySelectorAll('.lang-btn')).forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-l')===lang); });
+      try{ localStorage.setItem(KEY,lang); }catch(e){}
+    }
+    window.__setLang=set;
+    var saved='ro'; try{ saved=localStorage.getItem(KEY)||'ro'; }catch(e){}
+    set(saved);
+  })();
+</script>
 </body>
 </html>

@@ -7,8 +7,8 @@
 <meta name="robots" content="noindex,nofollow">
 <!--
   PREZENTARE-STRATEGIE confidențială — candidatură pentru funcția de DIRECTOR GENERAL la Art Granit.
-  Diagnoză → viziune → piloni strategici → implementarea GO CRM → plan 30/60/90 → KPI asumați → dovadă (panouri).
-  Date ilustrative; secțiunea „Despre candidat" se completează de către candidat.
+  Bilingv RO/RU (comutator în nav). Diagnoză → viziune → piloni → GO CRM → plan 30/60/90 → KPI → dovadă.
+  Secțiunea „Despre candidat" se completează de către candidat.
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,6 +25,7 @@
   .wrap{max-width:1140px;margin:0 auto;padding:0 24px}
   .eyebrow{font-family:'League Spartan',sans-serif;font-weight:700;letter-spacing:.22em;text-transform:uppercase;font-size:12.5px;color:var(--gold)}
   a{color:inherit}
+  .hl{color:#fff}
 
   /* NAV */
   .nav{position:sticky;top:0;z-index:40;background:rgba(26,33,41,.92);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.08)}
@@ -37,7 +38,10 @@
   .nav .links a{color:#c4ccd4;text-decoration:none;font-size:13.5px;font-weight:500}
   .nav .links a:hover{color:#fff}
   .nav .cta{background:var(--gold);color:#241c00;padding:8px 16px;border-radius:9px;font-weight:700;font-size:13px;text-decoration:none}
-  @media(max-width:820px){.nav .links{display:none}}
+  .lang{display:flex;background:rgba(16,22,28,.6);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:3px}
+  .lang-btn{border:0;background:transparent;color:#c4ccd4;font-family:'League Spartan',sans-serif;font-weight:800;font-size:12px;letter-spacing:.06em;padding:5px 11px;border-radius:999px;cursor:pointer}
+  .lang-btn.on{background:var(--gold);color:#241c00}
+  @media(max-width:900px){.nav .links{display:none}}
 
   /* HERO */
   .hero{background:var(--graph);color:#fff;position:relative;overflow:hidden;padding:84px 0 92px}
@@ -161,17 +165,21 @@
 <nav class="nav"><div class="wrap">
   <a class="logo" href="#top">
     <svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="11" fill="#fff"/><polygon points="24,9 37,17 24,25 11,17" fill="#c9a227"/><polygon points="11,17 24,25 24,39 11,31" fill="#7c8893"/><polygon points="37,17 24,25 24,39 37,31" fill="#aeb8c1"/></svg>
-    <span><b>Art Granit</b><span>Strategie · Director General</span></span>
+    <span><b>Art Granit</b><span data-ru="Стратегия · Генеральный директор">Strategie · Director General</span></span>
   </a>
   <div class="links">
-    <a href="#diagnoza">Diagnoză</a>
-    <a href="#viziune">Viziune</a>
-    <a href="#piloni">Piloni</a>
+    <a href="#diagnoza" data-ru="Диагностика">Diagnoză</a>
+    <a href="#viziune" data-ru="Видение">Viziune</a>
+    <a href="#piloni" data-ru="Опоры">Piloni</a>
     <a href="#gocrm">GO CRM</a>
-    <a href="#plan">Plan 90 zile</a>
+    <a href="#plan" data-ru="План 90 дней">Plan 90 zile</a>
     <a href="#kpi">KPI</a>
   </div>
-  <a class="cta" href="#contact">Discutăm →</a>
+  <div class="lang" role="group" aria-label="Limbă / Язык">
+    <button class="lang-btn on" data-l="ro" type="button" onclick="__setLang('ro')">RO</button>
+    <button class="lang-btn" data-l="ru" type="button" onclick="__setLang('ru')">RU</button>
+  </div>
+  <a class="cta" href="#contact" data-ru="Обсудим →">Discutăm →</a>
 </div></nav>
 
 <!-- HERO -->
@@ -181,17 +189,17 @@
     <path d="M-50,300 C300,360 600,180 900,260 C1180,335 1300,170 1500,230" fill="none" stroke="#c9a227" stroke-width="1.2" opacity=".3"/>
   </svg>
   <div class="wrap">
-    <div class="eyebrow">Candidatură confidențială · Funcția de Director General</div>
-    <h1>O strategie pentru <em>următoarea etapă</em> a Art Granit.</h1>
-    <p class="lead">Nu vin doar cu o promisiune de management, ci cu un plan concret de creștere și cu un avantaj pe care îl aduc personal: <b style="color:#fff">implementarea sistemului de automatizare GO CRM</b> — sistemul nervos care nu lasă niciun client și nicio ofertă să se piardă.</p>
+    <div class="eyebrow" data-ru="Конфиденциальная кандидатура · Должность Генерального директора">Candidatură confidențială · Funcția de Director General</div>
+    <h1 data-ru="Стратегия для <em>следующего этапа</em> Art Granit.">O strategie pentru <em>următoarea etapă</em> a Art Granit.</h1>
+    <p class="lead" data-ru="Я прихожу не просто с обещанием менеджмента, а с конкретным планом роста и преимуществом, которое приношу лично: <b class='hl'>внедрение системы автоматизации GO CRM</b> — нервная система, которая не даёт потеряться ни одному клиенту и ни одному предложению.">Nu vin doar cu o promisiune de management, ci cu un plan concret de creștere și cu un avantaj pe care îl aduc personal: <b class="hl">implementarea sistemului de automatizare GO CRM</b> — sistemul nervos care nu lasă niciun client și nicio ofertă să se piardă.</p>
     <div class="who">
-      <span>Prezentat de: <b>[Nume Prenume]</b></span>
-      <span>Pentru: <b>conducerea / acționarii Art Granit</b></span>
-      <span><b>Orizont:</b> primele 12 luni</span>
+      <span data-ru="Представил: <b>[Имя Фамилия]</b>">Prezentat de: <b>[Nume Prenume]</b></span>
+      <span data-ru="Для: <b>руководства / акционеров Art Granit</b>">Pentru: <b>conducerea / acționarii Art Granit</b></span>
+      <span data-ru="<b>Горизонт:</b> первые 12 месяцев"><b>Orizont:</b> primele 12 luni</span>
     </div>
     <div class="actions">
-      <a class="btn gold" href="#gocrm">Vezi avantajul GO CRM →</a>
-      <a class="btn ghost" href="#plan">Planul pe 90 de zile</a>
+      <a class="btn gold" href="#gocrm" data-ru="Смотреть преимущество GO CRM →">Vezi avantajul GO CRM →</a>
+      <a class="btn ghost" href="#plan" data-ru="План на 90 дней">Planul pe 90 de zile</a>
     </div>
   </div>
 </header>
@@ -200,9 +208,9 @@
 <section id="teza">
   <div class="wrap">
     <div class="sec-head rv">
-      <div class="eyebrow">Teza mea</div>
-      <h2>Art Granit are deja brandul și măiestria. Îi lipsește un strat de sistem care să transforme efortul în creștere predictibilă.</h2>
-      <p>Cu 17+ ani de experiență, statut de reprezentant oficial Cosentino și garanție de 25 de ani, Art Granit are tot ce-i trebuie ca să domine piața premium. Ca Director General, rolul meu este să pun ordine, ritm și date peste această fundație — și să o fac măsurabil, din prima lună.</p>
+      <div class="eyebrow" data-ru="Мой тезис">Teza mea</div>
+      <h2 data-ru="У Art Granit уже есть бренд и мастерство. Не хватает системного слоя, который превратит усилия в предсказуемый рост.">Art Granit are deja brandul și măiestria. Îi lipsește un strat de sistem care să transforme efortul în creștere predictibilă.</h2>
+      <p data-ru="С опытом более 17 лет, статусом официального представителя Cosentino и гарантией 25 лет у Art Granit есть всё, чтобы доминировать на премиум-рынке. Как Генеральный директор, моя роль — навести порядок, задать ритм и данные поверх этой основы, и сделать это измеримо, с первого месяца.">Cu 17+ ani de experiență, statut de reprezentant oficial Cosentino și garanție de 25 de ani, Art Granit are tot ce-i trebuie ca să domine piața premium. Ca Director General, rolul meu este să pun ordine, ritm și date peste această fundație — și să o fac măsurabil, din prima lună.</p>
     </div>
   </div>
 </section>
@@ -211,24 +219,24 @@
 <section id="diagnoza" style="background:var(--paper2)">
   <div class="wrap">
     <div class="sec-head rv">
-      <div class="eyebrow">01 · Diagnoză</div>
-      <h2>Cum văd Art Granit astăzi</h2>
-      <p>O evaluare onestă: pe ce construim și unde sunt câștigurile rapide. (Ipoteze de validat cu cifrele reale în primele 2 săptămâni.)</p>
+      <div class="eyebrow" data-ru="01 · Диагностика">01 · Diagnoză</div>
+      <h2 data-ru="Каким я вижу Art Granit сегодня">Cum văd Art Granit astăzi</h2>
+      <p data-ru="Честная оценка: на чём строим и где быстрые победы. (Гипотезы для проверки реальными цифрами в первые 2 недели.)">O evaluare onestă: pe ce construim și unde sunt câștigurile rapide. (Ipoteze de validat cu cifrele reale în primele 2 săptămâni.)</p>
     </div>
     <div class="twocol">
       <div class="panel good rv">
-        <h3>💪 Puncte forte de valorificat</h3>
-        <div class="li"><span class="mk">✓</span><span><b>Reprezentant oficial Cosentino</b> (Silestone &amp; Dekton) + garanție 25 ani<span>cel mai puternic diferențiator din piață — astăzi subutilizat în procesul de vânzare</span></span></div>
-        <div class="li"><span class="mk">✓</span><span><b>17+ ani și două showroom-uri</b> (Grigore Vieru 19 + Stone Gallery)<span>notorietate și capacitate de producție CNC reale</span></span></div>
-        <div class="li"><span class="mk">✓</span><span><b>Gamă premium completă</b> — granit, marmură, Silestone, Dekton<span>acoperim de la persoane fizice la proiecte mari de developeri</span></span></div>
-        <div class="li"><span class="mk">✓</span><span><b>Marjă mai mare pe compozite</b> (Dekton/Silestone)<span>pârghie directă de profit prin orientarea mixului</span></span></div>
+        <h3 data-ru="💪 Сильные стороны для использования">💪 Puncte forte de valorificat</h3>
+        <div class="li"><span class="mk">✓</span><span data-ru="<b>Официальный представитель Cosentino</b> (Silestone и Dekton) + гарантия 25 лет<span>сильнейшее отличие на рынке — сегодня недоиспользуется в процессе продаж</span>"><b>Reprezentant oficial Cosentino</b> (Silestone &amp; Dekton) + garanție 25 ani<span>cel mai puternic diferențiator din piață — astăzi subutilizat în procesul de vânzare</span></span></div>
+        <div class="li"><span class="mk">✓</span><span data-ru="<b>17+ лет и два шоурума</b> (Григоре Виеру 19 + Stone Gallery)<span>известность и реальные мощности ЧПУ-производства</span>"><b>17+ ani și două showroom-uri</b> (Grigore Vieru 19 + Stone Gallery)<span>notorietate și capacitate de producție CNC reale</span></span></div>
+        <div class="li"><span class="mk">✓</span><span data-ru="<b>Полный премиум-ассортимент</b> — гранит, мрамор, Silestone, Dekton<span>охватываем от частных лиц до крупных проектов застройщиков</span>"><b>Gamă premium completă</b> — granit, marmură, Silestone, Dekton<span>acoperim de la persoane fizice la proiecte mari de developeri</span></span></div>
+        <div class="li"><span class="mk">✓</span><span data-ru="<b>Более высокая маржа на композитах</b> (Dekton/Silestone)<span>прямой рычаг прибыли через управление ассортиментом</span>"><b>Marjă mai mare pe compozite</b> (Dekton/Silestone)<span>pârghie directă de profit prin orientarea mixului</span></span></div>
       </div>
       <div class="panel opp rv">
-        <h3>🎯 Oportunități (câștiguri rapide)</h3>
-        <div class="li"><span class="mk">!</span><span><b>Ofertarea durează prea mult</b> → lead-uri pierdute<span>fiecare ofertă întârziată cu zile = client care merge la concurent</span></span></div>
-        <div class="li"><span class="mk">!</span><span><b>Lead-urile nu sunt urmărite centralizat</b><span>apeluri ratate, cereri de pe site/Instagram fără răspuns rapid</span></span></div>
-        <div class="li"><span class="mk">!</span><span><b>Fluxul proiectului nu e digitalizat</b> (ofertă→măsurare→CNC→montaj)<span>termene greu de garantat, refaceri, lipsă de vizibilitate</span></span></div>
-        <div class="li"><span class="mk">!</span><span><b>Venit recurent ratat</b> — mentenanța / resigilarea pietrei<span>baza de clienți existentă nu e reactivată sistematic</span></span></div>
+        <h3 data-ru="🎯 Возможности (быстрые победы)">🎯 Oportunități (câștiguri rapide)</h3>
+        <div class="li"><span class="mk">!</span><span data-ru="<b>Подготовка предложений слишком долгая</b> → потерянные лиды<span>каждое предложение с задержкой в дни = клиент уходит к конкуренту</span>"><b>Ofertarea durează prea mult</b> → lead-uri pierdute<span>fiecare ofertă întârziată cu zile = client care merge la concurent</span></span></div>
+        <div class="li"><span class="mk">!</span><span data-ru="<b>Лиды не отслеживаются централизованно</b><span>пропущенные звонки, заявки с сайта/Instagram без быстрого ответа</span>"><b>Lead-urile nu sunt urmărite centralizat</b><span>apeluri ratate, cereri de pe site/Instagram fără răspuns rapid</span></span></div>
+        <div class="li"><span class="mk">!</span><span data-ru="<b>Поток проекта не оцифрован</b> (предложение→замер→ЧПУ→монтаж)<span>сложно гарантировать сроки, переделки, нет прозрачности</span>"><b>Fluxul proiectului nu e digitalizat</b> (ofertă→măsurare→CNC→montaj)<span>termene greu de garantat, refaceri, lipsă de vizibilitate</span></span></div>
+        <div class="li"><span class="mk">!</span><span data-ru="<b>Упущенный регулярный доход</b> — обслуживание / повторная герметизация камня<span>существующая база клиентов не реактивируется системно</span>"><b>Venit recurent ratat</b> — mentenanța / resigilarea pietrei<span>baza de clienți existentă nu e reactivată sistematic</span></span></div>
       </div>
     </div>
   </div>
@@ -238,15 +246,15 @@
 <section id="viziune" class="dark">
   <div class="wrap">
     <div class="sec-head rv">
-      <div class="eyebrow">02 · Viziune</div>
-      <h2>Unde duc compania în 12–24 de luni</h2>
-      <p>Art Granit — <b style="color:#fff">liderul digitalizat al pietrei premium din Moldova</b>: fiecare lead urmărit, fiecare proiect livrat la termen, fiecare client revine pentru mentenanță. Creștere pe care o conduc pe date, nu pe intuiție.</p>
+      <div class="eyebrow" data-ru="02 · Видение">02 · Viziune</div>
+      <h2 data-ru="Куда я веду компанию за 12–24 месяца">Unde duc compania în 12–24 de luni</h2>
+      <p data-ru="Art Granit — <b class='hl'>цифровой лидер премиального камня в Молдове</b>: каждый лид отслеживается, каждый проект сдан в срок, каждый клиент возвращается за обслуживанием. Рост, которым я управляю на данных, а не на интуиции.">Art Granit — <b class="hl">liderul digitalizat al pietrei premium din Moldova</b>: fiecare lead urmărit, fiecare proiect livrat la termen, fiecare client revine pentru mentenanță. Creștere pe care o conduc pe date, nu pe intuiție.</p>
     </div>
     <div class="pillars rv">
-      <div class="pill"><div class="no">↗</div><h3>Mai multe lead-uri convertite</h3><p>Răspuns în minute, ofertă în aceeași zi, zero cereri pierdute.</p></div>
-      <div class="pill"><div class="no">⚙</div><h3>Producție predictibilă</h3><p>Termene respectate, mai puține refaceri, atelier planificat pe capacitate.</p></div>
-      <div class="pill"><div class="no">💎</div><h3>Mix orientat spre marjă</h3><p>Mai mult Dekton/Silestone, valoarea reprezentanței Cosentino pusă în față.</p></div>
-      <div class="pill"><div class="no">🔁</div><h3>Venit recurent</h3><p>Mentenanță și reactivarea bazei de clienți ca flux constant de comenzi.</p></div>
+      <div class="pill"><div class="no">↗</div><h3 data-ru="Больше конвертированных лидов">Mai multe lead-uri convertite</h3><p data-ru="Ответ за минуты, предложение в тот же день, ноль потерянных заявок.">Răspuns în minute, ofertă în aceeași zi, zero cereri pierdute.</p></div>
+      <div class="pill"><div class="no">⚙</div><h3 data-ru="Предсказуемое производство">Producție predictibilă</h3><p data-ru="Соблюдение сроков, меньше переделок, цех спланирован по мощности.">Termene respectate, mai puține refaceri, atelier planificat pe capacitate.</p></div>
+      <div class="pill"><div class="no">💎</div><h3 data-ru="Ассортимент с упором на маржу">Mix orientat spre marjă</h3><p data-ru="Больше Dekton/Silestone, ценность представительства Cosentino на первом плане.">Mai mult Dekton/Silestone, valoarea reprezentanței Cosentino pusă în față.</p></div>
+      <div class="pill"><div class="no">🔁</div><h3 data-ru="Регулярный доход">Venit recurent</h3><p data-ru="Обслуживание и реактивация базы клиентов как постоянный поток заказов.">Mentenanță și reactivarea bazei de clienți ca flux constant de comenzi.</p></div>
     </div>
   </div>
 </section>
@@ -255,30 +263,30 @@
 <section id="piloni" class="dark" style="padding-top:0">
   <div class="wrap">
     <div class="sec-head rv">
-      <div class="eyebrow">03 · Strategie de activitate</div>
-      <h2>Cei 4 piloni pe care voi conduce</h2>
-      <p>Cum operez compania, concret, pe fiecare zonă — fiecare pilon cu priorități clare și responsabili.</p>
+      <div class="eyebrow" data-ru="03 · Стратегия деятельности">03 · Strategie de activitate</div>
+      <h2 data-ru="4 опоры, на которых я буду управлять">Cei 4 piloni pe care voi conduce</h2>
+      <p data-ru="Как я конкретно управляю компанией по каждому направлению — каждая опора с чёткими приоритетами и ответственными.">Cum operez compania, concret, pe fiecare zonă — fiecare pilon cu priorități clare și responsabili.</p>
     </div>
     <div class="pillars rv">
       <div class="pill">
-        <div class="no">PILON 1</div><h3>Comercial &amp; creștere</h3>
-        <p>Transform vânzarea într-un proces, nu un noroc.</p>
-        <ul><li>Pipeline digital pe fiecare lead și proiect</li><li>Cotare rapidă, ofertă în aceeași zi</li><li>Mix orientat spre marjă (Dekton/Silestone)</li><li>Program de parteneri: arhitecți &amp; designeri</li></ul>
+        <div class="no" data-ru="ОПОРА 1">PILON 1</div><h3 data-ru="Коммерция и рост">Comercial &amp; creștere</h3>
+        <p data-ru="Превращаю продажу в процесс, а не в удачу.">Transform vânzarea într-un proces, nu un noroc.</p>
+        <ul><li data-ru="Цифровой пайплайн по каждому лиду и проекту">Pipeline digital pe fiecare lead și proiect</li><li data-ru="Быстрый расчёт, предложение в тот же день">Cotare rapidă, ofertă în aceeași zi</li><li data-ru="Ассортимент с упором на маржу (Dekton/Silestone)">Mix orientat spre marjă (Dekton/Silestone)</li><li data-ru="Партнёрская программа: архитекторы и дизайнеры">Program de parteneri: arhitecți &amp; designeri</li></ul>
       </div>
       <div class="pill">
-        <div class="no">PILON 2</div><h3>Operațiuni &amp; calitate</h3>
-        <p>Termene garantate și mai puține refaceri.</p>
-        <ul><li>Flux digital ofertă→măsurare→CNC→montaj</li><li>Planificarea atelierului pe capacitate</li><li>Nesting: mai puține deșeuri din plăci scumpe</li><li>Control calitate cu trasabilitate pe placă</li></ul>
+        <div class="no" data-ru="ОПОРА 2">PILON 2</div><h3 data-ru="Операции и качество">Operațiuni &amp; calitate</h3>
+        <p data-ru="Гарантированные сроки и меньше переделок.">Termene garantate și mai puține refaceri.</p>
+        <ul><li data-ru="Цифровой поток предложение→замер→ЧПУ→монтаж">Flux digital ofertă→măsurare→CNC→montaj</li><li data-ru="Планирование цеха по мощности">Planificarea atelierului pe capacitate</li><li data-ru="Раскрой: меньше отходов дорогих плит">Nesting: mai puține deșeuri din plăci scumpe</li><li data-ru="Контроль качества с прослеживаемостью по плите">Control calitate cu trasabilitate pe placă</li></ul>
       </div>
       <div class="pill">
-        <div class="no">PILON 3</div><h3>Oameni &amp; cultură</h3>
-        <p>Roluri clare, obiective și recunoaștere.</p>
-        <ul><li>KPI și responsabilități pe fiecare echipă</li><li>Comisioane transparente, calculate automat</li><li>Clasamente și obiective pentru consultanți</li><li>Formare pe produsele Cosentino</li></ul>
+        <div class="no" data-ru="ОПОРА 3">PILON 3</div><h3 data-ru="Люди и культура">Oameni &amp; cultură</h3>
+        <p data-ru="Чёткие роли, цели и признание.">Roluri clare, obiective și recunoaștere.</p>
+        <ul><li data-ru="KPI и ответственность по каждой команде">KPI și responsabilități pe fiecare echipă</li><li data-ru="Прозрачные комиссии, рассчитанные автоматически">Comisioane transparente, calculate automat</li><li data-ru="Рейтинги и цели для консультантов">Clasamente și obiective pentru consultanți</li><li data-ru="Обучение по продуктам Cosentino">Formare pe produsele Cosentino</li></ul>
       </div>
       <div class="pill">
-        <div class="no">PILON 4</div><h3>Date &amp; automatizare</h3>
-        <p>Sistemul nervos: GO CRM. Decizii pe date.</p>
-        <ul><li>Tablou executiv în timp real</li><li>Alerte de risc (solduri, stoc, termene)</li><li>Rapoarte automate către conducere</li><li>Profitabilitate pe material, proiect și om</li></ul>
+        <div class="no" data-ru="ОПОРА 4">PILON 4</div><h3 data-ru="Данные и автоматизация">Date &amp; automatizare</h3>
+        <p data-ru="Нервная система: GO CRM. Решения на данных.">Sistemul nervos: GO CRM. Decizii pe date.</p>
+        <ul><li data-ru="Панель руководителя в реальном времени">Tablou executiv în timp real</li><li data-ru="Оповещения о рисках (задолженности, склад, сроки)">Alerte de risc (solduri, stoc, termene)</li><li data-ru="Автоматические отчёты руководству">Rapoarte automate către conducere</li><li data-ru="Прибыльность по материалу, проекту и человеку">Profitabilitate pe material, proiect și om</li></ul>
       </div>
     </div>
   </div>
@@ -288,43 +296,43 @@
 <section id="gocrm">
   <div class="wrap">
     <div class="sec-head rv">
-      <div class="eyebrow">04 · Diferențiatorul meu</div>
+      <div class="eyebrow" data-ru="04 · Моё отличие">04 · Diferențiatorul meu</div>
       <div class="gocrm-intro"><span class="tag">GO <em>CRM</em></span></div>
-      <h2 style="margin-top:6px">Avantajul pe care îl aduc personal: implementarea sistemului de automatizare</h2>
-      <p>Nu propun doar să „digitalizăm" — vin cu un plan de implementare în 3 faze, cu rezultate vizibile din prima lună. Acesta este plus-ul meu față de orice alt candidat.</p>
+      <h2 style="margin-top:6px" data-ru="Преимущество, которое я приношу лично: внедрение системы автоматизации">Avantajul pe care îl aduc personal: implementarea sistemului de automatizare</h2>
+      <p data-ru="Я не просто предлагаю «оцифровать» — я прихожу с планом внедрения в 3 этапа, с видимыми результатами с первого месяца. Это моё преимущество перед любым другим кандидатом.">Nu propun doar să „digitalizăm" — vin cu un plan de implementare în 3 faze, cu rezultate vizibile din prima lună. Acesta este plus-ul meu față de orice alt candidat.</p>
     </div>
     <div class="phases rv">
       <div class="phase">
-        <span class="when">Luna 1 · Fundația</span>
-        <h3>Captura: niciun lead pierdut</h3>
-        <div class="goal">Punem temelia și prindem câștigurile rapide.</div>
+        <span class="when" data-ru="Месяц 1 · Фундамент">Luna 1 · Fundația</span>
+        <h3 data-ru="Захват: ни одного потерянного лида">Captura: niciun lead pierdut</h3>
+        <div class="goal" data-ru="Закладываем основу и берём быстрые победы.">Punem temelia și prindem câștigurile rapide.</div>
         <ul>
-          <li>Setup CRM + pipeline vizual de proiecte</li>
-          <li>Captarea lead-urilor din toate canalele (site, Facebook, Instagram, telefon)</li>
-          <li><b>Missed-call text-back</b>: apel pierdut → SMS automat instant</li>
-          <li>Căsuță unificată: SMS, WhatsApp, email, Instagram</li>
+          <li data-ru="Настройка CRM + визуальный пайплайн проектов">Setup CRM + pipeline vizual de proiecte</li>
+          <li data-ru="Захват лидов со всех каналов (сайт, Facebook, Instagram, телефон)">Captarea lead-urilor din toate canalele (site, Facebook, Instagram, telefon)</li>
+          <li data-ru="<b>Ответ на пропущенный звонок</b>: пропущенный звонок → мгновенный авто-SMS"><b>Missed-call text-back</b>: apel pierdut → SMS automat instant</li>
+          <li data-ru="Единый ящик: SMS, WhatsApp, email, Instagram">Căsuță unificată: SMS, WhatsApp, email, Instagram</li>
         </ul>
       </div>
       <div class="phase">
-        <span class="when">Lunile 2–3 · Viteza</span>
-        <h3>Conversie: ofertă în aceeași zi</h3>
-        <div class="goal">Tăiem timpul de la cerere la contract.</div>
+        <span class="when" data-ru="Месяцы 2–3 · Скорость">Lunile 2–3 · Viteza</span>
+        <h3 data-ru="Конверсия: предложение в тот же день">Conversie: ofertă în aceeași zi</h3>
+        <div class="goal" data-ru="Сокращаем время от заявки до договора.">Tăiem timpul de la cerere la contract.</div>
         <ul>
-          <li><b>Cotare automată a blaturilor</b> → ofertă instant pe SMS/WhatsApp/email</li>
-          <li><b>Chatbot AI 24/7</b> pe artgranit.md — califică și programează măsurători</li>
-          <li>Programare online cu confirmări + remindere</li>
-          <li>Notificări automate de status proiect către client</li>
+          <li data-ru="<b>Автоматический расчёт столешниц</b> → мгновенное предложение по SMS/WhatsApp/email"><b>Cotare automată a blaturilor</b> → ofertă instant pe SMS/WhatsApp/email</li>
+          <li data-ru="<b>AI-чат-бот 24/7</b> на artgranit.md — квалифицирует и записывает на замер"><b>Chatbot AI 24/7</b> pe artgranit.md — califică și programează măsurători</li>
+          <li data-ru="Онлайн-запись с подтверждениями + напоминания">Programare online cu confirmări + remindere</li>
+          <li data-ru="Автоматические уведомления о статусе проекта клиенту">Notificări automate de status proiect către client</li>
         </ul>
       </div>
       <div class="phase">
-        <span class="when">Lunile 4–6 · Pârghia</span>
-        <h3>Creștere: reputație &amp; recurent</h3>
-        <div class="goal">Transformăm clienții în motor de creștere.</div>
+        <span class="when" data-ru="Месяцы 4–6 · Рычаг">Lunile 4–6 · Pârghia</span>
+        <h3 data-ru="Рост: репутация и регулярность">Creștere: reputație &amp; recurent</h3>
+        <div class="goal" data-ru="Превращаем клиентов в двигатель роста.">Transformăm clienții în motor de creștere.</div>
         <ul>
-          <li><b>Recenzii Google automate</b> după montaj → mai mulți clienți</li>
-          <li><b>Mentenanță recurentă</b> — reminder anual de resigilare = venit recurent</li>
-          <li>Reactivarea bazei de clienți existente</li>
-          <li>Dashboard executiv + comisioane calculate automat</li>
+          <li data-ru="<b>Автоматические отзывы Google</b> после монтажа → больше клиентов"><b>Recenzii Google automate</b> după montaj → mai mulți clienți</li>
+          <li data-ru="<b>Регулярное обслуживание</b> — ежегодное напоминание о герметизации = регулярный доход"><b>Mentenanță recurentă</b> — reminder anual de resigilare = venit recurent</li>
+          <li data-ru="Реактивация существующей базы клиентов">Reactivarea bazei de clienți existente</li>
+          <li data-ru="Панель руководителя + автоматический расчёт комиссий">Dashboard executiv + comisioane calculate automat</li>
         </ul>
       </div>
     </div>
@@ -335,39 +343,39 @@
 <section id="plan" class="dark">
   <div class="wrap">
     <div class="sec-head rv">
-      <div class="eyebrow">05 · Plan de start</div>
-      <h2>Primele 90 de zile</h2>
-      <p>Ce livrez concret, etapizat, ca să generez încredere și rezultate rapide.</p>
+      <div class="eyebrow" data-ru="05 · План старта">05 · Plan de start</div>
+      <h2 data-ru="Первые 90 дней">Primele 90 de zile</h2>
+      <p data-ru="Что я конкретно делаю, поэтапно, чтобы создать доверие и быстрые результаты.">Ce livrez concret, etapizat, ca să generez încredere și rezultate rapide.</p>
     </div>
     <div class="tl rv">
       <div class="step">
-        <div class="d">0–30</div><div class="t">Zile · Ascult &amp; măsor</div>
+        <div class="d">0–30</div><div class="t" data-ru="Дней · Слушаю и измеряю">Zile · Ascult &amp; măsor</div>
         <ul>
-          <li>Audit complet: vânzări, atelier, finanțe, echipă</li>
-          <li>Validez diagnoza cu cifrele reale</li>
-          <li>1-la-1 cu fiecare șef de echipă</li>
-          <li>Pornesc setup-ul GO CRM (captură lead-uri)</li>
-          <li>Câștig rapid: missed-call text-back activ</li>
+          <li data-ru="Полный аудит: продажи, цех, финансы, команда">Audit complet: vânzări, atelier, finanțe, echipă</li>
+          <li data-ru="Проверяю диагностику реальными цифрами">Validez diagnoza cu cifrele reale</li>
+          <li data-ru="1-на-1 с каждым руководителем команды">1-la-1 cu fiecare șef de echipă</li>
+          <li data-ru="Запускаю настройку GO CRM (захват лидов)">Pornesc setup-ul GO CRM (captură lead-uri)</li>
+          <li data-ru="Быстрая победа: ответ на пропущенный звонок активен">Câștig rapid: missed-call text-back activ</li>
         </ul>
       </div>
       <div class="step">
-        <div class="d">30–60</div><div class="t">Zile · Pun ritm</div>
+        <div class="d">30–60</div><div class="t" data-ru="Дней · Задаю ритм">Zile · Pun ritm</div>
         <ul>
-          <li>Pipeline digital pe toate proiectele</li>
-          <li>Cotare rapidă — ofertă în aceeași zi</li>
-          <li>Ședință săptămânală pe cifre (nu pe păreri)</li>
-          <li>KPI și comisioane clare pe echipe</li>
-          <li>Orientarea mixului spre marjă (Dekton/Silestone)</li>
+          <li data-ru="Цифровой пайплайн по всем проектам">Pipeline digital pe toate proiectele</li>
+          <li data-ru="Быстрый расчёт — предложение в тот же день">Cotare rapidă — ofertă în aceeași zi</li>
+          <li data-ru="Еженедельная планёрка по цифрам (а не по мнениям)">Ședință săptămânală pe cifre (nu pe păreri)</li>
+          <li data-ru="Чёткие KPI и комиссии по командам">KPI și comisioane clare pe echipe</li>
+          <li data-ru="Ориентация ассортимента на маржу (Dekton/Silestone)">Orientarea mixului spre marjă (Dekton/Silestone)</li>
         </ul>
       </div>
       <div class="step">
-        <div class="d">60–90</div><div class="t">Zile · Demonstrez</div>
+        <div class="d">60–90</div><div class="t" data-ru="Дней · Демонстрирую">Zile · Demonstrez</div>
         <ul>
-          <li>Chatbot AI + programare online live</li>
-          <li>Notificări de status către clienți</li>
-          <li>Primul dashboard executiv funcțional</li>
-          <li>Program de mentenanță recurentă pornit</li>
-          <li>Raport de rezultate la 90 de zile, pe cifre</li>
+          <li data-ru="AI-чат-бот + онлайн-запись вживую">Chatbot AI + programare online live</li>
+          <li data-ru="Уведомления о статусе клиентам">Notificări de status către clienți</li>
+          <li data-ru="Первая рабочая панель руководителя">Primul dashboard executiv funcțional</li>
+          <li data-ru="Запущена программа регулярного обслуживания">Program de mentenanță recurentă pornit</li>
+          <li data-ru="Отчёт о результатах на 90 дней, в цифрах">Raport de rezultate la 90 de zile, pe cifre</li>
         </ul>
       </div>
     </div>
@@ -378,19 +386,19 @@
 <section id="kpi">
   <div class="wrap">
     <div class="sec-head rv">
-      <div class="eyebrow">06 · Ce îmi asum</div>
-      <h2>KPI pe care îi pun pe masă</h2>
-      <p>Mă judecați pe rezultate, nu pe activitate. Țintele se calibrează după auditul inițial — direcția rămâne aceeași. <i>(valori ilustrative)</i></p>
+      <div class="eyebrow" data-ru="06 · Что я беру на себя">06 · Ce îmi asum</div>
+      <h2 data-ru="KPI, которые я кладу на стол">KPI pe care îi pun pe masă</h2>
+      <p data-ru="Судите меня по результатам, а не по активности. Цели калибруются после первичного аудита — направление остаётся прежним. <i>(иллюстративные значения)</i>">Mă judecați pe rezultate, nu pe activitate. Țintele se calibrează după auditul inițial — direcția rămâne aceeași. <i>(valori ilustrative)</i></p>
     </div>
     <div class="kpis rv">
-      <div class="kpi"><div class="now">azi: ~2 zile</div><div class="goal">&lt; 1 zi</div><div class="lab">Timp mediu de ofertare</div></div>
-      <div class="kpi"><div class="now">azi: necunoscut</div><div class="goal">~0</div><div class="lab">Lead-uri pierdute din apeluri ratate</div></div>
-      <div class="kpi"><div class="now">azi: nemăsurat</div><div class="goal">+X%</div><div class="lab">Rată conversie lead → contract</div></div>
-      <div class="kpi"><div class="now">azi: manual</div><div class="goal">timp real</div><div class="lab">Vizibilitate pe proiecte &amp; finanțe</div></div>
-      <div class="kpi"><div class="now">azi: sporadic</div><div class="goal">flux constant</div><div class="lab">Venit recurent din mentenanță</div></div>
-      <div class="kpi"><div class="now">azi: ad-hoc</div><div class="goal">+ stele</div><div class="lab">Recenzii Google (volum &amp; scor)</div></div>
-      <div class="kpi"><div class="now">azi: variabil</div><div class="goal">↘ sub prag</div><div class="lab">Rată de refacere (rework)</div></div>
-      <div class="kpi"><div class="now">azi: neorientat</div><div class="goal">↗ marjă</div><div class="lab">Pondere mix Dekton/Silestone</div></div>
+      <div class="kpi"><div class="now" data-ru="сегодня: ~2 дня">azi: ~2 zile</div><div class="goal" data-ru="&lt; 1 дня">&lt; 1 zi</div><div class="lab" data-ru="Среднее время подготовки предложения">Timp mediu de ofertare</div></div>
+      <div class="kpi"><div class="now" data-ru="сегодня: неизвестно">azi: necunoscut</div><div class="goal">~0</div><div class="lab" data-ru="Лиды, потерянные из-за пропущенных звонков">Lead-uri pierdute din apeluri ratate</div></div>
+      <div class="kpi"><div class="now" data-ru="сегодня: не измеряется">azi: nemăsurat</div><div class="goal">+X%</div><div class="lab" data-ru="Конверсия лид → договор">Rată conversie lead → contract</div></div>
+      <div class="kpi"><div class="now" data-ru="сегодня: вручную">azi: manual</div><div class="goal" data-ru="в реальном времени">timp real</div><div class="lab" data-ru="Прозрачность по проектам и финансам">Vizibilitate pe proiecte &amp; finanțe</div></div>
+      <div class="kpi"><div class="now" data-ru="сегодня: эпизодически">azi: sporadic</div><div class="goal" data-ru="постоянный поток">flux constant</div><div class="lab" data-ru="Регулярный доход от обслуживания">Venit recurent din mentenanță</div></div>
+      <div class="kpi"><div class="now" data-ru="сегодня: от случая к случаю">azi: ad-hoc</div><div class="goal" data-ru="+ звёзды">+ stele</div><div class="lab" data-ru="Отзывы Google (объём и рейтинг)">Recenzii Google (volum &amp; scor)</div></div>
+      <div class="kpi"><div class="now" data-ru="сегодня: переменная">azi: variabil</div><div class="goal" data-ru="↘ ниже порога">↘ sub prag</div><div class="lab" data-ru="Доля переделок (rework)">Rată de refacere (rework)</div></div>
+      <div class="kpi"><div class="now" data-ru="сегодня: неуправляемый">azi: neorientat</div><div class="goal" data-ru="↗ маржа">↗ marjă</div><div class="lab" data-ru="Доля Dekton/Silestone в ассортименте">Pondere mix Dekton/Silestone</div></div>
     </div>
   </div>
 </section>
@@ -399,22 +407,22 @@
 <section id="dovada" style="background:var(--paper2)">
   <div class="wrap">
     <div class="sec-head rv">
-      <div class="eyebrow">07 · Dovada</div>
-      <h2>Nu doar spun cum aș conduce — vă arăt</h2>
-      <p>Am construit deja panourile de management pe care aș conduce Art Granit. Intrați și navigați ca un director — pe structura reală a afacerii.</p>
+      <div class="eyebrow" data-ru="07 · Доказательство">07 · Dovada</div>
+      <h2 data-ru="Я не просто говорю, как буду руководить — я показываю">Nu doar spun cum aș conduce — vă arăt</h2>
+      <p data-ru="Я уже построил управленческие панели, на которых буду руководить Art Granit. Зайдите и навигируйте как директор — по реальной структуре бизнеса.">Am construit deja panourile de management pe care aș conduce Art Granit. Intrați și navigați ca un director — pe structura reală a afacerii.</p>
     </div>
     <div class="proof rv">
       <a class="pcard" href="../demo-ceo/">
         <div class="ic">📊</div>
-        <h3>Panoul Directorului General</h3>
-        <p>Finanțe, vânzări &amp; showroom, atelier CNC, materiale, reprezentanța Cosentino, radar de risc — și ce automatizez pentru conducere.</p>
-        <span class="go">Deschide panoul →</span>
+        <h3 data-ru="Панель Генерального директора">Panoul Directorului General</h3>
+        <p data-ru="Финансы, продажи и шоурум, цех ЧПУ, материалы, представительство Cosentino, радар рисков — и что я автоматизирую для руководства.">Finanțe, vânzări &amp; showroom, atelier CNC, materiale, reprezentanța Cosentino, radar de risc — și ce automatizez pentru conducere.</p>
+        <span class="go" data-ru="Открыть панель →">Deschide panoul →</span>
       </a>
       <a class="pcard" href="../demo-director/">
         <div class="ic">💼</div>
-        <h3>Panoul Directorului Comercial</h3>
-        <p>Showroom-uri, consultanți (clasament + comisioane), fluxul ofertă → măsurare → producție → montaj, departamente.</p>
-        <span class="go">Deschide panoul →</span>
+        <h3 data-ru="Панель Коммерческого директора">Panoul Directorului Comercial</h3>
+        <p data-ru="Шоурумы, консультанты (рейтинг + комиссии), поток предложение → замер → производство → монтаж, отделы.">Showroom-uri, consultanți (clasament + comisioane), fluxul ofertă → măsurare → producție → montaj, departamente.</p>
+        <span class="go" data-ru="Открыть панель →">Deschide panoul →</span>
       </a>
     </div>
   </div>
@@ -424,9 +432,9 @@
 <section id="candidat">
   <div class="wrap">
     <div class="cand rv">
-      <div class="fillnote">↳ De completat de candidat</div>
-      <h3>Despre mine</h3>
-      <p class="ph">[Aici adăugați 3–4 fraze: cine sunteți, câți ani de experiență, ce ați condus / ce rezultate ați obținut, de ce Art Granit și de ce acum. Dacă aveți experiență în piatră, construcții, vânzări B2B, producție sau automatizări — scoateți-o în față. Acesta este singurul loc personal din prezentare; restul e strategie.]</p>
+      <div class="fillnote" data-ru="↳ Заполняется кандидатом">↳ De completat de candidat</div>
+      <h3 data-ru="Обо мне">Despre mine</h3>
+      <p class="ph" data-ru="[Здесь добавьте 3–4 фразы: кто вы, сколько лет опыта, чем вы руководили / каких результатов достигли, почему Art Granit и почему сейчас. Если у вас есть опыт в камне, строительстве, B2B-продажах, производстве или автоматизации — выведите его на первый план. Это единственное личное место в презентации; остальное — стратегия.]">[Aici adăugați 3–4 fraze: cine sunteți, câți ani de experiență, ce ați condus / ce rezultate ați obținut, de ce Art Granit și de ce acum. Dacă aveți experiență în piatră, construcții, vânzări B2B, producție sau automatizări — scoateți-o în față. Acesta este singurul loc personal din prezentare; restul e strategie.]</p>
     </div>
   </div>
 </section>
@@ -435,12 +443,12 @@
 <section id="contact" class="dark" style="padding-top:0">
   <div class="wrap">
     <div class="close rv">
-      <div class="eyebrow" style="color:var(--gold-l)">Concluzie</div>
-      <h2>Alți candidați vă aduc un CV. Eu vă aduc o <em>strategie</em> și un <em>sistem</em>.</h2>
-      <p>Viziune de business + un avantaj pe care îl implementez personal: GO CRM. Sunt gata să încep cu auditul și primele câștiguri rapide din prima lună. Hai să discutăm cum arată asta pentru Art Granit.</p>
+      <div class="eyebrow" style="color:var(--gold-l)" data-ru="Заключение">Concluzie</div>
+      <h2 data-ru="Другие кандидаты приносят вам резюме. Я приношу вам <em>стратегию</em> и <em>систему</em>.">Alți candidați vă aduc un CV. Eu vă aduc o <em>strategie</em> și un <em>sistem</em>.</h2>
+      <p data-ru="Бизнес-видение + преимущество, которое я внедряю лично: GO CRM. Я готов начать с аудита и первых быстрых побед с первого месяца. Давайте обсудим, как это выглядит для Art Granit.">Viziune de business + un avantaj pe care îl implementez personal: GO CRM. Sunt gata să încep cu auditul și primele câștiguri rapide din prima lună. Hai să discutăm cum arată asta pentru Art Granit.</p>
       <div class="actions" style="justify-content:center">
-        <a class="btn gold" href="mailto:[email]">Programați o discuție →</a>
-        <a class="btn ghost" href="#gocrm">Revezi planul GO CRM</a>
+        <a class="btn gold" href="mailto:[email]" data-ru="Назначьте встречу →">Programați o discuție →</a>
+        <a class="btn ghost" href="#gocrm" data-ru="Пересмотреть план GO CRM">Revezi planul GO CRM</a>
       </div>
     </div>
   </div>
@@ -448,24 +456,44 @@
 
 <footer><div class="wrap">
   <div>
-    <a class="logo" href="#top" style="margin-bottom:10px"><svg viewBox="0 0 48 48" width="30" height="30" aria-hidden="true"><rect width="48" height="48" rx="11" fill="#fff"/><polygon points="24,9 37,17 24,25 11,17" fill="#c9a227"/><polygon points="11,17 24,25 24,39 11,31" fill="#7c8893"/><polygon points="37,17 24,25 24,39 37,31" fill="#aeb8c1"/></svg><span><b style="color:#fff">Art Granit</b><span>Strategie · Director General</span></span></a>
+    <a class="logo" href="#top" style="margin-bottom:10px"><svg viewBox="0 0 48 48" width="30" height="30" aria-hidden="true"><rect width="48" height="48" rx="11" fill="#fff"/><polygon points="24,9 37,17 24,25 11,17" fill="#c9a227"/><polygon points="11,17 24,25 24,39 11,31" fill="#7c8893"/><polygon points="37,17 24,25 24,39 37,31" fill="#aeb8c1"/></svg><span><b style="color:#fff">Art Granit</b><span data-ru="Стратегия · Генеральный директор">Strategie · Director General</span></span></a>
   </div>
-  <div class="legal">
+  <div class="legal" data-ru="Конфиденциальная стратегия-презентация, составленная в рамках кандидатуры на должность Генерального директора. Операционные данные и цели иллюстративны и калибруются после первичного аудита. Материал предназначен исключительно для руководства Art Granit — воспроизведение без согласия не допускается.">
     Prezentare-strategie confidențială, întocmită ca parte a candidaturii pentru funcția de Director General. Datele operaționale și țintele sunt ilustrative și se calibrează după auditul inițial. Material destinat exclusiv conducerii Art Granit — reproducerea fără acord nu este permisă.
   </div>
 </div></footer>
 
 <script>
-  // Reveal pe scroll, cu respect pentru reduced-motion
+  /* Reveal pe scroll, cu respect pentru reduced-motion */
   (function(){
     var els = document.querySelectorAll('.rv');
     if(!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-      els.forEach(function(e){ e.classList.add('in'); }); return;
+      els.forEach(function(e){ e.classList.add('in'); });
+    } else {
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
+      }, { threshold:.14 });
+      els.forEach(function(e){ io.observe(e); });
     }
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
-    }, { threshold:.14 });
-    els.forEach(function(e){ io.observe(e); });
+  })();
+
+  /* i18n RO/RU */
+  (function(){
+    var KEY='ag_lang';
+    var TITLES={ro:'Strategie pentru funcția de Director General · Art Granit', ru:'Стратегия на должность Генерального директора · Art Granit'};
+    var els=[].slice.call(document.querySelectorAll('[data-ru]'));
+    els.forEach(function(el){ el.setAttribute('data-ro', el.innerHTML); });
+    function set(lang){
+      if(lang!=='ru') lang='ro';
+      document.documentElement.lang=lang;
+      els.forEach(function(el){ el.innerHTML = el.getAttribute(lang==='ru'?'data-ru':'data-ro'); });
+      document.title=TITLES[lang];
+      [].slice.call(document.querySelectorAll('.lang-btn')).forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-l')===lang); });
+      try{ localStorage.setItem(KEY,lang); }catch(e){}
+    }
+    window.__setLang=set;
+    var saved='ro'; try{ saved=localStorage.getItem(KEY)||'ro'; }catch(e){}
+    set(saved);
   })();
 </script>
 </body>
