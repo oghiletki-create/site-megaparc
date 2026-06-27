@@ -76,20 +76,25 @@
   .agent .nums{text-align:right;flex:0 0 auto;font-size:12px;line-height:1.5} .agent .nums .s{font-weight:700} .agent .nums .com{color:var(--green-d);font-weight:800;display:block} .pct{font-weight:700}
 
   .legal{max-width:1180px;margin:8px auto 26px;padding:0 18px;color:var(--muted);font-size:11px;text-align:center;line-height:1.5}
+.langtg{margin-left:auto;display:flex;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.32);border-radius:999px;padding:3px}
+.langtg button{border:0;background:transparent;color:#fff;font-family:inherit;font-weight:800;font-size:11.5px;letter-spacing:.04em;padding:5px 11px;border-radius:999px;cursor:pointer}
+.langtg button.on{background:#c9a227;color:#241c00}
+.topbar .role{margin-left:12px}
 </style>
 </head>
 <body>
 <div class="topbar">
   <svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#fff"/><polygon points="24,9 37,17 24,25 11,17" fill="#c9a227"/><polygon points="11,17 24,25 24,39 11,31" fill="#7c8893"/><polygon points="37,17 24,25 24,39 37,31" fill="#aeb8c1"/></svg>
-  <div class="brand"><b>Art Granit</b><span>Panou de management</span></div>
-  <div class="role">👤 Director Comercial <span class="demo-badge">DEMO</span></div>
+  <div class="brand"><b>Art Granit</b><span data-ru="Панель управления">Panou de management</span></div>
+  <div class="langtg" role="group" aria-label="Limbă/Язык"><button type="button" data-l="ro" onclick="__setLang('ro')">RO</button><button type="button" data-l="ru" onclick="__setLang('ru')">RU</button></div>
+  <div class="role"><span data-ru="👤 Коммерческий директор">👤 Director Comercial</span> <span class="demo-badge">DEMO</span></div>
 </div>
 
 <div class="shell">
   <nav class="nav" id="nav"></nav>
   <main class="main" id="main"></main>
 </div>
-<p class="legal" id="legal"></p>
+<p class="legal" id="legal" data-ru="© 2026 · Конфиденциальное демо, выполнено на заказ для Art Granit. Иллюстративные данные — заполняются реальными. Концепция, дизайн и реализация = собственность разработчика; воспроизведение без согласия запрещено.">© 2026 · Demo confidențial, realizat la comandă pentru Art Granit. Date ilustrative — se completează cu cele reale. Concept, design și implementare = proprietatea dezvoltatorului; reproducerea fără acord interzisă.</p>
 
 <script>
 /* ===== DATE DEMO — se completează cu cele reale Art Granit ===== */
@@ -172,7 +177,7 @@ const WISH=[
 let view="overview";
 const $=s=>document.querySelector(s);
 function renderNav(){ $('#nav').innerHTML=NAV.map(n=>{ if(n[0]==="sep")return '<div class="sep"></div>'; return `<button class="${view===n[0]?'on':''}" onclick="go('${n[0]}')"><span class="mi">${n[1]}</span>${n[2]}</button>`; }).join(''); }
-function go(v){ view=v; renderNav(); renderMain(); window.scrollTo({top:0,behavior:'smooth'}); }
+function go(v){ view=v; renderNav(); renderMain(); if(window.__applyDyn)__applyDyn(); window.scrollTo({top:0,behavior:'smooth'}); }
 window.go=go;
 function empList(a){ return a.map(e=>`<div class="emp"><div class="av">${e[2]}</div><div class="n">${e[0]}</div><div class="ct">×${e[1]}</div></div>`).join(''); }
 function taskList(a){ const l={man:"manual",prog:"în lucru",auto:"automatizat"}; return a.map(t=>`<div class="task"><span class="st ${t[1]}">${l[t[1]]}</span><span>${t[0]}</span></div>`).join(''); }
@@ -197,10 +202,10 @@ function renderMain(){
       </div>
       <div class="grid">
         <div class="card"><h3>🏛️ Puncte de lucru <span class="c">${STORES.length}</span></h3>
-          ${STORES.map(s=>`<div class="task"><span class="st ${s.ok?'auto':'man'}">${s.ok?'OK':'alertă'}</span><span><b>${s.name}</b> — ${s.city} · ${s.sales}</span></div>`).join('')}
+          ${STORES.map(s=>`<div class="task"><span class="st ${s.ok?'auto':'man'}">${s.ok?'OK':'alertă'}</span><span><b class="i18">${s.name}</b> — <span class="i18">${s.city}</span> · ${s.sales}</span></div>`).join('')}
         </div>
-        <div class="card"><h3>👥 Echipă <span class="c">${totalStaff} pers.</span></h3>
-          ${Object.values(DEPTS).map(d=>`<div class="task"><span class="st prog">${d.employees.reduce((s,e)=>s+e[1],0)}</span><span>${d.ic} ${d.name}</span></div>`).join('')}
+        <div class="card"><h3>👥 Echipă <span class="c">${totalStaff}</span></h3>
+          ${Object.values(DEPTS).map(d=>`<div class="task"><span class="st prog">${d.employees.reduce((s,e)=>s+e[1],0)}</span><span>${d.ic} <span class="i18">${d.name}</span></span></div>`).join('')}
         </div>
       </div>
     `;
@@ -232,7 +237,7 @@ function renderMain(){
       <div class="card"><h3>📈 Clasament <span class="c">după vânzări</span></h3>
         ${sorted.map((a,i)=>`<div class="agent"><div class="rank ${i<3?'top':''}">${i<3?medal[i]:(i+1)}</div>
           <div class="who2"><b>${a.name}</b><div class="z">${a.zone}</div><div class="bar"><i style="width:${Math.min(a.target,100)}%;background:${tcol(a.target)}"></i></div></div>
-          <div class="nums"><span class="s">${fmt(a.sales)} lei</span> · <span class="pct" style="color:${tcol(a.target)}">${a.target}%</span><span class="com">+${fmt(a.com)} lei comision</span></div></div>`).join('')}
+          <div class="nums"><span class="s">${fmt(a.sales)} lei</span> · <span class="pct" style="color:${tcol(a.target)}">${a.target}%</span><span class="com">+${fmt(a.com)} lei <span class="i18">comision</span></span></div></div>`).join('')}
       </div>
       <div class="card" style="margin-top:16px"><h3>⚙️ Ce automatizăm aici <span class="c">AI</span></h3>
         ${autoList([["Comisioane calculate automat","din vânzările confirmate, pe material"],["Clasament în timp real",""],["Alerte consultanți sub target",""],["Obiective și bonusuri urmărite automat",""]])}
@@ -240,16 +245,44 @@ function renderMain(){
   } else {
     const d=DEPTS[view];
     m.innerHTML=`
-      <div class="h"><div class="ic">${d.ic}</div><div><h1>${d.name}</h1><p>${d.sub} — date demo</p></div></div>
+      <div class="h"><div class="ic">${d.ic}</div><div><h1>${d.name}</h1><p><span class="i18">${d.sub}</span> — date demo</p></div></div>
       <div class="grid">
-        <div class="card"><h3>👥 Angajați <span class="c">${d.employees.reduce((s,e)=>s+e[1],0)} pers.</span></h3>${empList(d.employees)}</div>
+        <div class="card"><h3>👥 Angajați <span class="c">${d.employees.reduce((s,e)=>s+e[1],0)}</span></h3>${empList(d.employees)}</div>
         <div class="card"><h3>📋 Sarcini curente</h3>${taskList(d.tasks)}</div>
       </div>
-      <div class="card" style="margin-top:16px"><h3>⚙️ Ce automatizăm în ${d.name} <span class="c">AI</span></h3>${autoList(d.autos)}</div>`;
+      <div class="card" style="margin-top:16px"><h3>⚙️ Ce automatizăm în <span class="i18">${d.name}</span> <span class="c">AI</span></h3>${autoList(d.autos)}</div>`;
   }
 }
-$('#legal').textContent="© 2026 · Demo confidențial, realizat la comandă pentru Art Granit. Date ilustrative — se completează cu cele reale. Concept, design și implementare = proprietatea dezvoltatorului; reproducerea fără acord interzisă.";
-renderNav(); renderMain();
+/* ===== i18n RO/RU ===== */
+const RU={
+"Privire de ansamblu":"Обзор","Showroom-uri & atelier":"Шоурумы и цех","Consultanți (clasament)":"Консультанты (рейтинг)","Vânzări & ofertare":"Продажи и расчёт","Măsurători & proiectare":"Замеры и проектирование","Atelier producție":"Производственный цех","Montaj":"Монтаж","Aprovizionare & import":"Снабжение и импорт","Marketing":"Маркетинг",
+"Compania pe showroom-uri și departamente — date demo":"Компания по шоурумам и отделам — демо-данные","2 + atelier":"2 + цех","showroom-uri":"шоурумы","proiecte active":"активные проекты","din vânzări = proiecte B2B":"продаж = B2B-проекты","target lunar atins":"месячный план выполнен",
+"🎯 Ce aș automatiza întâi — ca director comercial":"🎯 Что я автоматизирую первым — как коммерческий директор","Lucrurile care îmi iau cel mai mult timp și le-aș automatiza primele:":"То, что отнимает у меня больше всего времени и что я автоматизирую первым:",
+"Cotare automată a blaturilor — ofertă în minute, nu în zile":"Автоматический расчёт столешниц — предложение за минуты, а не дни","material × m² × prelucrări":"материал × м² × обработка","Lead-urile de pe artgranit.md captate automat în CRM":"Лиды с artgranit.md автоматически в CRM","niciuna pierdută":"ни одного потерянного","Fiecare proiect urmărit ofertă → măsurare → debitare → montaj":"Каждый проект отслеживается: предложение → замер → распил → монтаж","într-un singur ecran":"на одном экране","Nesting automat pe placă":"Автоматический раскрой на плите","deșeu minim din plăcile scumpe":"минимум отходов из дорогих плит","Garanția Cosentino 25 ani inclusă automat în oferte":"Гарантия Cosentino 25 лет автоматически в предложениях","Clasament consultanți + comisioane calculate automat":"Рейтинг консультантов + комиссии рассчитываются автоматически",
+"🏛️ Puncte de lucru":"🏛️ Точки работы","alertă":"тревога","👥 Echipă":"👥 Команда",
+"Centru Art-Granit":"Центр Art-Granit","Atelier producție (CNC)":"Производственный цех (ЧПУ)","Online artgranit.md":"Онлайн artgranit.md","bd. Grigore Vieru 19, Chișinău":"бул. Григоре Виеру 19, Кишинёв","str. Uzinelor 171/2, Chișinău":"ул. Узинелор 171/2, Кишинёв","Debitare, prelucrare, finisaj":"Распил, обработка, финиш","Cereri de ofertă · livrare națională":"Заявки на расчёт · доставка по стране",
+"Fiecare punct de lucru separat — date demo":"Каждая точка работы отдельно — демо-данные","Responsabil":"Ответственный","Angajați":"Сотрудники","Activitate azi":"Активность сегодня","Stoc":"Склад","3 plăci sub prag":"3 плиты ниже порога","⚙️ Ce s-ar automatiza la nivel de rețea":"⚙️ Что автоматизируем на уровне сети","Stoc de plăci sincronizat între showroom-uri și atelier":"Склад плит синхронизирован между шоурумами и цехом","ce-ai în depozit vezi din ambele showroom-uri":"что на складе — видно из обоих шоурумов","Cotare cu același preț pe toate punctele":"Расчёт по единой цене во всех точках","Comparație activitate între showroom-uri, în timp real":"Сравнение активности шоурумов в реальном времени","Lead-urile online direcționate către showroom-ul potrivit":"Онлайн-лиды направляются в нужный шоурум",
+"Consultanți — clasament & comisioane":"Консультанты — рейтинг и комиссии","Luna curentă · comision 3% din vânzări confirmate · date demo":"Текущий месяц · комиссия 3% от подтверждённых продаж · демо-данные","consultanți de vânzări":"консультантов по продажам","vânzări consultanți (lună)":"продажи консультантов (месяц)","comisioane de plată":"комиссии к выплате","top vânzător 🏆":"топ-продавец 🏆","📈 Clasament":"📈 Рейтинг","după vânzări":"по продажам","comision":"комиссия","Proiecte developeri · Chișinău":"Проекты застройщиков · Кишинёв","Bucătării persoane fizice":"Кухни частных лиц","Arhitecți & designeri (parteneri)":"Архитекторы и дизайнеры (партнёры)","HoReCa & retail":"HoReCa и ритейл","Showroom Stone Gallery":"Шоурум Stone Gallery","Online / lead-uri artgranit.md":"Онлайн / лиды artgranit.md","⚙️ Ce automatizăm aici":"⚙️ Что автоматизируем здесь","Comisioane calculate automat":"Комиссии рассчитываются автоматически","din vânzările confirmate, pe material":"из подтверждённых продаж, по материалу","Clasament în timp real":"Рейтинг в реальном времени","Alerte consultanți sub target":"Оповещения о консультантах ниже плана","Obiective și bonusuri urmărite automat":"Цели и бонусы отслеживаются автоматически",
+"Atelier producție (CNC/waterjet)":"Производственный цех (ЧПУ/гидрорез)","Montaj (echipe pe teren)":"Монтаж (выездные бригады)","Aprovizionare & import plăci":"Снабжение и импорт плит","showroom, persoane fizice, proiecte B2B, parteneri":"шоурум, частные лица, B2B-проекты, партнёры","șabloane la client, debitare pe desen":"шаблоны у клиента, распил по чертежу","debitare, prelucrare margine, finisaj":"распил, обработка кромки, финиш","transport, montaj, recepție la client":"транспорт, монтаж, приёмка у клиента","reprezentant oficial Cosentino + furnizori piatră":"официальный представитель Cosentino + поставщики камня","showroom, online, social, parteneri arhitecți":"шоурум, онлайн, соцсети, партнёры-архитекторы","— date demo":"— демо-данные",
+"👥 Angajați":"👥 Сотрудники","📋 Sarcini curente":"📋 Текущие задачи","⚙️ Ce automatizăm în":"⚙️ Что автоматизируем в","manual":"вручную","în lucru":"в работе","automatizat":"автоматизировано",
+"Director comercial":"Коммерческий директор","Consultanți showroom":"Консультанты шоурума","Manageri proiecte":"Менеджеры проектов","Operator lead-uri online":"Оператор онлайн-лидов","Șef proiectare":"Руководитель проектирования","Tehnicieni măsurători":"Техники замеров","Desenatori CAD":"Чертёжники CAD","Șef atelier":"Начальник цеха","Operatori CNC / waterjet":"Операторы ЧПУ / гидрорез","Prelucrare margine & finisaj":"Обработка кромки и финиш","Control calitate":"Контроль качества","Manipulare plăci":"Перемещение плит","Coordonator montaj":"Координатор монтажа","Echipe montaj":"Монтажные бригады","Șoferi / transport plăci":"Водители / перевозка плит","Șef achiziții":"Руководитель закупок","Specialist import":"Специалист по импорту","Operator depozit plăci":"Оператор склада плит","Marketing manager":"Менеджер по маркетингу","Social media / foto proiecte":"Соцсети / фото проектов","Content & SEO":"Контент и SEO",
+"Oferte de blat de întocmit azi: 14":"Предложения по столешницам на сегодня: 14","Proiecte developeri în negociere: 7":"Проекты застройщиков в переговорах: 7","Lead-uri artgranit.md de procesat: 19":"Лиды artgranit.md к обработке: 19","Target lunar: 88% atins":"Месячный план: 88% выполнено","Măsurători programate azi: 6":"Замеры на сегодня: 6","Șabloane de transformat în desen de debitare: 9":"Шаблоны для перевода в чертёж распила: 9","Decupaje speciale (chiuvete sub-blat): 4":"Спецвырезы (мойки под столешницу): 4","Proiecte în producție: 54":"Проекты в производстве: 54","Debitări programate azi: 11":"Распилов на сегодня: 11","Plăci-cheie sub prag de stoc: 3":"Ключевые плиты ниже порога склада: 3","Montaje programate săptămâna asta: 9":"Монтажей на этой неделе: 9","Transporturi de planificat: 5":"Перевозок к планированию: 5","Recepții/semnături garanție: 6":"Приёмки/подписи гарантии: 6","Containere în tranzit: 6":"Контейнеров в пути: 6","Plăci-cheie de comandat: 3":"Ключевых плит к заказу: 3","Facturi furnizori de introdus: 11":"Счетов поставщиков к вводу: 11","Proiecte de fotografiat pentru portofoliu: 5":"Проектов к фотосъёмке для портфолио: 5","Campanie „blat la comandă” de pregătit":"Кампания „столешница на заказ” к подготовке","Postări Instagram (artgranit.md)":"Посты в Instagram (artgranit.md)",
+"material × m² × prelucrări (debitare, profil margine, decupaj chiuvetă/plită) → ofertă în minute":"материал × м² × обработка (распил, профиль кромки, вырез под мойку/плиту) → предложение за минуты","Lead-uri de pe artgranit.md captate automat în CRM":"Лиды с artgranit.md автоматически в CRM","nicio cerere de ofertă pierdută":"ни одной потерянной заявки","Relansare automată a ofertelor fără răspuns":"Автоматический повторный контакт по предложениям без ответа","CRM viu pe fiecare client/proiect":"Живой CRM по каждому клиенту/проекту","istoric, material ales, stadiu, sold":"история, выбранный материал, стадия, задолженность","Cotare automată a blaturilor":"Автоматический расчёт столешниц","Garanția Cosentino 25 ani inclusă automat în oferte Silestone/Dekton":"Гарантия Cosentino 25 лет автоматически в предложениях Silestone/Dekton","Comisioane consultanți calculate automat":"Комиссии консультантов рассчитываются автоматически","fără Excel":"без Excel","Echipă digital":"Цифровая команда",
+"Șablon digital → desen de debitare automat":"Цифровой шаблон → автоматический чертёж распила","layout optim, deșeu minim din plăcile scumpe":"оптимальная раскладка, минимум отходов из дорогих плит","Verificare automată a decupajelor":"Автоматическая проверка вырезов","chiuvetă, plită, baterie — fără erori":"мойка, плита, смеситель — без ошибок","Vizualizare 3D a blatului pentru client":"3D-визуализация столешницы для клиента",
+"Planificarea atelierului pe capacitate":"Планирование цеха по мощности","comenzi vs. mașini, fără suprapuneri":"заказы vs. станки, без накладок","Status producție live pentru client":"Статус производства в реальном времени для клиента","„blatul tău se taie azi":"„вашу столешницу режут сегодня","Predicție întârzieri":"Прогноз задержек","alertă când un proiect riscă termenul de montaj":"оповещение, когда проект рискует сорвать срок монтажа","Trasabilitatea plăcii":"Прослеживаемость плиты","de la container la blatul finit":"от контейнера до готовой столешницы",
+"Planificare montaje pe echipe și zone":"Планирование монтажей по бригадам и зонам","grupare automată, mai puține drumuri":"автогруппировка, меньше поездок","Confirmare programare cu clientul (SMS/automat)":"Подтверждение записи с клиентом (SMS/авто)","Proces-verbal de recepție + garanție 25 ani, digital":"Акт приёмки + гарантия 25 лет, в цифре","Optimizare rute de transport":"Оптимизация маршрутов транспорта","plăci fragile, traseu sigur":"хрупкие плиты, безопасный маршрут",
+"Reaprovizionare predictivă pe culorile best-seller":"Прогнозный дозаказ по цветам-бестселлерам","plăcile cerute des nu se epuizează":"часто запрашиваемые плиты не заканчиваются","Urmărire comenzi Cosentino + termene + curs valutar":"Отслеживание заказов Cosentino + сроки + курс валют","Comparare furnizori de piatră":"Сравнение поставщиков камня","preț, calitate, termen":"цена, качество, срок","Citire automată a facturilor și documentelor de import":"Автоматическое считывание счетов и импортных документов",
+"Portofoliu auto din proiectele finalizate":"Автопортфолио из завершённых проектов","foto → galerie pe site, automat":"фото → галерея на сайте, автоматически","Segmentare: persoane fizice vs. developeri vs. arhitecți":"Сегментация: частные лица vs. застройщики vs. архитекторы","Program de parteneriat pentru arhitecți & designeri":"Партнёрская программа для архитекторов и дизайнеров","lead-uri recomandate, urmărite":"рекомендованные лиды, отслеживаются","Conținut + SEO pe materiale (Silestone, Dekton, granit)":"Контент + SEO по материалам (Silestone, Dekton, гранит)"
+};
+const STAT=[].slice.call(document.querySelectorAll('[data-ru]'));
+STAT.forEach(function(el){ el.setAttribute('data-ro', el.innerHTML); });
+let L='ro';
+function __applyDyn(){ if(L!=='ru')return; ['#nav','#main'].forEach(function(sel){ var root=$(sel); if(!root)return; var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null,false); var n; while(n=w.nextNode()){ var t=n.textContent, k=t.trim(); if(k&&Object.prototype.hasOwnProperty.call(RU,k)){ n.textContent=t.replace(k,RU[k]); } } }); }
+window.__applyDyn=__applyDyn;
+function __setLang(lang){ L=(lang==='ru')?'ru':'ro'; document.documentElement.lang=L; STAT.forEach(function(el){ el.innerHTML=el.getAttribute(L==='ru'?'data-ru':'data-ro'); }); renderNav(); renderMain(); __applyDyn(); [].slice.call(document.querySelectorAll('.langtg button')).forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-l')===L); }); try{ localStorage.setItem('ag_lang',L); }catch(e){} }
+window.__setLang=__setLang;
+var __saved='ro'; try{ __saved=localStorage.getItem('ag_lang')||'ro'; }catch(e){}
+__setLang(__saved);
 </script>
 </body>
 </html>
