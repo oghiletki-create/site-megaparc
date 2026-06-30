@@ -1,0 +1,22 @@
+{
+  "name": "Megaparc — Investiții și construcții premium",
+  "short_name": "Megaparc",
+  "description": "Megaparc SRL — companie de investiții și construcții din Chișinău. Dezvoltăm și administrăm proiecte comerciale, de oficii și rezidențiale, durabile și orientate spre viitor.",
+  "lang": "ro",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#150F12",
+  "theme_color": "#CB0102",
+  "categories": ["business", "real estate"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23CB0102'/%3E%3Ctext x='32' y='45' font-family='Arial,sans-serif' font-size='38' font-weight='800' fill='%23FFFFFF' text-anchor='middle'%3EM%3C/text%3E%3C/svg%3E",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
