@@ -2,7 +2,7 @@
   --intro: 4.75s;
   --red: #CB0102;
   --red-hot: #E31E2D;
-  --red-soft: #D94C4E;
+  --red-soft: #E06366;
   --ink: #100B0E;
   --ink-2: #181115;
   --ink-3: #221A1F;
@@ -611,7 +611,7 @@ body.intro-lock { overflow: hidden; }
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 15px;
-  color: var(--red-hot);
+  color: #FF5660;
   border: 1px solid rgba(227, 30, 45, 0.4);
   padding: 7px 9px 5px;
   line-height: 1;
@@ -917,4 +917,30 @@ body.intro-lock { overflow: hidden; }
   .hero-sub { color: rgba(251, 250, 255, 0.9); }
   .scroll-hint { display: none; }
   .intro-svg { width: 92vw; }
+}
+
+/* Accesibilitate: skip-link + focus vizibil */
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 300;
+  background: var(--red);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 12px 20px;
+  text-decoration: none;
+  transform: translateY(-150%);
+  transition: transform 0.2s ease;
+}
+.skip-link:focus {
+  transform: none;
+  outline: 2px solid var(--white);
+  outline-offset: 2px;
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--red-hot);
+  outline-offset: 3px;
 }

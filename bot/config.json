@@ -1,0 +1,37 @@
+{
+  "nume_bot": "Salon Demo",
+  "mesaj_bun_venit": "Bună ziua! 👋 Sunt asistentul automat al salonului *Salon Demo*.\nAlegeți o întrebare de mai jos sau scrieți-mi direct.",
+  "mesaj_necunoscut": "Îmi pare rău, nu am înțeles întrebarea. 🙏\nScrieți /ajutor ca să vedeți la ce vă pot răspunde, sau sunați la +373 00 000 000.",
+  "intrebari": [
+    {
+      "id": "program",
+      "buton": "🕒 Program de lucru",
+      "cuvinte": ["program", "ora", "ore", "deschid", "deschis", "inchis", "închis", "cand", "când"],
+      "raspuns": "Programul nostru:\n• Luni–Vineri: 09:00–20:00\n• Sâmbătă: 09:00–17:00\n• Duminică: închis"
+    },
+    {
+      "id": "preturi",
+      "buton": "💶 Prețuri",
+      "cuvinte": ["pret", "preț", "preturi", "prețuri", "cost", "cat costa", "cât costă", "tarif"],
+      "raspuns": "Prețuri orientative:\n• Tuns damă: de la 200 lei\n• Tuns bărbați: de la 120 lei\n• Vopsit: de la 400 lei\n• Manichiură: de la 250 lei"
+    },
+    {
+      "id": "adresa",
+      "buton": "📍 Adresă",
+      "cuvinte": ["adresa", "adresă", "unde", "locatie", "locație", "harta", "hartă"],
+      "raspuns": "Ne găsiți la:\n📍 str. Exemplu 10, Chișinău\n(lângă parcul central)"
+    },
+    {
+      "id": "servicii",
+      "buton": "✂️ Servicii",
+      "cuvinte": ["servicii", "ce faceti", "ce faceți", "oferta", "ofertă"],
+      "raspuns": "Servicii disponibile:\n• Tuns și coafat\n• Vopsit și șuvițe\n• Manichiură / Pedichiură\n• Tratamente pentru păr"
+    },
+    {
+      "id": "programare",
+      "buton": "📅 Cum mă programez",
+      "cuvinte": ["programare", "programez", "rezervare", "rezerv", "vreau o programare"],
+      "raspuns": "Pentru o programare, sunați sau scrieți pe WhatsApp la:\n📞 +373 00 000 000\n\n(În curând veți putea face programarea direct prin acest bot.)"
+    }
+  ]
+}
