@@ -172,39 +172,109 @@ if (finePointer && !reduceMotion) {
 
 document.getElementById('year').textContent = new Date().getFullYear();
 
-const pages = document.querySelectorAll('.page');
-const pageNames = new Set(Array.from(pages, p => p.dataset.page));
-const navLinks = nav.querySelectorAll('a[href^="#"]');
+/* ---- Rent & guarantee calculator ---- */
+(() => {
+  const area = document.getElementById('calc-area');
+  if (!area) return;
+  const tariff = document.getElementById('calc-tariff');
+  const areaOut = document.getElementById('calc-area-out');
+  const tariffOut = document.getElementById('calc-tariff-out');
+  const bldBtns = document.querySelectorAll('.calc-bld');
+  const bldType = document.getElementById('calc-bld-type');
+  const out = {
+    month: document.getElementById('calc-month'),
+    year: document.getElementById('calc-year'),
+    stdDeposit: document.getElementById('calc-std-deposit'),
+    stdSigning: document.getElementById('calc-std-signing'),
+    avDiscount: document.getElementById('calc-av-discount'),
+    avSigning: document.getElementById('calc-av-signing'),
+    bkSigning: document.getElementById('calc-bk-signing')
+  };
 
-const showPage = (name, animate) => {
-  const target = document.querySelector('.page[data-page="' + name + '"]');
-  if (!target) return;
-  pages.forEach(p => p.classList.remove('active', 'enter'));
-  target.classList.add('active');
-  if (animate && !reduceMotion) target.classList.add('enter');
-  window.scrollTo(0, 0);
-  navLinks.forEach(a => a.classList.toggle('current', a.getAttribute('href') === '#' + name));
-  requestAnimationFrame(() => {
-    revealInView();
-    startCounters();
-  });
-};
+  // Tarife de chirie orientative pe imobil (€/m² pe lună). De înlocuit cu
+  // valorile reale Megaparc — un singur loc de editat. rate = valoarea
+  // implicită, min/max = intervalul (ex. parter vs. demisol, vitrină vs.
+  // interior). `type` referă cheia i18n a tipului de spațiu.
+  const BUILDINGS = {
+    dacia31:      { rate: 15, min: 12, max: 22, type: 'proj.1t' },
+    moscova9:     { rate: 14, min: 11, max: 20, type: 'proj.2t' },
+    moscova20:    { rate: 9,  min: 6,  max: 13, type: 'proj.3t' },
+    vasilelupu48: { rate: 11, min: 9,  max: 15, type: 'proj.4t' }
+  };
 
-const routeFromHash = animate => {
-  const name = location.hash.replace(/^#\/?/, '') || 'acasa';
-  showPage(pageNames.has(name) ? name : 'acasa', animate);
-};
+  const eur = n => '€ ' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
-document.addEventListener('click', e => {
-  const link = e.target.closest('a[href^="#"]');
-  if (!link) return;
-  const raw = link.getAttribute('href').slice(1);
-  const dest = raw === 'top' ? 'acasa' : raw;
-  if (!pageNames.has(dest)) return;
-  e.preventDefault();
-  if (location.hash !== '#' + dest) history.pushState(null, '', '#' + dest);
-  showPage(dest, true);
+  const setType = key => {
+    if (!bldType) return;
+    bldType.dataset.i18n = key;
+    try {
+      const lang = localStorage.getItem('megaparc-lang') || 'ro';
+      const dict = typeof I18N !== 'undefined' ? (I18N[lang] || I18N.ro) : null;
+      if (dict && dict[key]) bldType.innerHTML = dict[key];
+    } catch (e) {}
+  };
+
+  const applyBuilding = id => {
+    const b = BUILDINGS[id];
+    if (!b) return;
+    tariff.min = b.min;
+    tariff.max = b.max;
+    tariff.step = 0.5;
+    tariff.value = b.rate;
+    setType(b.type);
+  };
+
+  const render = () => {
+    const a = Number(area.value);
+    const t = Number(tariff.value);
+    const month = a * t;
+    const annual = month * 12;
+    areaOut.textContent = a + ' m²';
+    tariffOut.textContent = '€' + t;
+
+    out.month.textContent = eur(month);
+    out.year.textContent = eur(annual);
+
+    // Standard: fond de garanție = 3 luni; la semnare = prima lună + fond
+    out.stdDeposit.textContent = eur(month * 3);
+    out.stdSigning.textContent = eur(month * 4);
+
+    // Plată în avans: reducere 10%, fără fond de garanție, tot anul în avans
+    const discount = annual * 0.10;
+    out.avDiscount.textContent = '− ' + eur(discount);
+    out.avSigning.textContent = eur(annual - discount);
+
+    // Garanție bancară: fără depozit în numerar, la semnare = prima lună
+    out.bkSigning.textContent = eur(month);
+  };
+
+  area.addEventListener('input', render);
+  tariff.addEventListener('input', render);
+  bldBtns.forEach(btn => btn.addEventListener('click', () => {
+    bldBtns.forEach(b => b.classList.toggle('active', b === btn));
+    applyBuilding(btn.dataset.bld);
+    render();
+  }));
+
+  applyBuilding('dacia31');
+  render();
+})();
+
+// Scroll-spy: highlight the nav link of the section currently in view.
+const navLinks = nav.querySelectorAll('a[href^="#"]:not(.nav-cta)');
+const spyTargets = [];
+navLinks.forEach(a => {
+  const el = document.getElementById(a.getAttribute('href').slice(1));
+  if (el) spyTargets.push(el);
 });
 
-window.addEventListener('popstate', () => routeFromHash(true));
-routeFromHash(false);
+if ('IntersectionObserver' in window && spyTargets.length) {
+  const spy = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const id = entry.target.id;
+      navLinks.forEach(a => a.classList.toggle('current', a.getAttribute('href') === '#' + id));
+    });
+  }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+  spyTargets.forEach(el => spy.observe(el));
+}
