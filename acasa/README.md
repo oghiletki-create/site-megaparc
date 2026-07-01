@@ -7,6 +7,7 @@ Materiale de pitch pentru compania de dezvoltare imobiliară **A-casa**, din par
 ## Conținut
 
 - [`PROPUNERE-ACASA.md`](./PROPUNERE-ACASA.md) — **propunerea unificată pentru conducere**: leagă Clienți + Vânzări + Contracte + Încasări + Construcție, cu beneficii, plan pe etape și model de colaborare. *Începe de aici.*
+- [`PREZENTARE-GO-CRM.md`](./PREZENTARE-GO-CRM.md) — **prezentarea completă a sistemului**: panoul Directorului General (bani, șantier, radar de risc pe praguri, delegare) + meniul separat pe fiecare departament (Vânzări, Contabilitate, Marketing/PR, Departament tehnic).
 - [`VANZARI-SI-CRM.md`](./VANZARI-SI-CRM.md) — **pâlnia lead → contract**, grila de apartamente (șahmatca) vie, agenți/comisioane și **guvernanța prețului** (discountul îl aprobă doar directorul de vânzări).
 - [`ASISTENT-CLIENTI.md`](./ASISTENT-CLIENTI.md) — **asistentul de vânzări AI** (front-office): găsește apartamentul, calculează ratele, programează vizionarea, califică lead-ul. 24/7, RO/RU.
 - [`CONSTRUCTIE-FINANTE.md`](./CONSTRUCTIE-FINANTE.md) — **graficul de rate** cu confirmare automată a plăților + reconciliere + **stadiul construcției** (buget/termen) + tabloul executiv.
