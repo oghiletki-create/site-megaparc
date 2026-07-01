@@ -12,7 +12,7 @@ Fiecare lead are un status vizibil, nu se pierde niciunul:
 NOU ─► CONTACTAT ─► CALIFICAT ─► VIZIONARE ─► OFERTĂ ─► REZERVARE ─► CONTRACT ─► ÎNCASĂRI
 ```
 
-- **Captură omnicanal:** lead-urile din site, reclame (Facebook/Instagram/Google), bot, telefon și WhatsApp intră automat în pâlnie — fără re-tastare, cu sursa marcată (ca să știi ce reclamă aduce contracte, nu doar click-uri).
+- **Captură omnicanal:** lead-urile din site, reclame (Facebook/Instagram/Google), asistentul GO CRM, telefon și WhatsApp intră automat în pâlnie — fără re-tastare, cu sursa marcată (ca să știi ce reclamă aduce contracte, nu doar click-uri).
 - **Distribuție automată către agenți**, cu reminder de follow-up. Un lead necontactat în X ore e escaladat.
 - **Fișa clientului** adună tot: din ce reclamă a venit, ce a discutat, ce apartamente a văzut, ce ofertă a primit, ce a semnat, ce a plătit.
 

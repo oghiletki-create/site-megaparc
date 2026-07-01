@@ -38,7 +38,7 @@ Astăzi lead-ul e într-un loc, grila apartamentelor în altul, contractele înt
   LEAD ──► VIZIONARE ──► REZERVARE ──► CONTRACT ──► ÎNCASĂRI (grafic rate)
  (site,     (agent,       (grila         (juridic,     (bancă/casă →
   reclame,   programare)   apartament)    semnare)      reconciliere auto)
-  bot 24/7)     │              │                             │
+  GO CRM 24/7)  │              │                             │
      ▲          │              ▼                             ▼
      │          │        CONSTRUCȚIE / ȘANTIER         CONTABILITATE
      │          │        (stadiu pe bloc, buget)       (confirmă rata, sold client)
