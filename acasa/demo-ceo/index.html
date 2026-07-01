@@ -5,9 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>A-casa × GO CRM — Panou General (demo Director General / CEO)</title>
 <!--
-  DEMO INTERN pentru DIRECTORUL GENERAL (CEO) — GO CRM pentru A-casa.
-  Vedere executivă pe tot dezvoltatorul: finanțe & încasări, vânzări pe
-  proiecte, construcție/șantier, stoc de apartamente, echipă, plus deciziile AI.
+  DEMO INTERN pentru DIRECTORUL GENERAL (CEO) — Sistemul de automatizare GO CRM
+  pentru A-casa. Redus intenționat la ce urmărește de fapt un director general
+  la un dezvoltator imobiliar: BANI (lichiditate, cash-flow) + ȘANTIER (stadiu
+  vs. grafic, buget vs. real) + RADAR DE RISC pe PRAGURI (nu activitate brută).
+  Detaliile operaționale (lead-uri, grilă, facturi individuale) rămân la
+  nivelul fiecărui departament (vezi panoul de management pe departamente).
   Date DEMO — se completează cu cele reale A-casa. Concept confidențial,
   proprietatea GO CRM (Ghiletchi Consulting).
 -->
@@ -26,14 +29,15 @@
   .role{margin-left:auto;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:7px}
   .demo-badge{background:var(--gold);color:#3a2c00;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.5px}
 
-  .shell{display:grid;grid-template-columns:230px 1fr;gap:18px;max-width:1180px;margin:18px auto;padding:0 18px}
+  .shell{display:grid;grid-template-columns:210px 1fr;gap:18px;max-width:1180px;margin:18px auto;padding:0 18px}
   @media(max-width:820px){.shell{grid-template-columns:1fr}}
   .nav{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px;height:max-content;box-shadow:var(--shadow);position:sticky;top:74px}
   @media(max-width:820px){.nav{position:static;display:flex;flex-wrap:wrap;gap:6px}}
-  .nav button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;color:var(--ink);padding:10px 12px;border-radius:10px;font-size:13.5px;font-weight:600;cursor:pointer;text-align:left}
+  .nav button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;color:var(--ink);padding:11px 12px;border-radius:10px;font-size:13.5px;font-weight:600;cursor:pointer;text-align:left}
   @media(max-width:820px){.nav button{width:auto}}
   .nav button:hover{background:var(--brand-l)} .nav button.on{background:var(--brand);color:#fff}
-  .nav .mi{font-size:17px;flex:0 0 20px;text-align:center}
+  .nav .mi{font-size:18px;flex:0 0 20px;text-align:center}
+  .nav .note{padding:10px 12px 4px;font-size:11px;color:var(--muted);line-height:1.5;border-top:1px solid var(--line);margin-top:6px}
 
   .main{min-width:0}
   .h{display:flex;align-items:center;gap:12px;margin:2px 0 14px}
@@ -45,6 +49,7 @@
   .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
   .kpi b{font-size:20px;color:var(--brand-d);display:block} .kpi span{font-size:12px;color:var(--muted)}
   .kpi .up{color:var(--green);font-weight:700;font-size:12px}
+  .kpi .down{color:var(--red);font-weight:700;font-size:12px}
 
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px} @media(max-width:680px){.grid{grid-template-columns:1fr}}
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
@@ -57,12 +62,15 @@
   .bar{height:8px;background:var(--line);border-radius:999px;overflow:hidden}
   .bar i{display:block;height:100%;border-radius:999px;background:var(--brand)}
   .bar.gold i{background:var(--gold)}
+  .bar.warn i{background:var(--amber)}
+  .bar.risk i{background:var(--red)}
 
   .row{display:flex;align-items:center;gap:9px;padding:9px 0;border-top:1px solid var(--line);font-size:13px;line-height:1.4}
   .row:first-of-type{border-top:0}
   .st{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap;flex:0 0 auto}
   .st.ok{background:#e8f5e9;color:var(--green)} .st.warn{background:#fff3e0;color:var(--amber)} .st.risk{background:#fdecea;color:var(--red)}
   .row .grow{flex:1} .row .val{font-weight:700;color:var(--ink);font-size:12.5px}
+  .dept-tag{font-size:10px;font-weight:700;color:var(--brand-d);background:var(--brand-l);padding:1px 7px;border-radius:999px;flex:0 0 auto}
 
   .auto{display:flex;gap:9px;padding:9px 0;border-top:1px dashed var(--line);font-size:13px;line-height:1.45}
   .auto:first-of-type{border-top:0}
@@ -72,8 +80,24 @@
   .wish{background:linear-gradient(135deg,var(--brand-d),var(--brand));color:#fff;border-radius:14px;padding:18px;box-shadow:var(--shadow);margin-bottom:16px}
   .wish h3{margin:0 0 4px;font-size:16px;display:flex;align-items:center;gap:8px}
   .wish p.sub{margin:0 0 12px;font-size:12.5px;opacity:.9}
-  .wish ol{margin:0;padding-left:20px} .wish li{padding:5px 0;font-size:13.5px;line-height:1.45}
+  .wish ol,.wish ul{margin:0;padding-left:20px} .wish li{padding:5px 0;font-size:13.5px;line-height:1.45}
   .wish li b{background:rgba(255,255,255,.18);padding:0 6px;border-radius:5px}
+  .wish .quote{font-style:italic;font-size:13px;opacity:.95;border-left:3px solid var(--gold);padding-left:10px;margin-top:12px}
+
+  .cf-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--line)}
+  .cf-row:first-of-type{border-top:0}
+  .cf-row .mo{width:78px;font-size:12.5px;font-weight:700;flex:0 0 78px}
+  .cf-row .track{flex:1;height:20px;background:var(--line);border-radius:6px;overflow:hidden;position:relative}
+  .cf-row .track i{display:block;height:100%;border-radius:6px}
+  .cf-row .val{width:100px;text-align:right;font-weight:700;font-size:12.5px;flex:0 0 100px}
+  .cf-row.neg .val{color:var(--red)}
+  .cf-row .tag{font-size:10px;font-weight:700;padding:1px 7px;border-radius:999px;flex:0 0 auto;margin-left:6px}
+  .tag.real{background:#e8f5e9;color:var(--green)} .tag.proj{background:#eef1f8;color:var(--brand-d)}
+
+  .delroom{display:grid;grid-template-columns:110px 1fr 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:12.5px;align-items:start}
+  .delroom:first-of-type{border-top:0}
+  .delroom b{color:var(--brand-d)}
+  @media(max-width:680px){.delroom{grid-template-columns:1fr}}
 
   .legal{max-width:1180px;margin:8px auto 26px;padding:0 18px;color:var(--muted);font-size:11px;text-align:center;line-height:1.5}
 </style>
@@ -94,163 +118,200 @@
 <p class="legal" id="legal"></p>
 
 <script>
-/* ===== DATE DEMO — se completează cu cele reale A-casa (în €) ===== */
-const PROJECTS=[
-  {n:"Botanica Park · Bloc B",v:"9 apart. / lună",sold:"58% vândut"},
-  {n:"Botanica Park · Bloc C",v:"5 apart. / lună",sold:"41% vândut"},
-  {n:"Centru Premium · Bloc 1",v:"4 apart. / lună",sold:"33% vândut"},
-  {n:"Telecentru · Bloc A",v:"7 apart. / lună",sold:"88% vândut"}
-];
-const LINES=[["Botanica Park",44],["Centru Premium",33],["Telecentru",23]];
-const SOURCES=[["Reclame online (Meta / Google)",46],["Recomandări & direct",30],["Portaluri imobiliare (999.md / makler)",24]];
-const RISK=[
-  ["risk","4 rate restante peste 30 de zile","62 400 €"],
-  ["warn","Bloc 1 (Centru) — 2 săpt. în urma graficului","termen predare"],
-  ["warn","3 rezervări expiră în 48h fără contract","stoc blocat"],
-  ["ok","Cash-flow pozitiv luna aceasta","+286 000 €"]
-];
-const DEPTS=[["Vânzări",11],["Marketing",4],["Construcție / șantier",9],["Juridic & contracte",3],["Finanțe & încasări",4],["Post-vânzare",2],["Conducere",2]];
+/* ============================================================
+   DATE DEMO — se completează cu cele reale A-casa (în €)
+   Filosofie: directorul general vede BANI + ȘANTIER + RISC pe
+   PRAGURI. Detaliul operațional (lead-uri, facturi individuale,
+   agenți) rămâne în panoul fiecărui departament.
+   ============================================================ */
+const CASH = {
+  soldAzi: 412000,
+  scadente14z: 268000,
+  incasatIeri: 34200,
+  cheltuitIeri: 41000,
+  cashflowLuna: 286000,
+  restante: 62400
+};
 
-const WISH=[
-  ["Tablou de bord consolidat în timp real","— toate proiectele, vânzările, încasările și construcția pe un ecran"],
-  ["Absorbția pe proiect și prognoză de cash-flow","— știu din ce bani și în ce ritm construiesc"],
-  ["Radar de rate restante","— cine, cât, de câte zile — din prima zi"],
-  ["Buget vs. real pe fiecare bloc","— văd abaterea înainte să devină problemă"],
-  ["Raport executiv automat, zilnic, în limbaj natural",""],
-  ["Scenarii „what-if” pentru decizii","— preț, ritm de vânzare, lansare de bloc nou"]
+const CASHFLOW_PROGNOZA = [
+  {luna:"Iulie",      val: 286000, tip:"real"},
+  {luna:"August",     val: 190000, tip:"proiectat"},
+  {luna:"Septembrie", val: -40000, tip:"proiectat"}
 ];
 
+const RESTANTE_PROIECT = [
+  {proiect:"Botanica Park", suma:38200, zile:34},
+  {proiect:"Centru Premium", suma:24200, zile:41}
+];
+
+const BLOCURI = [
+  {n:"Telecentru · Bloc A",      pct:88, plan:610000, cheltuit:598000, termen:"la zi"},
+  {n:"Botanica Park · Bloc B",   pct:62, plan:540000, cheltuit:556000, termen:"la zi"},
+  {n:"Botanica Park · Bloc C",   pct:47, plan:480000, cheltuit:471000, termen:"la zi"},
+  {n:"Centru Premium · Bloc 1",  pct:34, plan:420000, cheltuit:456000, termen:"întârziere 14 zile"}
+];
+
+const RISK = [
+  {level:"risk", dept:"Tehnic",        text:"Centru Premium · Bloc 1 — întârziere 14 zile (prag: 7 zile)", val:"14 zile"},
+  {level:"risk", dept:"Tehnic",        text:"Centru Premium · Bloc 1 — buget depășit (prag: 5%)", val:"+8,6%"},
+  {level:"risk", dept:"Contabilitate", text:"4 rate restante peste 30 de zile (prag: 30 zile)", val:"62 400 €"},
+  {level:"risk", dept:"Bani",          text:"Prognoză cash-flow septembrie — sold proiectat negativ", val:"−40 000 €"},
+  {level:"warn", dept:"Vânzări",       text:"3 rezervări expiră în 48h fără contract (prag: 48h)", val:"stoc blocat"},
+  {level:"ok",   dept:"Bani",          text:"Cash-flow pozitiv luna aceasta", val:"+286 000 €"}
+];
+
+const DELEGARE = [
+  {dept:"Tehnic",        prag:"abatere buget peste 5% sau întârziere peste 7 zile", act:"raport automat în 24h, cu cauza — nu la ședința lunară"},
+  {dept:"Vânzări",       prag:"ritm de vânzare sub target pe un bloc", act:"alertă + soluție propusă de directorul de vânzări"},
+  {dept:"Contabilitate", prag:"restanță client peste 30 de zile", act:"semnal imediat, nu la închiderea lunii"},
+  {dept:"Juridic",       prag:"contract cu penalitate sau clauză neobișnuită", act:"trece prin aprobarea directorului înainte de semnare"}
+];
+
+/* ============================================================
+   RENDARE
+   ============================================================ */
 const NAV=[
-  ["overview","📊","Privire de ansamblu"],
-  ["finante","💵","Finanțe & încasări"],
-  ["vanzari","🏢","Vânzări & proiecte"],
-  ["constructie","🏗️","Construcție"],
-  ["stoc","🗂️","Stoc apartamente"],
-  ["echipa","👥","Echipă"],
-  ["ai","🤖","Decizii AI"]
+  ["cockpit","📊","Cockpit"],
+  ["bani","💵","Bani & cash-flow"],
+  ["santier","🏗️","Șantier"],
+  ["risc","⚠️","Radar de risc"]
 ];
-let view="overview";
+let view="cockpit";
 const $=s=>document.querySelector(s);
-function renderNav(){ $('#nav').innerHTML=NAV.map(n=>`<button class="${view===n[0]?'on':''}" onclick="go('${n[0]}')"><span class="mi">${n[1]}</span>${n[2]}</button>`).join(''); }
+const fmt=n=>Math.round(n).toLocaleString("ro-RO");
+const fmtSigned=n=>(n>=0?"+":"−")+fmt(Math.abs(n))+" €";
+
+function renderNav(){
+  $('#nav').innerHTML=NAV.map(n=>`<button class="${view===n[0]?'on':''}" onclick="go('${n[0]}')"><span class="mi">${n[1]}</span>${n[2]}</button>`).join('')
+    +`<p class="note">Vânzări, Contabilitate, Marketing/PR și Tehnic au fiecare panoul lor operațional. Aici vede directorul doar ce-i cere lui decizia.</p>`;
+}
 function go(v){ view=v; renderNav(); renderMain(); window.scrollTo({top:0,behavior:'smooth'}); }
 window.go=go;
 
-function splits(arr,gold){ return arr.map(x=>`<div class="split"><div class="lab"><span>${x[0]}</span><b>${x[1]}%</b></div><div class="bar${gold?' gold':''}"><i style="width:${x[1]}%"></i></div></div>`).join(''); }
-function risks(arr){ const lbl={ok:"OK",warn:"atenție",risk:"risc"}; return arr.map(r=>`<div class="row"><span class="st ${r[0]}">${lbl[r[0]]}</span><span class="grow">${r[1]}</span><span class="val">${r[2]}</span></div>`).join(''); }
+function riskCount(level){ return RISK.filter(r=>r.level===level).length; }
+function riskRows(arr){
+  const lbl={ok:"OK",warn:"atenție",risk:"risc"};
+  return arr.map(r=>`<div class="row"><span class="st ${r.level}">${lbl[r.level]}</span><span class="dept-tag">${r.dept}</span><span class="grow">${r.text}</span><span class="val">${r.val}</span></div>`).join('');
+}
 function autoList(arr){ return arr.map(a=>`<div class="auto"><span class="b">✓</span><span><b>${a[0]}</b>${a[1]?`<span class="benefit">${a[1]}</span>`:''}</span></div>`).join(''); }
+function cashflowRows(arr){
+  const max=Math.max(...arr.map(x=>Math.abs(x.val)));
+  return arr.map(x=>{
+    const neg=x.val<0;
+    const w=Math.round(Math.abs(x.val)/max*100);
+    const color=neg?'var(--red)':'var(--brand)';
+    return `<div class="cf-row${neg?' neg':''}"><span class="mo">${x.luna}</span><div class="track"><i style="width:${w}%;background:${color}"></i></div><span class="val">${fmtSigned(x.val)}</span><span class="tag ${x.tip==='real'?'real':'proj'}">${x.tip==='real'?'real':'proiectat'}</span></div>`;
+  }).join('');
+}
+function blocRows(){
+  return BLOCURI.map(b=>{
+    const abatere=((b.cheltuit-b.plan)/b.plan*100);
+    const over=abatere>5;
+    const lateFlag=b.termen!=="la zi";
+    return `<div class="row"><span class="st ${over||lateFlag?'risk':'ok'}">${over||lateFlag?'atenție':'OK'}</span><span class="grow"><b>${b.n}</b><br><span style="color:var(--muted);font-size:11.5px">${fmt(b.cheltuit)} € cheltuit din ${fmt(b.plan)} € planificat · ${b.termen}</span></span><span class="val" style="color:${over?'var(--red)':'var(--ink)'}">${abatere>=0?'+':''}${abatere.toFixed(1)}%</span></div>`;
+  }).join('');
+}
 
 function renderMain(){
   const m=$('#main');
-  if(view==="overview"){
+  if(view==="cockpit"){
+    const alerte=riskCount('risk'), atentie=riskCount('warn');
     m.innerHTML=`
-      <div class="h"><div class="ic">📊</div><div><h1>Privire de ansamblu</h1><p>Dezvoltatorul la zi — date demo</p></div></div>
+      <div class="h"><div class="ic">📊</div><div><h1>Cockpit</h1><p>Ce contează azi, în 2 minute — date demo</p></div></div>
       <div class="kpis">
-        <div class="kpi"><b>21 apart.</b><span>vândute (luna)</span></div>
-        <div class="kpi"><b>1,86 mln €</b><span>încasări (luna)</span></div>
-        <div class="kpi"><b>58%</b><span>din stoc vândut</span></div>
-        <div class="kpi"><b class="up">+19%</b><span>vs. anul trecut</span></div>
+        <div class="kpi"><b>${fmt(CASH.soldAzi)} €</b><span>sold de cont azi</span></div>
+        <div class="kpi"><b>${fmt(CASH.scadente14z)} €</b><span>plăți scadente (14 zile)</span></div>
+        <div class="kpi"><b class="${CASH.cashflowLuna>=0?'up':'down'}">${fmtSigned(CASH.cashflowLuna)}</b><span>cash-flow (luna)</span></div>
+        <div class="kpi"><b>${alerte}</b><span>alerte de risc active</span></div>
       </div>
       <div class="wish">
-        <h3>🎯 Ce aș automatiza întâi — ca director general</h3>
-        <p class="sub">Lucrurile pe care le-aș vrea pe un singur ecran, ca să conduc pe date, nu pe rapoarte întârziate:</p>
-        <ol>${WISH.map(w=>`<li>${w[0]} ${w[1]?`<b>${w[1].replace(/^— /,'')}</b>`:''}</li>`).join('')}</ol>
+        <h3>🎯 Ce urmăresc în primul rând — ca director general</h3>
+        <p class="sub">Nu tot ce mișcă în companie — doar ce-mi cere mie decizia:</p>
+        <ol>
+          <li>Supraviețuiesc financiar în lunile următoare? <b>am bani de șantier?</b></li>
+          <li>Care proiect îmi va exploda bugetul — <b>cât mai devreme văd abaterea</b>?</li>
+          <li>Ritmul de vânzare ține pasul cu ritmul de cheltuială pe șantier?</li>
+          <li>Ce decizie mă așteaptă pe mine azi, nu pe altcineva?</li>
+        </ol>
+        <p class="quote">„Nu vreau să mă întrebi — vreau să știu singur, de la sistem, exact când pragul meu e depășit."</p>
       </div>
       <div class="grid">
-        <div class="card"><h3>🏢 Vânzări pe proiect</h3>${splits(LINES)}</div>
-        <div class="card"><h3>📣 Surse de lead</h3>${splits(SOURCES,true)}</div>
+        <div class="card"><h3>💵 Bani <span class="c">rezumat</span></h3>
+          <div class="row"><span class="grow">Încasat ieri</span><span class="val" style="color:var(--green)">+${fmt(CASH.incasatIeri)} €</span></div>
+          <div class="row"><span class="grow">Cheltuit ieri</span><span class="val" style="color:var(--red)">−${fmt(CASH.cheltuitIeri)} €</span></div>
+          <div class="row"><span class="grow">Restanțe totale</span><span class="val">${fmt(CASH.restante)} €</span></div>
+        </div>
+        <div class="card"><h3>🏗️ Șantier <span class="c">rezumat</span></h3>
+          ${BLOCURI.slice(0,2).map(b=>`<div class="split"><div class="lab"><span>${b.n}</span><b>${b.pct}%</b></div><div class="bar${b.termen!=="la zi"?' warn':''}"><i style="width:${b.pct}%"></i></div></div>`).join('')}
+          <p style="color:var(--muted);font-size:11.5px;margin:6px 0 0">2 din ${BLOCURI.length} blocuri — vezi tot în „Șantier".</p>
+        </div>
       </div>
-      <div class="card" style="margin-top:16px"><h3>⚠️ Radar de risc <span class="c">timp real</span></h3>${risks(RISK)}</div>
-    `;
-  } else if(view==="finante"){
-    m.innerHTML=`
-      <div class="h"><div class="ic">💵</div><div><h1>Finanțe & încasări</h1><p>Cash-flow și graficul de rate — date demo</p></div></div>
-      <div class="kpis">
-        <div class="kpi"><b>14,2 mln €</b><span>contractat (an, YTD)</span></div>
-        <div class="kpi"><b>9,7 mln €</b><span>încasat (YTD)</span></div>
-        <div class="kpi"><b class="up">+286 000 €</b><span>cash-flow (luna)</span></div>
-        <div class="kpi"><b>62 400 €</b><span>rate restante</span></div>
-      </div>
-      <div class="grid">
-        <div class="card"><h3>📈 Încasat vs. grafic (luna)</h3>${splits([["Încasat la timp",83],["Restant / întârziat",17]])}</div>
-        <div class="card"><h3>⚠️ Rate restante</h3>${risks([["risk","Peste 30 de zile","62 400 €"],["warn","Scadente săptămâna aceasta","148 000 €"],["ok","Încasat luna aceasta","1,86 mln €"]])}</div>
-      </div>
-      <div class="card" style="margin-top:16px"><h3>⚙️ Ce automatizăm în finanțe <span class="c">AI</span></h3>
-        ${autoList([["Confirmarea automată a ratelor din grafic","plata se potrivește singură cu rata corectă"],["Radar de restanțe în timp real","cine datorează, cât, de câte zile — din prima zi"],["Prognoză de cash-flow pe proiect","construiești din bani previzibili"],["Raport financiar executiv automat","fără să aștepți închiderea lunii"]])}
+      <div class="card" style="margin-top:16px"><h3>⚠️ Radar de risc <span class="c">${alerte} risc · ${atentie} atenție</span></h3>
+        ${riskRows(RISK.filter(r=>r.level!=='ok').slice(0,4))}
+        <div class="auto" style="border-top:1px solid var(--line);margin-top:8px;padding-top:12px"><span class="b" style="cursor:pointer" onclick="go('risc')">→</span><span>Vezi tot radarul și principiul de delegare <b style="cursor:pointer;color:var(--brand-d)" onclick="go('risc')">în tab-ul „Radar de risc"</b></span></div>
       </div>
     `;
-  } else if(view==="vanzari"){
+  } else if(view==="bani"){
     m.innerHTML=`
-      <div class="h"><div class="ic">🏢</div><div><h1>Vânzări & proiecte</h1><p>Consolidat pe complexe și blocuri — date demo</p></div></div>
+      <div class="h"><div class="ic">💵</div><div><h1>Bani & cash-flow</h1><p>Lichiditate, nu profit contabil — date demo</p></div></div>
       <div class="kpis">
-        <div class="kpi"><b>21</b><span>apart. vândute (luna)</span></div>
-        <div class="kpi"><b>38</b><span>rezervări active</span></div>
-        <div class="kpi"><b>4</b><span>blocuri în vânzare</span></div>
-        <div class="kpi"><b class="up">+19%</b><span>vs. anul trecut</span></div>
+        <div class="kpi"><b>${fmt(CASH.soldAzi)} €</b><span>sold de cont azi</span></div>
+        <div class="kpi"><b>${fmt(CASH.scadente14z)} €</b><span>plăți scadente (14 zile)</span></div>
+        <div class="kpi"><b class="${CASH.cashflowLuna>=0?'up':'down'}">${fmtSigned(CASH.cashflowLuna)}</b><span>cash-flow (luna)</span></div>
+        <div class="kpi"><b>${fmt(CASH.restante)} €</b><span>restanțe de la clienți</span></div>
       </div>
-      <div class="grid">
-        <div class="card"><h3>📣 Surse de lead</h3>${splits(SOURCES,true)}</div>
-        <div class="card"><h3>🏢 Pe proiecte</h3>${PROJECTS.map(p=>`<div class="row"><span class="grow">${p.n}</span><span class="val">${p.v}</span></div>`).join('')}</div>
+      <div class="card"><h3>📈 Prognoză cash-flow <span class="c">3 luni, actualizată automat</span></h3>
+        ${cashflowRows(CASHFLOW_PROGNOZA)}
+        <p style="color:var(--red);font-size:12px;margin:10px 0 0"><b>⚠️ Septembrie proiectat negativ</b> — semnal din timp, cât mai e loc de reacție (grăbești încasări, negociezi cu banca, amâni o cheltuială).</p>
       </div>
-      <div class="card" style="margin-top:16px"><h3>⚙️ Ce automatizăm <span class="c">AI</span></h3>
-        ${autoList([["Tablou consolidat: proiecte + grilă, în timp real",""],["Absorbție și prognoză de vânzări pe bloc",""],["Aceeași politică de preț peste tot, inclusiv pe site","modificabilă doar de directorul de vânzări"],["Alertă rezervări care expiră fără contract",""]])}
+      <div class="grid" style="margin-top:16px">
+        <div class="card"><h3>⚠️ Restanțe pe proiect</h3>
+          ${RESTANTE_PROIECT.map(r=>`<div class="row"><span class="grow">${r.proiect}</span><span class="val">${fmt(r.suma)} € · ${r.zile} zile</span></div>`).join('')}
+        </div>
+        <div class="card"><h3>⚙️ Ce alimentează acest ecran <span class="c">Contabilitate</span></h3>
+          ${autoList([["Extrasul bancar citit automat","plata se potrivește singură cu rata din grafic"],["Restanța semnalată din prima zi","nu la închiderea lunii"],["Prognoza de cash-flow","din ritmul real de vânzări și cheltuieli"]])}
+        </div>
       </div>
     `;
-  } else if(view==="constructie"){
+  } else if(view==="santier"){
+    const mediePct=Math.round(BLOCURI.reduce((s,b)=>s+b.pct,0)/BLOCURI.length);
+    const intarziate=BLOCURI.filter(b=>b.termen!=="la zi").length;
+    const abatereMedie=(BLOCURI.reduce((s,b)=>s+((b.cheltuit-b.plan)/b.plan*100),0)/BLOCURI.length);
     m.innerHTML=`
-      <div class="h"><div class="ic">🏗️</div><div><h1>Construcție</h1><p>Stadiu, buget și termen pe blocuri — date demo</p></div></div>
+      <div class="h"><div class="ic">🏗️</div><div><h1>Șantier</h1><p>Stadiu real vs. grafic, buget vs. real — date demo</p></div></div>
       <div class="kpis">
-        <div class="kpi"><b>4</b><span>blocuri active</span></div>
-        <div class="kpi"><b>61%</b><span>avansare medie</span></div>
-        <div class="kpi"><b>1</b><span>bloc în urma graficului</span></div>
-        <div class="kpi"><b>96%</b><span>buget respectat (mediu)</span></div>
+        <div class="kpi"><b>${BLOCURI.length}</b><span>blocuri active</span></div>
+        <div class="kpi"><b>${mediePct}%</b><span>avansare medie</span></div>
+        <div class="kpi"><b>${intarziate}</b><span>blocuri în urma graficului</span></div>
+        <div class="kpi"><b class="${abatereMedie>5?'down':'up'}">${abatereMedie>=0?'+':''}${abatereMedie.toFixed(1)}%</b><span>abatere buget medie</span></div>
       </div>
       <div class="card"><h3>🏗️ Avansare pe bloc</h3>
-        ${splits([["Telecentru · Bloc A — finisaje",88],["Botanica · Bloc B — structură + închideri",62],["Botanica · Bloc C — structură",47],["Centru · Bloc 1 — fundație + structură",34]])}
+        ${BLOCURI.map(b=>`<div class="split"><div class="lab"><span>${b.n}</span><b>${b.pct}%</b></div><div class="bar${b.termen!=="la zi"?' warn':''}"><i style="width:${b.pct}%"></i></div></div>`).join('')}
       </div>
-      <div class="card" style="margin-top:16px"><h3>⚙️ Ce automatizăm <span class="c">AI</span></h3>
-        ${autoList([["Stadiu pe bloc și pe etapă, în timp real","fundație → structură → finisaje → predare"],["Buget planificat vs. cheltuit, cu alerte de abatere",""],["Alerte de întârziere față de termenul de predare",""],["Legătura construcție ↔ vânzări ↔ încasări","construiești în ritmul banilor care intră"]])}
+      <div class="card" style="margin-top:16px"><h3>💰 Deviz — planificat vs. cheltuit</h3>
+        ${blocRows()}
       </div>
-    `;
-  } else if(view==="stoc"){
-    m.innerHTML=`
-      <div class="h"><div class="ic">🗂️</div><div><h1>Stoc apartamente</h1><p>Grila consolidată (șahmatca) — date demo</p></div></div>
-      <div class="kpis">
-        <div class="kpi"><b>412</b><span>apartamente total</span></div>
-        <div class="kpi"><b>173</b><span>disponibile</span></div>
-        <div class="kpi"><b>38</b><span>rezervate</span></div>
-        <div class="kpi"><b>201</b><span>vândute</span></div>
-      </div>
-      <div class="card"><h3>🗂️ Structura stocului</h3>${splits([["Vândute",49],["Disponibile",42],["Rezervate",9]],true)}</div>
-      <div class="card" style="margin-top:16px"><h3>⚙️ Ce automatizăm <span class="c">AI</span></h3>
-        ${autoList([["Grilă vie cu statut unic","disponibil / rezervat / vândut — fără dublă rezervare"],["Sincronizare grilă ↔ site","vândutul dispare, prețul nou apare instant"],["Profitabilitate pe tip de apartament și pe bloc",""],["Alertă apartamente „greu vandabile”","semnal pentru preț sau campanie"]])}
-      </div>
-    `;
-  } else if(view==="echipa"){
-    const tot=DEPTS.reduce((s,d)=>s+d[1],0);
-    m.innerHTML=`
-      <div class="h"><div class="ic">👥</div><div><h1>Echipă</h1><p>${tot} angajați pe departamente — date demo</p></div></div>
-      <div class="card"><h3>👥 Angajați pe departamente <span class="c">${tot}</span></h3>
-        ${DEPTS.map(d=>`<div class="row"><span class="grow">${d[0]}</span><span class="val">${d[1]}</span></div>`).join('')}
-      </div>
-      <div class="card" style="margin-top:16px"><h3>⚙️ Ce automatizăm <span class="c">AI</span></h3>
-        ${autoList([["Productivitate pe echipă și pe agent",""],["Comisioane calculate automat din contracte",""],["Rapoarte de performanță, fără Excel",""]])}
+      <div class="card" style="margin-top:16px"><h3>⚙️ Ce alimentează acest ecran <span class="c">Departament tehnic</span></h3>
+        ${autoList([["Stadiul bifat din teren de diriginte","direct din raportul pe care oricum îl face"],["Deviz cheltuit vs. planificat, pe poziții","abaterea semnalată devreme, nu la final"],["Alertă de întârziere față de grafic",""]])}
       </div>
     `;
   } else {
     m.innerHTML=`
-      <div class="h"><div class="ic">🤖</div><div><h1>Decizii AI</h1><p>Ce îți dă sistemul, ca director general</p></div></div>
-      <div class="card"><h3>⚙️ Automatizări pentru conducere</h3>
-        ${autoList([
-          ["Tablou de bord consolidat în timp real","toate proiectele, vânzările, încasările și construcția într-un loc"],
-          ["Absorbție pe proiect și prognoză de cash-flow","din ce bani și în ce ritm construiești"],
-          ["Radar de rate restante","cine datorează, cât, de câte zile — din prima zi"],
-          ["Buget vs. real pe fiecare bloc","abaterea, înainte să devină problemă"],
-          ["Raport executiv automat, zilnic, în limbaj natural","fără rapoarte manuale"],
-          ["Scenarii „what-if” pentru decizii","preț, ritm de vânzare, lansare de bloc nou"]
-        ])}
+      <div class="h"><div class="ic">⚠️</div><div><h1>Radar de risc</h1><p>Doar praguri depășite — nu activitate brută — date demo</p></div></div>
+      <div class="kpis">
+        <div class="kpi"><b class="down">${riskCount('risk')}</b><span>alerte critice</span></div>
+        <div class="kpi"><b style="color:var(--amber)">${riskCount('warn')}</b><span>alerte de atenție</span></div>
+        <div class="kpi"><b class="up">${riskCount('ok')}</b><span>indicatori în regulă</span></div>
+        <div class="kpi"><b>4</b><span>departamente conectate</span></div>
       </div>
-      <div class="card" style="margin-top:16px"><h3>🛡️ Principiu</h3>
-        <p style="font-size:13.5px;line-height:1.5;margin:0">AI-ul <b>pregătește și propune</b> — deciziile rămân la conducere. Prețul, contractul și discountul rămân sub control uman. Construim peste sistemele existente (ex. 1C, site), nu le înlocuim.</p>
+      <div class="card"><h3>⚠️ Toate alertele active <span class="c">timp real</span></h3>
+        ${riskRows(RISK)}
+      </div>
+      <div class="wish" style="margin-top:16px">
+        <h3>🤝 Principiul de delegare</h3>
+        <p class="sub">Fiecare responsabil are un prag definit. Sub prag, decide singur — nu mă întreabă. Peste prag, sistemul mă anunță automat, cu context.</p>
+        ${DELEGARE.map(d=>`<div class="delroom"><b>${d.dept}</b><span>prag: ${d.prag}</span><span>${d.act}</span></div>`).join('')}
+        <p class="quote">„Dacă nu mă anunți și aflu eu, e problemă de încredere, nu doar de proces."</p>
       </div>
     `;
   }
