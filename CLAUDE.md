@@ -7,6 +7,11 @@
   **A nu se mai pomeni public și a nu se mai lucra pe el** decât dacă Oleg cere explicit.
   Reținut doar ca memorie internă.
 
+- **A-casa** — dezvoltator imobiliar, prospect activ pentru GO CRM (propunere în `acasa/`,
+  vezi PR #27). Director general: **Veaceslav**. Soția lui, **Elena**, e directoare la
+  **Andersen** — un business separat, al ei. Reținut doar ca context intern (relații/familie);
+  **a nu se lucra pe Andersen ca prospect** decât dacă Oleg cere explicit.
+
 ## Site publicat
 
 - Netlify publică folderul **`lider/`** ca rădăcină (vezi `netlify.toml`).
