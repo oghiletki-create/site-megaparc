@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A-casa × GO CRM — Asistent de vânzări AI (demo)</title>
+<!--
+  PROTOTIP DEMONSTRATIV pentru pitch — GO CRM pentru A-casa (dezvoltator imobiliar)
+  ---------------------------------------------------------------
+  Asistent de vânzări cu MENIU PRINCIPAL:
+   • Caută apartament (grilă/șahmatca)   • Calcul rate / ipotecă
+   • Programare vizionare                • Stadiul construcției
+   • Rezervările mele                    • Plățile mele (grafic rate)
+   • Contact & birou vânzări
+  Plus: preț blocat pe grilă (îl modifică doar directorul de vânzări),
+  statut apartament (disponibil/rezervat/vândut), RO/RU.
+
+  BRAND: identitatea GO CRM; în producție se poate marca cu logo-ul A-casa.
+  CREIER: în producție LLM (Claude) + RAG pe grila reală + condițiile de plată.
+-->
+<style>
+  :root{
+    --brand:#243b6b; --brand-d:#182a4e; --brand-l:#eef1f8; --gold:#c9a24b;
+    --bg:#f3f5fa; --card:#ffffff; --ink:#1e2430; --muted:#6b7280; --line:#e4e7ee;
+    --ok:#2e7d32; --warn:#ef6c00; --red:#c62828; --blue:#1565c0;
+    --shadow:0 10px 30px rgba(24,42,78,.12); --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;
+    background:linear-gradient(160deg,#eef1f7 0%,#e5eaf4 100%);color:var(--ink);
+    min-height:100%;display:flex;align-items:center;justify-content:center;padding:24px}
+  .wrap{width:100%;max-width:1060px}
+  .topnote{text-align:center;margin:0 0 16px;color:var(--brand-d);font-size:13px}
+  .topnote b{background:var(--gold);color:#3a2c00;padding:2px 8px;border-radius:999px;font-size:11px;letter-spacing:.5px}
+  .legal{text-align:center;margin:16px auto 0;max-width:780px;color:var(--muted);font-size:11px;line-height:1.5}
+  .layout{display:grid;grid-template-columns:1.02fr .98fr;gap:22px;align-items:start}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}}
+
+  .pitch{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px;border:1px solid var(--line)}
+  .logo{display:flex;align-items:center;gap:12px}
+  .logo .mark{width:46px;height:46px;flex:0 0 46px;color:var(--brand)}
+  .logo .wm{line-height:1}
+  .logo .wm b{font-size:24px;font-weight:800;color:var(--brand-d);letter-spacing:.2px;display:block}
+  .logo .wm span{font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+  .pitch h1{font-size:21px;margin:18px 0 6px;line-height:1.25}
+  .pitch p.lead{color:var(--muted);margin:0 0 16px;font-size:14.5px;line-height:1.5}
+  .feat{display:flex;gap:11px;padding:11px 0;border-top:1px solid var(--line)}
+  .feat .ic{flex:0 0 34px;height:34px;border-radius:9px;background:var(--brand-l);display:grid;place-items:center;font-size:17px}
+  .feat b{display:block;font-size:14.5px}
+  .feat span{color:var(--muted);font-size:13px;line-height:1.45}
+  .pitch .foot{margin-top:16px;font-size:12px;color:var(--muted);line-height:1.5;border-top:1px solid var(--line);padding-top:12px}
+
+  .chat{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line);display:flex;flex-direction:column;height:720px;overflow:hidden}
+  .chat-head{background:linear-gradient(135deg,var(--brand),var(--brand-d));color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px}
+  .chat-head .mark{width:38px;height:38px;flex:0 0 38px;color:#fff}
+  .chat-head .who{flex:1}
+  .chat-head .who b{font-size:15px;display:block}
+  .chat-head .who span{font-size:12px;opacity:.9;display:flex;align-items:center;gap:6px}
+  .dot{width:8px;height:8px;border-radius:50%;background:#7CFC9B;animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,252,155,.6)}70%{box-shadow:0 0 0 7px rgba(124,252,155,0)}100%{box-shadow:0 0 0 0 rgba(124,252,155,0)}}
+  .lang{display:flex;gap:4px}
+  .lang button{border:1px solid rgba(255,255,255,.5);background:transparent;color:#fff;border-radius:7px;padding:4px 8px;font-size:12px;font-weight:700;cursor:pointer}
+  .lang button.on{background:#fff;color:var(--brand-d)}
+
+  .ctxbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding:9px 14px;background:#eef1f8;border-bottom:1px solid var(--line);font-size:12px}
+  .ctx{display:flex;align-items:center;gap:7px}
+  .ctx>label{color:var(--muted);font-weight:600}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;flex-wrap:wrap}
+  .seg button{border:0;background:#fff;padding:5px 9px;font-size:12px;cursor:pointer;color:var(--ink);font-weight:600}
+  .seg button.on{background:var(--brand);color:#fff}
+  .lockhint{display:flex;align-items:center;gap:5px;color:var(--gold);font-size:11px;margin-left:auto;font-weight:600}
+
+  .msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:11px;background:var(--bg)}
+  .row{display:flex;gap:9px;max-width:94%}
+  .row.user{align-self:flex-end;flex-direction:row-reverse}
+  .bub{padding:10px 13px;border-radius:14px;font-size:14px;line-height:1.5;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+  .row.bot .bub{background:#fff;border:1px solid var(--line);border-top-left-radius:4px}
+  .row.user .bub{background:var(--brand);color:#fff;border-top-right-radius:4px}
+  .mini-av{width:30px;height:30px;border-radius:50%;background:var(--brand-l);display:grid;place-items:center;font-size:16px;flex:0 0 30px}
+  .sys{align-self:center;background:#eef1f8;border:1px dashed #c7d0e6;color:var(--brand-d);font-size:11.5px;padding:4px 11px;border-radius:999px}
+
+  .typing{display:flex;gap:4px;padding:12px 14px}
+  .typing i{width:7px;height:7px;border-radius:50%;background:#c1c8d6;animation:bounce 1.3s infinite}
+  .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+  @keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
+
+  .menu{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
+  .menu.single{grid-template-columns:1fr}
+  .menu button{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 11px;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;text-align:left}
+  .menu button:hover{border-color:var(--brand);background:var(--brand-l)}
+  .menu button .mi{font-size:16px;flex:0 0 18px;text-align:center}
+
+  .prod{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:8px}
+  .prod .head{display:flex;gap:11px;align-items:flex-start}
+  .prod .pic{width:46px;height:46px;border-radius:10px;background:var(--brand-l);display:grid;place-items:center;font-size:24px;flex:0 0 46px}
+  .prod .info{flex:1;min-width:0}
+  .prod .info b{font-size:13.5px;display:block}
+  .specs{display:flex;flex-wrap:wrap;gap:5px 14px;margin-top:5px;font-size:12px;color:var(--muted)}
+  .specs span b{color:var(--ink)}
+  .badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+  .b{font-size:10px;padding:1px 7px;border-radius:999px;font-weight:600}
+  .b.disp{background:#e8f5e9;color:var(--ok)}
+  .b.rez{background:#fff3e0;color:var(--warn)}
+  .b.vandut{background:#f3e5e5;color:var(--red)}
+  .b.cx{background:var(--brand-l);color:var(--brand-d)}
+  .prod .price{font-weight:800;color:var(--brand-d);font-size:15px;margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .prod .price .ppm{font-size:11px;font-weight:600;color:var(--muted);background:#eef1f8;padding:1px 6px;border-radius:999px}
+  .prod .price .lock{font-size:11px;color:var(--gold);cursor:help}
+  .actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+  .actions button{border:0;border-radius:8px;padding:6px 11px;font-size:12px;font-weight:700;cursor:pointer}
+  .actions .b1{background:var(--brand);color:#fff}.actions .b1:hover{background:var(--brand-d)}
+  .actions .b2{background:#fff;border:1px solid var(--brand)!important;color:var(--brand-d)}.actions .b2:hover{background:var(--brand-l)}
+  .actions button:disabled{opacity:.55;cursor:default}
+
+  .note{font-size:11.5px;color:#6b4f00;background:#fff7e6;border:1px solid #ffe2a8;border-radius:9px;padding:7px 10px;margin-top:8px;line-height:1.45}
+  .why{font-size:12px;color:var(--brand-d);background:#eef4ff;border-left:3px solid var(--brand);border-radius:6px;padding:6px 10px;margin-top:7px;line-height:1.45}
+  .plan{margin-top:8px;border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:12.5px}
+  .plan .r{display:flex;justify-content:space-between;padding:7px 11px;border-top:1px solid var(--line)}
+  .plan .r:first-child{border-top:0;background:#eef1f8;font-weight:700}
+  .plan .r b{color:var(--brand-d)}
+  .prog{height:9px;background:var(--line);border-radius:999px;overflow:hidden;margin-top:8px}
+  .prog i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--brand),var(--gold))}
+  .offer{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-top:7px;font-size:13px}
+  .offer .st{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px}
+  .st.paid{background:#e8f5e9;color:var(--ok)}.st.wait{background:#fff3e0;color:var(--warn)}
+
+  .chips{display:flex;flex-wrap:wrap;gap:7px;padding:10px 14px;border-top:1px solid var(--line);background:#fff}
+  .chips button{border:1px solid var(--brand);color:var(--brand-d);background:#fff;border-radius:999px;padding:6px 12px;font-size:12.5px;cursor:pointer;font-weight:600}
+  .chips button:hover{background:var(--brand-l)}
+  .composer{display:flex;gap:8px;padding:11px 12px;border-top:1px solid var(--line);background:#fff}
+  .composer .menu-btn{border:1px solid var(--line);background:#fff;color:var(--brand-d);width:44px;border-radius:11px;font-size:17px;cursor:pointer}
+  .composer .menu-btn:hover{background:var(--brand-l);border-color:var(--brand)}
+  .composer input{flex:1;border:1px solid var(--line);border-radius:11px;padding:11px 13px;font-size:14px;outline:none}
+  .composer input:focus{border-color:var(--brand)}
+  .composer .send{border:0;background:var(--brand);color:#fff;width:44px;border-radius:11px;font-size:18px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="topnote"><b id="t-badge">DEMO</b> &nbsp;<span id="t-note">Prototip pentru pitch (GO CRM); în producție: LLM (Claude) + RAG pe grila reală A-casa.</span></p>
+
+  <div class="layout">
+    <section class="pitch">
+      <div class="logo">
+        <svg class="mark" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+          <path d="M9 23 L24 11 L39 23"/><path d="M13 21 V37 H35 V21"/><path d="M21 37 V28 H27 V37"/>
+        </svg>
+        <div class="wm"><b>GO&nbsp;CRM</b><span>pentru A-casa · imobiliar</span></div>
+      </div>
+      <h1 id="p-h1">Asistent de vânzări AI pentru dezvoltator imobiliar</h1>
+      <p class="lead" id="p-lead">Cu meniu principal ca orice sistem serios: caută apartament în grilă, calcul rate, vizionare, stadiul construcției, plăți — plus un consultant care duce lead-ul până la contract.</p>
+      <div class="feat"><div class="ic">🔎</div><div><b id="f1b">Caută în grilă</b><span id="f1s">Camere, buget, etaj, complex — arată doar ce e disponibil, cu preț la zi și preț pe m².</span></div></div>
+      <div class="feat"><div class="ic">🧮</div><div><b id="f2b">Calcul rate & ipotecă</b><span id="f2s">Avans + rate lunare până la predare, pe apartamentul ales — instant.</span></div></div>
+      <div class="feat"><div class="ic">📅</div><div><b id="f3b">Vizionare & lead calificat</b><span id="f3s">Programează vizionarea și trece lead-ul, gata calificat, în CRM.</span></div></div>
+      <div class="feat"><div class="ic">🔒</div><div><b id="f4b">Preț blocat pe grilă</b><span id="f4s">Prețul îl modifică doar directorul de vânzări. Fără dublă rezervare.</span></div></div>
+      <p class="foot" id="p-foot">Demo cu eșantion de grilă și logică simulată, în identitatea GO CRM (se poate marca cu logo-ul A-casa). În producție, răspunsurile sunt ancorate în datele reale A-casa.</p>
+    </section>
+
+    <section class="chat">
+      <div class="chat-head">
+        <svg class="mark" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+          <path d="M9 23 L24 11 L39 23"/><path d="M13 21 V37 H35 V21"/><path d="M21 37 V28 H27 V37"/>
+        </svg>
+        <div class="who"><b id="c-name">A-casa · Asistent</b><span><i class="dot"></i> <span id="c-status">online · răspunde instant</span></span></div>
+        <div class="lang"><button data-l="ro" class="on">RO</button><button data-l="ru">RU</button></div>
+      </div>
+
+      <div class="ctxbar">
+        <div class="ctx"><label id="lbl-cx">Complex:</label>
+          <div class="seg" id="seg-cx">
+            <button data-c="all" class="on">Toate</button>
+            <button data-c="botanica">Botanica Park</button>
+            <button data-c="centru">Centru Premium</button>
+            <button data-c="tele">Telecentru</button>
+          </div>
+        </div>
+        <div class="lockhint" title="Doar directorul de vânzări poate modifica prețul"><span>🔒</span><span id="lock-txt">preț fixat</span></div>
+      </div>
+
+      <div class="msgs" id="msgs"></div>
+      <div class="chips" id="chips"></div>
+      <div class="composer">
+        <button class="menu-btn" id="menu-btn" title="Meniu">☰</button>
+        <input id="input" placeholder="Scrie un mesaj…" autocomplete="off">
+        <button class="send" id="send">➤</button>
+      </div>
+    </section>
+  </div>
+  <p class="legal" id="legal"></p>
+</div>
+
+<script>
+/* ============================================================
+   COMPLEXE + STADIUL CONSTRUCȚIEI (demo)
+   ============================================================ */
+const COMPLEXES = {
+  botanica:{name:"Botanica Park", pct:62, phase:{ro:"structură + închideri",ru:"каркас + закрытие контура"}, term:{ro:"trim. II 2027",ru:"II кв. 2027"}},
+  centru:{name:"Centru Premium", pct:34, phase:{ro:"fundație + structură",ru:"фундамент + каркас"}, term:{ro:"trim. IV 2027",ru:"IV кв. 2027"}},
+  tele:{name:"Telecentru", pct:88, phase:{ro:"finisaje",ru:"отделка"}, term:{ro:"trim. IV 2026",ru:"IV кв. 2026"}}
+};
+
+/* ============================================================
+   GRILA DE APARTAMENTE / ȘAHMATCA (demo). Preț în €.
+   status: disp | rez | vandut
+   ============================================================ */
+const APARTS = {
+  a1:{cx:"tele", block:"Bloc A", floor:3, rooms:1, area:42, price:39900, orient:"S", status:"disp"},
+  a2:{cx:"tele", block:"Bloc A", floor:7, rooms:2, area:56, price:52500, orient:"S-E", status:"rez"},
+  a3:{cx:"botanica", block:"Bloc B", floor:5, rooms:2, area:58, price:53800, orient:"parc", status:"disp"},
+  a4:{cx:"botanica", block:"Bloc B", floor:9, rooms:3, area:78, price:71500, orient:"S-V", status:"disp"},
+  a5:{cx:"botanica", block:"Bloc C", floor:2, rooms:1, area:40, price:36500, orient:"E", status:"vandut"},
+  a6:{cx:"centru", block:"Bloc 1", floor:6, rooms:2, area:61, price:64000, orient:"V", status:"disp"},
+  a7:{cx:"centru", block:"Bloc 1", floor:10, rooms:3, area:84, price:92000, orient:"panoramic", status:"disp"},
+  a8:{cx:"tele", block:"Bloc A", floor:1, rooms:0, area:31, price:28900, orient:"curte", status:"disp"},
+  a9:{cx:"botanica", block:"Bloc B", floor:4, rooms:2, area:57, price:52900, orient:"parc", status:"disp"},
+  a10:{cx:"centru", block:"Bloc 2", floor:8, rooms:2, area:60, price:63000, orient:"S", status:"rez"}
+};
+
+/* ============================================================
+   TRADUCERI
+   ============================================================ */
+const T = {
+  ro:{
+    placeholder:"Scrie un mesaj…", name:"A-casa · Asistent", status:"online · răspunde instant",
+    badge:"DEMO", tnote:"Prototip pentru pitch (GO CRM); în producție: LLM (Claude) + RAG pe grila reală A-casa.",
+    h1:"Asistent de vânzări AI pentru dezvoltator imobiliar",
+    lead:"Cu meniu principal ca orice sistem serios: caută apartament în grilă, calcul rate, vizionare, stadiul construcției, plăți — plus un consultant care duce lead-ul până la contract.",
+    f1b:"Caută în grilă", f1s:"Camere, buget, etaj, complex — arată doar ce e disponibil, cu preț la zi și preț pe m².",
+    f2b:"Calcul rate & ipotecă", f2s:"Avans + rate lunare până la predare, pe apartamentul ales — instant.",
+    f3b:"Vizionare & lead calificat", f3s:"Programează vizionarea și trece lead-ul, gata calificat, în CRM.",
+    f4b:"Preț blocat pe grilă", f4s:"Prețul îl modifică doar directorul de vânzări. Fără dublă rezervare.",
+    foot:"Demo cu eșantion de grilă și logică simulată, în identitatea GO CRM. În producție, răspunsurile sunt ancorate în datele reale A-casa.",
+    lblCx:"Complex:", lockTxt:"preț fixat",
+    legal:"© 2026 · GO CRM (Ghiletchi Consulting) · Demo confidențial, realizat la comandă. Concept, design și implementare sunt proprietatea dezvoltatorului. Reproducerea fără acord scris este interzisă.",
+    greet:"Bună ziua! 👋 Sunt asistentul de vânzări A-casa. Îți găsesc apartamentul potrivit, îți calculez ratele și îți programez o vizionare. Alege din meniu 👇",
+    menuTitle:"Meniu principal:",
+    mSearch:"Caută apartament", mRate:"Calcul rate / ipotecă", mViewing:"Programează vizionare",
+    mBuild:"Stadiul construcției", mRes:"Rezervările mele", mPay:"Plățile mele",
+    mContact:"Contact & birou", mFeedback:"Idei / ce mai dorești?",
+    fbPrompt:"Acesta e un demo 🙂 Spune-mi ce ți-ar plăcea să mai poată face sistemul (ex. tur virtual 3D, semnare online, integrare cu banca, notificări pe WhatsApp…) și transmit echipei.",
+    fbThanks:"Mulțumim! 🏠 Am notat ideea ta. O poți trimite și echipei printr-un clic:",
+    fbSend:"✉️ Trimite ideea echipei",
+    searchPrompt:"Spune-mi ce cauți: numărul de camere și bugetul (ex. „2 camere până în 55 000 €”). Pot filtra și pe complex sau etaj. Câteva idei:",
+    searchChips:["2 camere până în 55 000 €","Studio în Telecentru","3 camere cu vedere","Cel mai ieftin disponibil"],
+    foundIntro:(n)=>`Am găsit <b>${n}</b> ${n===1?"apartament disponibil":"apartamente disponibile"} care se potrivesc 👇`,
+    noneFound:"Nu am găsit apartamente disponibile exact pe acele criterii. Îți arăt cele mai apropiate variante — sau spune-mi alt buget / alt complex:",
+    roomsName:{0:"Studio",1:"1 cameră",2:"2 camere",3:"3 camere"},
+    floorL:"etaj", areaL:"m²", ppmL:"€/m²", priceL:"€",
+    orientName:{S:"Sud",E:"Est","S-E":"Sud-Est","S-V":"Sud-Vest",V:"Vest",parc:"spre parc",panoramic:"panoramic",curte:"spre curte"},
+    stDisp:"● Disponibil", stRez:"Rezervat", stVandut:"Vândut",
+    lockTip:"Preț fixat pe grilă. Îl poate modifica doar directorul de vânzări.",
+    actRate:"🧮 Rate", actView:"📅 Vizionare", actRes:"🔖 Rezervă",
+    ratePlan:(a)=>`Plan orientativ pentru <b>${a}</b> (rate la dezvoltator, până la predare):`,
+    rAvans:"Avans (30%)", rRest:"Rest de achitat", rMonths:"Rate lunare", rMonthly:"Rată lunară estimată",
+    rHint:"💡 Putem calcula și varianta cu credit ipotecar bancar — spune-mi avansul de care dispui.",
+    viewBooked:(a)=>`✅ Vizionare pentru „${a}” — alege un interval, iar un agent A-casa confirmă:`,
+    viewSlots:["Mâine 11:00","Mâine 16:00","Sâmbătă 12:00"],
+    viewDone:(s)=>`Perfect! Vizionarea a fost notată pentru ${s}. Lead-ul tău a intrat în CRM cu tot ce am discutat — te contactează un agent. 📞`,
+    reserved:(a)=>`🔖 Am marcat „${a}” ca <b>rezervat 3 zile</b> pe numele tău. Apartamentul dispare automat din grila publică; un agent te contactează pentru contract. (demo)`,
+    alreadyRez:"Acest apartament este deja rezervat. Îți pot arăta alternative similare 👇",
+    buildPrompt:"Alege complexul ca să vezi stadiul construcției:",
+    buildLine:(c)=>`🏗️ <b>${c.name}</b> — ${c.phase}, gata estimativ ${c.term}.`,
+    resText:"Rezervarea ta activă:",
+    resLine:"<b>Botanica Park · Bloc B, ap. 24</b> · 2 camere, 58 m²<br>🔖 rezervat — contract în pregătire",
+    payText:"Graficul tău de rate (rămâne în fișa ta de client):",
+    payNote:"💡 La confirmarea plății, rata devine automat „achitată” și soldul se actualizează singur.",
+    contactText:"📍 Birou vânzări A-casa · Chișinău<br>🕒 Program: Luni–Sâmbătă<br>💬 Rezervări și vizionări 24/7 prin acest asistent<br><span style='color:#6b7280;font-size:11px'>(date demo — se completează cu cele reale)</span>",
+    backMenu:"⬅ Meniu principal",
+    cxChanged:(c)=>`Complex setat: ${c} — filtrez căutarea`,
+    needSearch:"Ca să-ți calculez ratele, alege întâi un apartament. Îți caut acum câteva 👇",
+    fallback:"Pot ajuta cu: căutare apartament, calcul rate, vizionare, stadiul construcției, plăți. Alege din meniu sau scrie ce camere și ce buget cauți 👇"
+  },
+  ru:{
+    placeholder:"Напишите сообщение…", name:"A-casa · Ассистент", status:"онлайн · отвечает сразу",
+    badge:"ДЕМО", tnote:"Прототип для презентации (GO CRM); в продакшене: LLM (Claude) + RAG по реальной шахматке A-casa.",
+    h1:"AI-ассистент продаж для застройщика",
+    lead:"С главным меню, как у любой серьёзной системы: поиск квартиры в шахматке, расчёт рассрочки, просмотр, стадия стройки, платежи — плюс консультант, ведущий лид до договора.",
+    f1b:"Поиск в шахматке", f1s:"Комнаты, бюджет, этаж, комплекс — только доступное, с ценой и ценой за м².",
+    f2b:"Рассрочка и ипотека", f2s:"Аванс + ежемесячные платежи до сдачи, по выбранной квартире — мгновенно.",
+    f3b:"Просмотр и готовый лид", f3s:"Запишет на просмотр и передаст лид, уже квалифицированный, в CRM.",
+    f4b:"Цена зафиксирована", f4s:"Цену меняет только директор по продажам. Без двойной брони.",
+    foot:"Демо с образцом шахматки и имитацией логики, в айдентике GO CRM. В продакшене ответы строго по данным A-casa.",
+    lblCx:"Комплекс:", lockTxt:"цена фикс.",
+    legal:"© 2026 · GO CRM (Ghiletchi Consulting) · Конфиденциальное демо, разработанное на заказ. Концепция, дизайн и реализация — собственность разработчика. Копирование без письменного согласия запрещено.",
+    greet:"Здравствуйте! 👋 Я ассистент продаж A-casa. Подберу квартиру, рассчитаю рассрочку и запишу на просмотр. Выберите в меню 👇",
+    menuTitle:"Главное меню:",
+    mSearch:"Подобрать квартиру", mRate:"Рассрочка / ипотека", mViewing:"Записаться на просмотр",
+    mBuild:"Стадия строительства", mRes:"Мои брони", mPay:"Мои платежи",
+    mContact:"Контакты и офис", mFeedback:"Идеи / что добавить?",
+    fbPrompt:"Это демо 🙂 Напишите, что бы вы хотели добавить (например 3D-тур, онлайн-подписание, интеграцию с банком, уведомления в WhatsApp…) — передам команде.",
+    fbThanks:"Спасибо! 🏠 Записал вашу идею. Можно отправить её команде в один клик:",
+    fbSend:"✉️ Отправить идею команде",
+    searchPrompt:"Напишите, что ищете: число комнат и бюджет (например «2 комнаты до 55 000 €»). Могу фильтровать по комплексу или этажу. Примеры:",
+    searchChips:["2 комнаты до 55 000 €","Студия в Телецентре","3 комнаты с видом","Самое доступное"],
+    foundIntro:(n)=>`Нашёл <b>${n}</b> подходящих доступных ${n===1?"квартиру":"квартир"} 👇`,
+    noneFound:"Не нашёл точно по этим критериям. Показываю ближайшие варианты — или напишите другой бюджет / комплекс:",
+    roomsName:{0:"Студия",1:"1 комн.",2:"2 комн.",3:"3 комн."},
+    floorL:"этаж", areaL:"м²", ppmL:"€/м²", priceL:"€",
+    orientName:{S:"Юг",E:"Восток","S-E":"Юго-Восток","S-V":"Юго-Запад",V:"Запад",parc:"на парк",panoramic:"панорама",curte:"во двор"},
+    stDisp:"● Свободна", stRez:"Бронь", stVandut:"Продана",
+    lockTip:"Цена зафиксирована в шахматке. Менять может только директор по продажам.",
+    actRate:"🧮 Рассрочка", actView:"📅 Просмотр", actRes:"🔖 Бронь",
+    ratePlan:(a)=>`Ориентировочный план для <b>${a}</b> (рассрочка от застройщика, до сдачи):`,
+    rAvans:"Аванс (30%)", rRest:"Остаток", rMonths:"Мес. платежей", rMonthly:"Ежемесячно (оценка)",
+    rHint:"💡 Могу рассчитать и вариант с ипотекой банка — напишите ваш аванс.",
+    viewBooked:(a)=>`✅ Просмотр «${a}» — выберите время, агент A-casa подтвердит:`,
+    viewSlots:["Завтра 11:00","Завтра 16:00","Суббота 12:00"],
+    viewDone:(s)=>`Отлично! Просмотр записан на ${s}. Ваш лид попал в CRM со всем, что обсудили — с вами свяжется агент. 📞`,
+    reserved:(a)=>`🔖 Отметил «${a}» как <b>бронь на 3 дня</b> на ваше имя. Квартира автоматически убрана из публичной шахматки; агент свяжется по договору. (демо)`,
+    alreadyRez:"Эта квартира уже забронирована. Покажу похожие варианты 👇",
+    buildPrompt:"Выберите комплекс, чтобы увидеть стадию строительства:",
+    buildLine:(c)=>`🏗️ <b>${c.name}</b> — ${c.phase}, ориентировочная сдача ${c.term}.`,
+    resText:"Ваша активная бронь:",
+    resLine:"<b>Botanica Park · Блок B, кв. 24</b> · 2 комнаты, 58 м²<br>🔖 бронь — договор готовится",
+    payText:"Ваш график платежей (хранится в вашей карточке):",
+    payNote:"💡 При подтверждении оплаты платёж автоматически становится «оплачен», остаток пересчитывается сам.",
+    contactText:"📍 Офис продаж A-casa · Кишинёв<br>🕒 Режим: Пн–Сб<br>💬 Брони и просмотры 24/7 через этого ассистента<br><span style='color:#6b7280;font-size:11px'>(демо-данные — заменяются реальными)</span>",
+    backMenu:"⬅ Главное меню",
+    cxChanged:(c)=>`Комплекс: ${c} — фильтрую поиск`,
+    needSearch:"Чтобы рассчитать рассрочку, сначала выберите квартиру. Подберу сейчас 👇",
+    fallback:"Помогу с: подбором квартиры, расчётом рассрочки, просмотром, стадией стройки, платежами. Выберите в меню или напишите комнаты и бюджет 👇"
+  }
+};
+
+/* ============================================================ */
+let lang='ro', cx='all', pendingRate=false, pendingFeedback=false, pendingView=null;
+const $ = s=>document.querySelector(s);
+const msgs=$('#msgs'), chipsEl=$('#chips'), input=$('#input');
+const fmt=n=>n.toLocaleString('ro-RO');
+const cxName={all:{ro:"Toate",ru:"Все"},botanica:{ro:"Botanica Park",ru:"Botanica Park"},centru:{ro:"Centru Premium",ru:"Centru Premium"},tele:{ro:"Telecentru",ru:"Телецентр"}};
+
+function scrollDown(){ msgs.scrollTop=msgs.scrollHeight; }
+function addUser(text){const r=document.createElement('div');r.className='row user';r.innerHTML='<div class="bub"></div>';r.querySelector('.bub').textContent=text;msgs.appendChild(r);scrollDown();}
+function botRow(html){const r=document.createElement('div');r.className='row bot';r.innerHTML='<div class="mini-av">🏠</div><div class="bub">'+html+'</div>';msgs.appendChild(r);scrollDown();return r;}
+function sysMsg(text){const r=document.createElement('div');r.className='sys';r.textContent=text;msgs.appendChild(r);scrollDown();}
+function typing(){const r=document.createElement('div');r.className='row bot';r.innerHTML='<div class="mini-av">🏠</div><div class="bub"><div class="typing"><i></i><i></i><i></i></div></div>';msgs.appendChild(r);scrollDown();return r;}
+function bot(html, delay=600){const t=typing();return new Promise(res=>setTimeout(()=>{t.remove();res(botRow(html));},delay));}
+
+/* ---------- CARD APARTAMENT ---------- */
+function orientTxt(o){const tr=T[lang];return tr.orientName[o]||o;}
+function statusBadge(s){const tr=T[lang];if(s==='disp')return `<span class="b disp">${tr.stDisp}</span>`;if(s==='rez')return `<span class="b rez">${tr.stRez}</span>`;return `<span class="b vandut">${tr.stVandut}</span>`;}
+function apartCard(key){
+  const a=APARTS[key], tr=T[lang];
+  const ppm=Math.round(a.price/a.area);
+  const title=`${tr.roomsName[a.rooms]} · ${a.area} ${tr.areaL} · ${COMPLEXES[a.cx].name}`;
+  const disabled=a.status!=='disp';
+  return `<div class="prod" data-key="${key}"><div class="head"><div class="pic">🏢</div><div class="info">
+    <b>${title}</b>
+    <div class="specs"><span>${a.block}</span><span>${tr.floorL} <b>${a.floor}</b></span><span>${orientTxt(a.orient)}</span></div>
+    <div class="badges"><span class="b cx">${COMPLEXES[a.cx].name}</span>${statusBadge(a.status)}</div>
+    <div class="price"><span>${fmt(a.price)} ${tr.priceL}</span><span class="ppm">${fmt(ppm)} ${tr.ppmL}</span><span class="lock" title="${tr.lockTip}">🔒</span></div>
+    <div class="actions">
+      <button class="b1" ${disabled?'disabled':''} onclick="calcRate('${key}')">${tr.actRate}</button>
+      <button class="b2" ${disabled?'disabled':''} onclick="bookViewing('${key}')">${tr.actView}</button>
+      <button class="b2" ${disabled?'disabled':''} onclick="reserve('${key}',this)">${tr.actRes}</button>
+    </div>
+  </div></div></div>`;
+}
+
+/* ---------- ACȚIUNI CARD ---------- */
+async function calcRate(key){
+  const a=APARTS[key], tr=T[lang];
+  const title=`${tr.roomsName[a.rooms]}, ${a.area} ${tr.areaL}, ${COMPLEXES[a.cx].name}`;
+  const avans=Math.round(a.price*0.30), rest=a.price-avans, months=24, monthly=Math.round(rest/months/10)*10;
+  const plan=`<div class="plan">
+    <div class="r"><span>${title}</span><b>${fmt(a.price)} €</b></div>
+    <div class="r"><span>${tr.rAvans}</span><b>${fmt(avans)} €</b></div>
+    <div class="r"><span>${tr.rRest}</span><b>${fmt(rest)} €</b></div>
+    <div class="r"><span>${tr.rMonths}</span><b>${months}</b></div>
+    <div class="r"><span>${tr.rMonthly}</span><b>${fmt(monthly)} €</b></div>
+  </div>`;
+  await bot(tr.ratePlan(title)+plan+`<div class="why">${tr.rHint}</div>`, 550);
+}
+window.calcRate=calcRate;
+
+async function bookViewing(key){
+  const a=APARTS[key], tr=T[lang];
+  const title=`${tr.roomsName[a.rooms]}, ${COMPLEXES[a.cx].name}`;
+  pendingView=title;
+  chipsEl.innerHTML='';
+  await bot(tr.viewBooked(title), 500);
+  tr.viewSlots.forEach(s=>{const b=document.createElement('button');b.textContent=s;b.onclick=()=>pickSlot(s);chipsEl.appendChild(b);});
+}
+window.bookViewing=bookViewing;
+async function pickSlot(s){
+  chipsEl.innerHTML=''; addUser(s); pendingView=null;
+  await bot(T[lang].viewDone(s), 550); await bot(backBtn(),300);
+}
+
+async function reserve(key,btn){
+  const a=APARTS[key], tr=T[lang];
+  if(a.status!=='disp'){ await bot(tr.alreadyRez); return; }
+  const title=`${tr.roomsName[a.rooms]}, ${COMPLEXES[a.cx].name} (${a.block})`;
+  await bot(tr.reserved(title), 550);
+  await bot(backBtn(),300);
+}
+window.reserve=reserve;
+
+/* ---------- MENIU ---------- */
+function menuBtns(items, single){
+  return `<div class="menu${single?' single':''}">`+items.map(i=>`<button onclick="${i.fn}"><span class="mi">${i.ic}</span>${i.label}</button>`).join('')+`</div>`;
+}
+async function menuMain(){
+  const tr=T[lang]; chipsEl.innerHTML='';
+  await bot(tr.menuTitle+menuBtns([
+    {ic:"🔎",label:tr.mSearch,fn:"searchStart()"},
+    {ic:"🧮",label:tr.mRate,fn:"rateStart()"},
+    {ic:"📅",label:tr.mViewing,fn:"searchStart()"},
+    {ic:"🏗️",label:tr.mBuild,fn:"buildStart()"},
+    {ic:"🔖",label:tr.mRes,fn:"myRes()"},
+    {ic:"💰",label:tr.mPay,fn:"myPay()"},
+    {ic:"📍",label:tr.mContact,fn:"contactInfo()"},
+    {ic:"💡",label:tr.mFeedback,fn:"feedbackFlow()"}
+  ]), 350);
+}
+window.menuMain=menuMain;
+function backBtn(){ return menuBtns([{ic:"⬅",label:T[lang].backMenu,fn:"menuMain()"}], true); }
+
+async function searchStart(){ await bot(T[lang].searchPrompt); setSearchChips(); }
+window.searchStart=searchStart;
+async function rateStart(){ pendingRate=false; await bot(T[lang].needSearch); await doSearch({}); }
+window.rateStart=rateStart;
+async function buildStart(){
+  const tr=T[lang];
+  const items=Object.keys(COMPLEXES).map(k=>({ic:"🏗️",label:COMPLEXES[k].name,fn:`showBuild('${k}')`}));
+  await bot(tr.buildPrompt+menuBtns(items));
+}
+window.buildStart=buildStart;
+async function showBuild(k){
+  const tr=T[lang], c=COMPLEXES[k], line={name:c.name,phase:c.phase[lang],term:c.term[lang]};
+  await bot(tr.buildLine(line)+`<div class="prog"><i style="width:${c.pct}%"></i></div><div style="text-align:right;font-weight:700;color:var(--brand-d);margin-top:4px">${c.pct}%</div>`+backBtn());
+}
+window.showBuild=showBuild;
+
+async function myRes(){ await bot(T[lang].resText+`<div class="offer"><span>${T[lang].resLine}</span></div>`+backBtn()); }
+window.myRes=myRes;
+async function myPay(){
+  const tr=T[lang];
+  const rows=`<div class="offer"><span><b>Avans</b> · 16 140 €</span><span class="st paid">${lang==='ro'?'achitat':'оплачено'}</span></div>`+
+             `<div class="offer"><span><b>Rata 03/24</b> · 1 570 €</span><span class="st paid">${lang==='ro'?'achitat':'оплачено'}</span></div>`+
+             `<div class="offer"><span><b>Rata 04/24</b> · 1 570 €</span><span class="st wait">${lang==='ro'?'scadentă':'к оплате'}</span></div>`;
+  await bot(tr.payText+rows+`<div class="why">${tr.payNote}</div>`+backBtn());
+}
+window.myPay=myPay;
+async function contactInfo(){ await bot(T[lang].contactText+backBtn()); }
+window.contactInfo=contactInfo;
+async function feedbackFlow(){ chipsEl.innerHTML=''; pendingFeedback=true; await bot(T[lang].fbPrompt); }
+window.feedbackFlow=feedbackFlow;
+async function sendFeedback(text){
+  const tr=T[lang];
+  const href="mailto:oghiletki@gmail.com?subject="+encodeURIComponent("Idee pentru asistentul GO CRM (A-casa)")+"&body="+encodeURIComponent(text);
+  const link=`<div class="menu single"><a href="${href}" style="display:flex;align-items:center;gap:8px;border:1px solid var(--brand);background:var(--brand-l);border-radius:10px;padding:9px 11px;font-size:12.5px;font-weight:600;color:var(--brand-d);text-decoration:none"><span class="mi">✉️</span>${tr.fbSend}</a></div>`;
+  await bot(tr.fbThanks+link+backBtn());
+}
+
+/* ---------- CĂUTARE ---------- */
+function parseRooms(t){
+  if(/studio|garsonier|гарсоньер|студи/.test(t)) return 0;
+  let m=t.match(/(\d)\s*(camer|camere|комн|-комн|к\b)/); if(m) return parseInt(m[1]);
+  m=t.match(/\b(o|una)\s+camer/); if(m) return 1;
+  return null;
+}
+function parseBudget(t){
+  let m=t.match(/(\d[\d\s.,]*)\s*(k|mii|тыс)/i); if(m) return Math.round(parseFloat(m[1].replace(/[\s.,]/g,''))*1000);
+  m=t.match(/(\d[\d\s.]{2,})/); if(m){ const v=parseInt(m[1].replace(/[\s.]/g,'')); return v; }
+  return null;
+}
+async function doSearch({rooms,budget}){
+  const tr=T[lang];
+  let list=Object.keys(APARTS).filter(k=>APARTS[k].status==='disp');
+  if(cx!=='all') list=list.filter(k=>APARTS[k].cx===cx);
+  let filtered=list.slice();
+  if(rooms!=null) filtered=filtered.filter(k=>APARTS[k].rooms===rooms);
+  if(budget!=null) filtered=filtered.filter(k=>APARTS[k].price<=budget*1.02);
+  filtered.sort((a,b)=>APARTS[a].price-APARTS[b].price);
+  let none=false;
+  if(filtered.length===0){ none=true; filtered=list.sort((a,b)=>APARTS[a].price-APARTS[b].price).slice(0,3); }
+  else filtered=filtered.slice(0,3);
+  await bot(none?tr.noneFound:tr.foundIntro(filtered.length), 550);
+  for(const k of filtered){ await bot(apartCard(k), 340); }
+  await bot(backBtn(),280);
+}
+async function searchFromText(t){
+  const rooms=parseRooms(t), budget=parseBudget(t);
+  await doSearch({rooms,budget});
+}
+
+/* ---------- ROUTER ---------- */
+const KW={
+  menu:['meniu','menu','меню'],
+  build:['constru','șantier','santier','gata','termen','stadiu','стро','сдач','готов','когда'],
+  pay:['plat','rate','achit','grafic','плат','рассроч','оплат','взнос'],
+  res:['rezerv','бронь','мои брон'],
+  view:['vizion','vedea','vezi apart','просмотр','посмотр'],
+  contact:['contact','birou','adres','контакт','офис','адрес'],
+  greet:['salut','buna','bună','noroc','здрав','привет','добр'],
+  search:['camer','studio','garsonier','buget','apartament','ieftin','disponibil','vedere','комн','студи','бюджет','квартир','ищу','доступ','дешев','вид']
+};
+const has=(t,a)=>a.some(k=>t.includes(k));
+
+async function handle(text){
+  const t=text.toLowerCase().trim(), tr=T[lang];
+  if(pendingFeedback){ pendingFeedback=false; await sendFeedback(text); return; }
+  if(has(t,KW.menu)){ await menuMain(); return; }
+  if(has(t,KW.greet)&&t.length<14){ await bot(tr.greet); await menuMain(); return; }
+  if(has(t,KW.build)){ await buildStart(); return; }
+  if(has(t,KW.pay)&&!has(t,KW.search)){ await myPay(); return; }
+  if(has(t,KW.res)){ await myRes(); return; }
+  if(has(t,KW.contact)){ await contactInfo(); return; }
+  // căutare: dacă apar camere/buget/cuvinte de căutare
+  if(parseRooms(t)!=null || parseBudget(t)!=null || has(t,KW.search) || has(t,KW.view)){ await searchFromText(t); return; }
+  await bot(tr.fallback); setSearchChips();
+}
+
+/* ---------- CHIPS / INPUT / SELECTOARE ---------- */
+function setSearchChips(){
+  chipsEl.innerHTML='';
+  T[lang].searchChips.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.onclick=()=>send(c);chipsEl.appendChild(b);});
+}
+async function send(text){
+  if(!text) text=input.value.trim(); if(!text) return;
+  input.value=''; addUser(text); chipsEl.innerHTML=''; await handle(text);
+}
+$('#send').onclick=()=>send();
+$('#menu-btn').onclick=()=>{ chipsEl.innerHTML=''; menuMain(); };
+input.addEventListener('keydown',e=>{ if(e.key==='Enter') send(); });
+
+document.querySelectorAll('#seg-cx button').forEach(b=>{b.onclick=()=>{document.querySelectorAll('#seg-cx button').forEach(x=>x.classList.remove('on'));b.classList.add('on');cx=b.dataset.c;sysMsg(T[lang].cxChanged(cxName[cx][lang]));};});
+
+/* ---------- LIMBĂ ---------- */
+function applyLang(){
+  const tr=T[lang]; document.documentElement.lang=lang;
+  input.placeholder=tr.placeholder;
+  $('#c-name').textContent=tr.name; $('#c-status').textContent=tr.status;
+  $('#t-badge').textContent=tr.badge; $('#t-note').textContent=tr.tnote;
+  $('#p-h1').textContent=tr.h1; $('#p-lead').textContent=tr.lead;
+  $('#f1b').textContent=tr.f1b; $('#f1s').textContent=tr.f1s;
+  $('#f2b').textContent=tr.f2b; $('#f2s').textContent=tr.f2s;
+  $('#f3b').textContent=tr.f3b; $('#f3s').textContent=tr.f3s;
+  $('#f4b').textContent=tr.f4b; $('#f4s').textContent=tr.f4s;
+  $('#p-foot').textContent=tr.foot;
+  $('#lbl-cx').textContent=tr.lblCx; $('#lock-txt').textContent=tr.lockTxt;
+  $('#legal').textContent=tr.legal;
+}
+document.querySelectorAll('.lang button').forEach(b=>{b.onclick=()=>{document.querySelectorAll('.lang button').forEach(x=>x.classList.remove('on'));b.classList.add('on');lang=b.dataset.l;pendingRate=false;pendingView=null;applyLang();msgs.innerHTML='';boot();};});
+
+async function boot(){ applyLang(); await bot(T[lang].greet,400); await menuMain(); }
+boot();
+</script>
+</body>
+</html>
