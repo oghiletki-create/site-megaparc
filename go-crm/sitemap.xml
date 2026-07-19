@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://goproperty.digital/</loc>
+    <lastmod>2026-07-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="ro" href="https://goproperty.digital/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://goproperty.digital/ru.html"/>
+  </url>
+  <url>
+    <loc>https://goproperty.digital/ru.html</loc>
+    <lastmod>2026-07-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ro" href="https://goproperty.digital/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://goproperty.digital/ru.html"/>
+  </url>
+</urlset>
