@@ -17,7 +17,7 @@ implementare și suport direct de la autor.
 - Preț: 4.500 EUR/an (implementare, instruire, mentenanță incluse) sau 3.000 EUR implementare + 220 EUR/lună; preț fix, fără cost per utilizator
 - Clienți activi: Construct Resurs Holding (EcoFloor, Decor Park), Simplex
 - Poziționare: alternativa locală la CRM-urile rusești Bitrix24 și AmoCRM
-- Context legal: Legea 195/2024 privind facturarea electronică intră în vigoare la 23 august 2026 și obligă companiile din Moldova să treacă la procese digitale
+- Context legal: Legea 195/2024 privind protecția datelor cu caracter personal (echivalentul GDPR european) se aplică obligatoriu din 23 august 2026 — companiile din Moldova trebuie să-și digitalizeze și să-și securizeze evidența datelor
 - Contact: Telegram @oleg_ghiletchi · https://goproperty.digital
 
 ## Ce automatizează
