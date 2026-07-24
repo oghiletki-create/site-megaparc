@@ -129,7 +129,8 @@ td:last-child, th:last-child { text-align: right; }
   <header>
     <h1>GO CRM — Panou analitic</h1>
     <span id="badge" class="badge">SE ÎNCARCĂ…</span>
-    <button id="theme" class="theme-btn" type="button">Temă: auto</button>
+    <button id="refresh-now" class="theme-btn" type="button" style="margin-left:auto">↻ Actualizează</button>
+    <button id="theme" class="theme-btn" type="button" style="margin-left:0">Temă: auto</button>
   </header>
   <p class="sub" id="sub">Vânzări și lead-uri din sistemul de automatizare direct în Telegram</p>
 
@@ -478,8 +479,9 @@ function renderAll(kpi, live) {
   badge.textContent = live ? 'DATE LIVE' : 'DEMO · date exemplu'
   badge.classList.toggle('live', live)
   const when = new Date(kpi.generatedAt)
+  const autoNote = live ? ` · reîmprospătare automată la ${REFRESH_SECONDS} s` : ''
   document.getElementById('sub').textContent =
-    `Vânzări și lead-uri din sistemul de automatizare direct în Telegram · actualizat ${when.toLocaleString('ro-RO', { dateStyle: 'medium', timeStyle: 'short' })}`
+    `Vânzări și lead-uri din sistemul de automatizare direct în Telegram · actualizat ${when.toLocaleString('ro-RO', { dateStyle: 'medium', timeStyle: 'short' })}${autoNote}`
   if (kpi.revenueHint) document.getElementById('hint-revenue').textContent = kpi.revenueHint
   renderTiles(kpi)
   renderLine(kpi.leadsPerDay)
@@ -489,17 +491,45 @@ function renderAll(kpi, live) {
   if (kpi.oneC) renderOneC(kpi.oneC, kpi.currency)
 }
 
-async function load() {
+const REFRESH_SECONDS = Math.max(15, parseInt(new URLSearchParams(location.search).get('refresh') || '60', 10) || 60)
+let lastGoodAt = null
+
+async function fetchKpi() {
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), 5000)
   try {
-    const ctrl = new AbortController()
-    const timer = setTimeout(() => ctrl.abort(), 2500)
-    const res = await fetch('/api/kpi' + location.search, { signal: ctrl.signal })
-    clearTimeout(timer)
+    const res = await fetch('/api/kpi' + location.search, { signal: ctrl.signal, cache: 'no-store' })
     if (!res.ok) throw new Error('api')
-    renderAll(await res.json(), true)
-  } catch {
-    renderAll(DEMO, false)
+    return await res.json()
+  } finally {
+    clearTimeout(timer)
   }
+}
+
+function setOfflineBadge() {
+  const badge = document.getElementById('badge')
+  const ora = lastGoodAt ? lastGoodAt.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }) : ''
+  badge.textContent = 'FĂRĂ CONEXIUNE · ultimele date ' + ora
+  badge.classList.remove('live')
+}
+
+async function refresh(first) {
+  try {
+    const kpi = await fetchKpi()
+    lastGoodAt = new Date()
+    renderAll(kpi, true)
+  } catch {
+    if (first || !lastGoodAt) renderAll(DEMO, false)
+    else setOfflineBadge()
+  }
+}
+
+async function load() {
+  await refresh(true)
+  if (location.protocol !== 'file:') {
+    setInterval(() => refresh(false), REFRESH_SECONDS * 1000)
+  }
+  document.getElementById('refresh-now').addEventListener('click', () => refresh(false))
 }
 
 const themeBtn = document.getElementById('theme')

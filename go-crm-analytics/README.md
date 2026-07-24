@@ -213,6 +213,21 @@ setInterval(() => {
 - Pentru un link permanent pentru client, pune serverul în spatele unui
   reverse proxy cu HTTPS (Caddy sau nginx) sau al unui tunel (Cloudflare Tunnel).
 
+## Deschidere pe calculator, mereu actualizat
+
+- Deschide în browser linkul primit de la comanda `/analitica` (sau
+  `http://adresa:port/dashboard?token=...`). Pagina **reîmprospătează datele
+  automat la fiecare 60 de secunde**, fără reîncărcare — poate sta deschisă
+  permanent pe un monitor. Intervalul se schimbă din URL: `&refresh=30`
+  (minim 15 secunde). Butonul „↻ Actualizează" forțează o actualizare imediată.
+- Dacă serverul devine inaccesibil, pagina afișează „FĂRĂ CONEXIUNE · ultimele
+  date HH:MM" și păstrează ultimele cifre; la revenirea conexiunii trece
+  singură înapoi pe „DATE LIVE".
+- Ca să arate ca o aplicație de sine stătătoare: în Chrome/Edge deschide
+  linkul → meniul ⋮ → „Salvează și partajează" → „Creează scurtătură…" (bifează
+  „Deschide ca fereastră"). Apare o iconiță pe desktop care deschide direct
+  panoul, fără bara de browser.
+
 ## De ce așa și nu Power BI
 
 Power BI ar cere licențe Pro (~14 $/utilizator/lună), export de date din SQLite
