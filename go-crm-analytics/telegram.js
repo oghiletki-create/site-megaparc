@@ -30,6 +30,24 @@ function formatRaport(kpi) {
       lines.push(`• ${src.sursa}: <b>${nf.format(src.numar)}</b>`)
     }
   }
+  if (kpi.business) {
+    const b = kpi.business
+    lines.push('')
+    lines.push('<b>📦 Activitate generală:</b>')
+    if (b.clients) {
+      lines.push(`🧑‍💼 Clienți activi: <b>${nf.format(b.clients.activi)}</b> din ${nf.format(b.clients.total)} · Restanțieri: <b>${nf.format(b.clients.restante)}</b> · Pe Telegram: <b>${nf.format(b.clients.portalActiv)}</b>`)
+    }
+    if (b.payments) {
+      const medie = b.payments.medieZileIntarziere != null ? ` (medie ${b.payments.medieZileIntarziere} zile)` : ''
+      lines.push(`💵 Încasat luna curentă: <b>${nf.format(b.payments.incasatLunaCurenta)} ${kpi.currency}</b> · Plăți întârziate 30 zile: <b>${nf.format(b.payments.intarziate30d)}</b>${medie}`)
+    }
+    if (b.tasks) {
+      lines.push(`📋 Sarcini active: <b>${nf.format(b.tasks.active)}</b>, din care întârziate: <b>${nf.format(b.tasks.intarziate)}</b>` + (b.adminTasks ? ` · Sarcini admin: <b>${nf.format(b.adminTasks.active)}</b>` : ''))
+    }
+    if (b.prospects) {
+      lines.push(`🎯 Prospecți: <b>${nf.format(b.prospects.total)}</b> (` + b.prospects.byStatus.map(p => `${p.status}: ${p.numar}`).join(', ') + ')')
+    }
+  }
   if (kpi.callCenter) {
     const cc = kpi.callCenter
     lines.push('')

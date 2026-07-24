@@ -82,7 +82,7 @@ h1 { font-size: 22px; font-weight: 700; }
 .badge.live { color: var(--delta-good); border-color: currentColor; }
 .sub { color: var(--text-secondary); font-size: 13px; margin-bottom: 20px; }
 .theme-btn {
-  margin-left: auto; cursor: pointer; font-size: 13px;
+  cursor: pointer; font-size: 13px;
   background: var(--surface-1); color: var(--text-secondary);
   border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px;
 }
@@ -102,6 +102,7 @@ h1 { font-size: 22px; font-weight: 700; }
 .card.wide { grid-column: 1 / -1; }
 .card h2 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
 .card .hint { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+.card .tiles .tile { border-color: var(--grid); }
 svg { display: block; width: 100%; height: auto; }
 svg text { font-family: inherit; }
 .tick { font-size: 10px; fill: var(--text-muted); font-variant-numeric: tabular-nums; }
@@ -127,154 +128,202 @@ td:last-child, th:last-child { text-align: right; }
 <body>
 <div class="wrap">
   <header>
-    <h1>GO CRM — Panou analitic</h1>
-    <span id="badge" class="badge">SE ÎNCARCĂ…</span>
-    <button id="refresh-now" class="theme-btn" type="button" style="margin-left:auto">↻ Actualizează</button>
-    <button id="theme" class="theme-btn" type="button" style="margin-left:0">Temă: auto</button>
+    <h1 data-i18n="title">GO CRM — Panou analitic</h1>
+    <span id="badge" class="badge">…</span>
+    <button id="refresh-now" class="theme-btn" type="button" style="margin-left:auto">↻</button>
+    <button id="lang" class="theme-btn" type="button">Русский</button>
+    <button id="theme" class="theme-btn" type="button">Temă: auto</button>
   </header>
-  <p class="sub" id="sub">Vânzări și lead-uri din sistemul de automatizare direct în Telegram</p>
+  <p class="sub" id="sub"></p>
 
   <div class="tiles" id="tiles"></div>
 
   <div class="grid">
     <div class="card wide">
-      <h2>Lead-uri noi pe zi</h2>
-      <p class="hint">Ultimele 30 de zile</p>
+      <h2 data-i18n="cardLine">Lead-uri noi pe zi</h2>
+      <p class="hint" data-i18n="hintLine">Ultimele 30 de zile</p>
       <div id="chart-line"></div>
-      <details><summary>Vezi tabelul</summary><div id="table-line"></div></details>
+      <details><summary data-i18n="seeTable">Vezi tabelul</summary><div id="table-line"></div></details>
     </div>
     <div class="card">
-      <h2>Pâlnia de vânzări</h2>
-      <p class="hint">Lead-uri care au atins fiecare etapă · 90 de zile</p>
+      <h2 data-i18n="cardFunnel">Pâlnia de vânzări</h2>
+      <p class="hint" data-i18n="hintFunnel">Lead-uri care au atins fiecare etapă · 90 de zile</p>
       <div id="chart-funnel"></div>
-      <details><summary>Vezi tabelul</summary><div id="table-funnel"></div></details>
+      <details><summary data-i18n="seeTable">Vezi tabelul</summary><div id="table-funnel"></div></details>
     </div>
     <div class="card">
-      <h2>Venit pe lună</h2>
-      <p class="hint" id="hint-revenue">Vânzări încheiate · ultimele 6 luni</p>
+      <h2 data-i18n="cardRevenue">Venit pe lună</h2>
+      <p class="hint" id="hint-revenue" data-i18n="hintRevenue">Vânzări încheiate · ultimele 6 luni</p>
       <div id="chart-revenue"></div>
-      <details><summary>Vezi tabelul</summary><div id="table-revenue"></div></details>
+      <details><summary data-i18n="seeTable">Vezi tabelul</summary><div id="table-revenue"></div></details>
     </div>
     <div class="card wide">
-      <h2>Top surse de lead-uri</h2>
-      <p class="hint">Ultimele 30 de zile</p>
+      <h2 data-i18n="cardSources">Top surse de lead-uri</h2>
+      <p class="hint" data-i18n="hintSources">Ultimele 30 de zile</p>
       <div id="chart-sources"></div>
-      <details><summary>Vezi tabelul</summary><div id="table-sources"></div></details>
+      <details><summary data-i18n="seeTable">Vezi tabelul</summary><div id="table-sources"></div></details>
+    </div>
+    <div class="card wide" id="card-business" hidden>
+      <h2 data-i18n="cardBiz">Activitate generală</h2>
+      <p class="hint" data-i18n="hintBiz">Clienți, încasări și sarcini · situația curentă</p>
+      <div class="tiles" id="biz-tiles" style="margin-bottom:14px"></div>
+      <div id="chart-prospects"></div>
+      <details id="biz-details" hidden><summary data-i18n="seeTable">Vezi tabelul</summary><div id="table-prospects"></div></details>
     </div>
     <div class="card wide" id="card-callcenter" hidden>
-      <h2>Call center</h2>
-      <p class="hint">Prelucrarea lead-urilor · ultimele 30 de zile</p>
+      <h2 data-i18n="cardCC">Call center</h2>
+      <p class="hint" data-i18n="hintCC">Prelucrarea lead-urilor · ultimele 30 de zile</p>
       <div class="tiles" id="cc-tiles" style="margin-bottom:14px"></div>
       <div id="chart-callcenter"></div>
-      <details><summary>Vezi tabelul</summary><div id="table-callcenter"></div></details>
+      <details><summary data-i18n="seeTable">Vezi tabelul</summary><div id="table-callcenter"></div></details>
     </div>
     <div class="card wide" id="card-departments" hidden>
-      <h2>Departamente</h2>
-      <p class="hint">Sarcini finalizate · ultimele 30 de zile</p>
+      <h2 data-i18n="cardDeps">Departamente</h2>
+      <p class="hint" data-i18n="hintDeps">Sarcini finalizate · ultimele 30 de zile</p>
       <div id="chart-departments"></div>
-      <details><summary>Vezi tabelul</summary><div id="table-departments"></div></details>
+      <details><summary data-i18n="seeTable">Vezi tabelul</summary><div id="table-departments"></div></details>
     </div>
     <div class="card" id="card-1c-revenue" hidden>
-      <h2>Venit facturat în 1C</h2>
-      <p class="hint">Documente de vânzare din 1C · ultimele 6 luni</p>
+      <h2 data-i18n="card1cRev">Venit facturat în 1C</h2>
+      <p class="hint" data-i18n="hint1cRev">Documente de vânzare din 1C · ultimele 6 luni</p>
       <div id="chart-1c-revenue"></div>
-      <details><summary>Vezi tabelul</summary><div id="table-1c-revenue"></div></details>
+      <details><summary data-i18n="seeTable">Vezi tabelul</summary><div id="table-1c-revenue"></div></details>
     </div>
     <div class="card" id="card-1c-clients" hidden>
-      <h2>Top clienți în 1C</h2>
-      <p class="hint">După suma facturată · 90 de zile</p>
+      <h2 data-i18n="card1cCli">Top clienți în 1C</h2>
+      <p class="hint" data-i18n="hint1cCli">După suma facturată · 90 de zile</p>
       <div id="chart-1c-clients"></div>
-      <details><summary>Vezi tabelul</summary><div id="table-1c-clients"></div></details>
+      <details><summary data-i18n="seeTable">Vezi tabelul</summary><div id="table-1c-clients"></div></details>
     </div>
   </div>
 </div>
 <div id="tooltip"></div>
 
 <script>
-const DEMO = (() => {
-  const counts = [4,3,5,2,6,4,5,7,3,6,8,5,7,9,6,4,8,10,7,9,11,8,6,12,9,11,13,10,12,14]
-  const start = new Date('2026-06-24T00:00:00Z')
-  const leadsPerDay = counts.map((n, i) => ({
-    zi: new Date(start.getTime() + i * 86400000).toISOString().slice(0, 10),
-    numar: n
-  }))
-  return {
-    generatedAt: '2026-07-24T09:00:00Z',
-    currency: 'MDL',
-    totals: { leads30d: 224, won30d: 38, conversionRate: 17.0, revenue30d: 214500, avgResponseMinutes: 12 },
-    leadsPerDay,
-    funnel: [
-      { stadiu: 'Nou', numar: 224 },
-      { stadiu: 'Contactat', numar: 163 },
-      { stadiu: 'Ofertă', numar: 91 },
-      { stadiu: 'Câștigat', numar: 38 }
-    ],
-    revenueByMonth: [
-      { luna: '2026-02', total: 96500 },
-      { luna: '2026-03', total: 118200 },
-      { luna: '2026-04', total: 104700 },
-      { luna: '2026-05', total: 141300 },
-      { luna: '2026-06', total: 168900 },
-      { luna: '2026-07', total: 214500 }
-    ],
-    topSources: [
-      { sursa: 'Telegram', numar: 74 },
-      { sursa: 'Recomandări', numar: 41 },
-      { sursa: 'Instagram', numar: 32 },
-      { sursa: 'Facebook', numar: 24 },
-      { sursa: 'Site', numar: 15 }
-    ],
-    departments: [
-      { departament: 'Vânzări', angajati: 3, sarciniActive: 5, finalizate30d: 24, laTimp30d: 21, rataLaTimp: 88, notaMedie: 8.4 },
-      { departament: 'Administrativ', angajati: 2, sarciniActive: 3, finalizate30d: 17, laTimp30d: 15, rataLaTimp: 88, notaMedie: 7.9 },
-      { departament: 'Contabilitate', angajati: 1, sarciniActive: 2, finalizate30d: 9, laTimp30d: 9, rataLaTimp: 100, notaMedie: 9.1 }
-    ],
-    callCenter: {
-      apeluri30d: 186, contactati30d: 124, castigati30d: 21,
-      rataContactare: 67, reactieMedieMinute: 14, procesatePct: 93,
-      perAgent: [
-        { agent: 'Ana Rusu', apeluri: 78, contactati: 55, castigati: 9 },
-        { agent: 'Ion Cebanu', apeluri: 64, contactati: 41, castigati: 7 },
-        { agent: 'Maria Popa', apeluri: 44, contactati: 28, castigati: 5 }
-      ]
-    },
-    oneC: {
-      revenue30d: 268400,
-      revenueByMonth: [
-        { luna: '2026-02', total: 132800 },
-        { luna: '2026-03', total: 151400 },
-        { luna: '2026-04', total: 128900 },
-        { luna: '2026-05', total: 176300 },
-        { luna: '2026-06', total: 203700 },
-        { luna: '2026-07', total: 268400 }
-      ],
-      topClients: [
-        { client: 'Alfa Construct SRL', total: 184200 },
-        { client: 'MegaTrade SRL', total: 121500 },
-        { client: 'Danube Logistic SRL', total: 96800 },
-        { client: 'Vitalux Grup SRL', total: 74300 },
-        { client: 'Rontex Impex SRL', total: 52100 }
-      ]
-    }
+const STR = {
+  ro: {
+    title: 'GO CRM — Panou analitic',
+    loading: 'SE ÎNCARCĂ…',
+    live: 'DATE LIVE',
+    demo: 'DEMO · date exemplu',
+    offline: 'FĂRĂ CONEXIUNE · ultimele date',
+    sub: 'Vânzări și lead-uri din sistemul de automatizare direct în Telegram',
+    updated: 'actualizat',
+    auto: 'reîmprospătare automată la {s} s',
+    refresh: '↻ Actualizează',
+    themeAuto: 'Temă: auto', themeLight: 'Temă: luminoasă', themeDark: 'Temă: întunecată',
+    langBtn: 'Русский',
+    tileLeads: 'Lead-uri noi · 30 zile', tileConv: 'Rată de conversie',
+    tileRevenue: 'Venit · 30 zile', tileResponse: 'Timp mediu de răspuns', tile1c: 'Venit facturat 1C · 30 zile',
+    cardLine: 'Lead-uri noi pe zi', hintLine: 'Ultimele 30 de zile',
+    cardFunnel: 'Pâlnia de vânzări', hintFunnel: 'Lead-uri care au atins fiecare etapă · 90 de zile',
+    cardRevenue: 'Venit pe lună', hintRevenue: 'Vânzări încheiate · ultimele 6 luni',
+    cardSources: 'Top surse de lead-uri', hintSources: 'Ultimele 30 de zile',
+    cardCC: 'Call center', hintCC: 'Prelucrarea lead-urilor · ultimele 30 de zile',
+    ccCalls: 'Apeluri', ccContacted: 'Contactați', ccReaction: 'Reacție medie la lead', ccProcessed: 'Lead-uri preluate',
+    cardBiz: 'Activitate generală', hintBiz: 'Clienți, încasări și sarcini · situația curentă',
+    bizClients: 'Clienți activi', bizRestante: 'Restanțieri', bizPortal: 'Conectați la Telegram',
+    bizIncasat: 'Încasat luna curentă', bizLate: 'Plăți întârziate · 30 zile', bizAvgLate: 'medie {z} zile',
+    bizTasksLate: 'Sarcini întârziate', bizAdminTasks: 'Sarcini admin active',
+    prospectsTitle: 'Prospecți pe status', thStatus: 'Status', thProspects: 'Prospecți', wFrom: 'din',
+    cardDeps: 'Departamente', hintDeps: 'Sarcini finalizate · ultimele 30 de zile',
+    card1cRev: 'Venit facturat în 1C', hint1cRev: 'Documente de vânzare din 1C · ultimele 6 luni',
+    card1cCli: 'Top clienți în 1C', hint1cCli: 'După suma facturată · 90 de zile',
+    seeTable: 'Vezi tabelul',
+    thDay: 'Zi', thLeads: 'Lead-uri', thStage: 'Etapă', thMonth: 'Luna', thRevenue: 'Venit',
+    thSource: 'Sursă', thAgent: 'Agent', thCalls: 'Apeluri', thContacted: 'Contactați', thWon: 'Câștigați',
+    thDep: 'Departament', thEmployees: 'Angajați', thActive: 'Sarcini active', thDone30: 'Finalizate 30 zile',
+    thOnTime: '% la timp', thAiScore: 'Nota AI', thClient: 'Client', thBilled: 'Facturat',
+    wLeads: 'lead-uri', wOfTotal: 'din total', wCalls: 'apeluri', wContacted: 'contactați', wWon: 'câștigați',
+    wEmployees: 'angajați', wActive: 'sarcini active', wOnTime: 'la timp', wAi: 'nota AI', wDone: 'finalizate',
+    min: 'min'
+  },
+  ru: {
+    title: 'GO CRM — Аналитическая панель',
+    loading: 'ЗАГРУЗКА…',
+    live: 'ЖИВЫЕ ДАННЫЕ',
+    demo: 'ДЕМО · примерные данные',
+    offline: 'НЕТ СВЯЗИ · последние данные',
+    sub: 'Продажи и лиды из системы автоматизации прямо в Telegram',
+    updated: 'обновлено',
+    auto: 'автообновление каждые {s} с',
+    refresh: '↻ Обновить',
+    themeAuto: 'Тема: авто', themeLight: 'Тема: светлая', themeDark: 'Тема: тёмная',
+    langBtn: 'Română',
+    tileLeads: 'Новые лиды · 30 дней', tileConv: 'Конверсия',
+    tileRevenue: 'Доход · 30 дней', tileResponse: 'Среднее время ответа', tile1c: 'Выставлено в 1С · 30 дней',
+    cardLine: 'Новые лиды по дням', hintLine: 'Последние 30 дней',
+    cardFunnel: 'Воронка продаж', hintFunnel: 'Лиды, достигшие каждого этапа · 90 дней',
+    cardRevenue: 'Доход по месяцам', hintRevenue: 'Закрытые продажи · последние 6 месяцев',
+    cardSources: 'Топ источников лидов', hintSources: 'Последние 30 дней',
+    cardCC: 'Колл-центр', hintCC: 'Обработка лидов · последние 30 дней',
+    ccCalls: 'Звонки', ccContacted: 'Связались', ccReaction: 'Средняя реакция на лид', ccProcessed: 'Лиды в работе',
+    cardBiz: 'Общая активность', hintBiz: 'Клиенты, поступления и задачи · текущее состояние',
+    bizClients: 'Активные клиенты', bizRestante: 'Должники', bizPortal: 'Подключены к Telegram',
+    bizIncasat: 'Поступило в этом месяце', bizLate: 'Просроченные платежи · 30 дней', bizAvgLate: 'в среднем {z} дн.',
+    bizTasksLate: 'Просроченные задачи', bizAdminTasks: 'Активные задачи админа',
+    prospectsTitle: 'Проспекты по статусам', thStatus: 'Статус', thProspects: 'Проспекты', wFrom: 'из',
+    cardDeps: 'Отделы', hintDeps: 'Выполненные задачи · последние 30 дней',
+    card1cRev: 'Выставлено в 1С', hint1cRev: 'Документы продаж из 1С · последние 6 месяцев',
+    card1cCli: 'Топ клиентов в 1С', hint1cCli: 'По сумме счетов · 90 дней',
+    seeTable: 'Показать таблицу',
+    thDay: 'День', thLeads: 'Лиды', thStage: 'Этап', thMonth: 'Месяц', thRevenue: 'Доход',
+    thSource: 'Источник', thAgent: 'Агент', thCalls: 'Звонки', thContacted: 'Связались', thWon: 'Выиграно',
+    thDep: 'Отдел', thEmployees: 'Сотрудники', thActive: 'Активные задачи', thDone30: 'Выполнено · 30 дней',
+    thOnTime: '% в срок', thAiScore: 'Оценка ИИ', thClient: 'Клиент', thBilled: 'Выставлено',
+    wLeads: 'лидов', wOfTotal: 'от всех', wCalls: 'звонков', wContacted: 'связались', wWon: 'выиграно',
+    wEmployees: 'сотрудников', wActive: 'активных задач', wOnTime: 'в срок', wAi: 'оценка ИИ', wDone: 'выполнено',
+    min: 'мин'
   }
-})()
-
-const nf = new Intl.NumberFormat('ro-RO')
-const tooltip = document.getElementById('tooltip')
-const MONTHS = ['ian', 'feb', 'mar', 'apr', 'mai', 'iun', 'iul', 'aug', 'sep', 'oct', 'nov', 'dec']
-
-function cssVar(name) {
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim()
 }
+
+const DATA_RU = {
+  'Nou': 'Новый', 'Calificat': 'Квалифицирован', 'Contactat': 'Связались',
+  'Ofertă trimisă': 'Оферта отправлена', 'Câștigat': 'Выигран',
+  'Contactat­': 'Связались', 'Ofertă': 'Оферта',
+  'Vânzări': 'Продажи', 'Contabilitate': 'Бухгалтерия', 'Administrativ': 'Администрация',
+  'Fără departament': 'Без отдела', 'Recomandări': 'Рекомендации', 'Site': 'Сайт',
+  'necunoscut': 'неизвестно', 'nespecificat': 'не указано',
+  'Încasări înregistrate · ultimele 6 luni': 'Зарегистрированные поступления · последние 6 месяцев'
+}
+
+const PROSPECT_LABELS = {
+  ro: { NOU: 'Nou', CONTACTAT: 'Contactat', PREZENTARE_FACUTA: 'Prezentare făcută', INSCRIS: 'Înscris', ARHIVAT: 'Arhivat' },
+  ru: { NOU: 'Новый', CONTACTAT: 'Связались', PREZENTARE_FACUTA: 'Презентация проведена', INSCRIS: 'Записан', ARHIVAT: 'Архив' }
+}
+const pl = s => (PROSPECT_LABELS[LANG] && PROSPECT_LABELS[LANG][s]) || s
+
+const MONTHS_BY_LANG = {
+  ro: ['ian', 'feb', 'mar', 'apr', 'mai', 'iun', 'iul', 'aug', 'sep', 'oct', 'nov', 'dec'],
+  ru: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек']
+}
+
+const urlLang = new URLSearchParams(location.search).get('lang')
+let LANG = urlLang === 'ru' || urlLang === 'ro' ? urlLang : null
+if (!LANG) {
+  try { LANG = localStorage.getItem('gocrm_lang') } catch {}
+}
+if (LANG !== 'ru') LANG = LANG === 'ro' ? 'ro' : 'ro'
+
+const t = k => (STR[LANG] && STR[LANG][k]) || STR.ro[k] || k
+const dl = s => (LANG === 'ru' && DATA_RU[s]) || s
+const locale = () => LANG === 'ru' ? 'ru-RU' : 'ro-RO'
+let nf = new Intl.NumberFormat(locale())
+
+let lastKpi = null
+let lastLive = false
+let lastGoodAt = null
+
+const tooltip = document.getElementById('tooltip')
 
 function fmtDay(iso) {
   const d = new Date(iso + 'T00:00:00Z')
-  return d.getUTCDate() + ' ' + MONTHS[d.getUTCMonth()]
+  return d.getUTCDate() + ' ' + MONTHS_BY_LANG[LANG][d.getUTCMonth()]
 }
 
 function fmtMonth(ym) {
   const [y, m] = ym.split('-')
-  return MONTHS[+m - 1] + ' ' + y
+  return MONTHS_BY_LANG[LANG][+m - 1] + ' ' + y
 }
 
 function fmtK(v) {
@@ -320,18 +369,25 @@ function roundedRight(x, y, w, h, r) {
   return `M${x},${y} H${x + w - rr} Q${x + w},${y} ${x + w},${y + rr} V${y + h - rr} Q${x + w},${y + h} ${x + w - rr},${y + h} H${x} Z`
 }
 
+function fillTable(id, head, rows) {
+  document.getElementById(id).innerHTML =
+    `<table><thead><tr>${head.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>` +
+    rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('') +
+    '</tbody></table>'
+}
+
 function renderTiles(kpi) {
-  const t = kpi.totals
+  const tot = kpi.totals
   const items = [
-    { label: 'Lead-uri noi · 30 zile', value: nf.format(t.leads30d), unit: '' },
-    { label: 'Rată de conversie', value: String(t.conversionRate).replace('.', ','), unit: '%' },
-    { label: 'Venit · 30 zile', value: nf.format(t.revenue30d), unit: kpi.currency }
+    { label: t('tileLeads'), value: nf.format(tot.leads30d), unit: '' },
+    { label: t('tileConv'), value: String(tot.conversionRate).replace('.', ','), unit: '%' },
+    { label: t('tileRevenue'), value: nf.format(tot.revenue30d), unit: kpi.currency }
   ]
-  if (t.avgResponseMinutes != null) {
-    items.push({ label: 'Timp mediu de răspuns', value: nf.format(t.avgResponseMinutes), unit: 'min' })
+  if (tot.avgResponseMinutes != null) {
+    items.push({ label: t('tileResponse'), value: nf.format(tot.avgResponseMinutes), unit: t('min') })
   }
   if (kpi.oneC) {
-    items.push({ label: 'Venit facturat 1C · 30 zile', value: nf.format(kpi.oneC.revenue30d), unit: kpi.currency })
+    items.push({ label: t('tile1c'), value: nf.format(kpi.oneC.revenue30d), unit: kpi.currency })
   }
   document.getElementById('tiles').innerHTML = items.map(i =>
     `<div class="tile"><div class="label">${i.label}</div><div class="value">${i.value}<span class="unit">${i.unit}</span></div></div>`
@@ -344,7 +400,7 @@ function renderLine(rows) {
   const max = niceMax(Math.max(...rows.map(r => r.numar)))
   const x = i => padL + (rows.length > 1 ? i / (rows.length - 1) * iw : iw / 2)
   const y = v => padT + ih - v / max * ih
-  const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Lead-uri noi pe zi' })
+  const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': t('cardLine') })
 
   for (let g = 0; g <= 4; g++) {
     const gy = padT + ih - g / 4 * ih
@@ -376,7 +432,7 @@ function renderLine(rows) {
     const i = Math.max(0, Math.min(rows.length - 1, Math.round((mx - padL) / iw * (rows.length - 1))))
     cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.setAttribute('visibility', 'visible')
     dot.setAttribute('cx', x(i)); dot.setAttribute('cy', y(rows[i].numar)); dot.setAttribute('visibility', 'visible')
-    showTip(`${fmtDay(rows[i].zi)}: <b>${nf.format(rows[i].numar)}</b> lead-uri`, ev.clientX, ev.clientY)
+    showTip(`${fmtDay(rows[i].zi)}: <b>${nf.format(rows[i].numar)}</b> ${t('wLeads')}`, ev.clientX, ev.clientY)
   })
   hover.addEventListener('mouseleave', () => {
     cross.setAttribute('visibility', 'hidden')
@@ -386,28 +442,28 @@ function renderLine(rows) {
   svg.appendChild(hover)
 
   document.getElementById('chart-line').replaceChildren(svg)
-  fillTable('table-line', ['Zi', 'Lead-uri'], rows.map(r => [fmtDay(r.zi), nf.format(r.numar)]))
+  fillTable('table-line', [t('thDay'), t('thLeads')], rows.map(r => [fmtDay(r.zi), nf.format(r.numar)]))
 }
 
 function renderFunnel(rows) {
-  const W = 460, rowH = 34, gap = 10, padT = 4, labelW = 90
+  const W = 460, rowH = 34, gap = 10, padT = 4, labelW = 130
   const H = padT + rows.length * (rowH + gap)
   const max = rows.length ? rows[0].numar : 1
   const iw = W - labelW - 56
-  const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Pâlnia de vânzări' })
+  const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': t('cardFunnel') })
   rows.forEach((r, i) => {
     const y0 = padT + i * (rowH + gap)
     const w = Math.max(4, r.numar / max * iw)
     const p = el('path', { d: roundedRight(labelW, y0, w, rowH, 4), fill: `var(--funnel-${Math.min(i + 1, 5)})` })
     const pct = Math.round(r.numar / max * 100)
-    p.addEventListener('mousemove', ev => showTip(`${r.stadiu}: <b>${nf.format(r.numar)}</b> (${pct}% din total)`, ev.clientX, ev.clientY))
+    p.addEventListener('mousemove', ev => showTip(`${dl(r.stadiu)}: <b>${nf.format(r.numar)}</b> (${pct}% ${t('wOfTotal')})`, ev.clientX, ev.clientY))
     p.addEventListener('mouseleave', hideTip)
     svg.appendChild(p)
-    svg.appendChild(el('text', { x: labelW - 8, y: y0 + rowH / 2 + 4, 'text-anchor': 'end', class: 'blabel' }, r.stadiu))
+    svg.appendChild(el('text', { x: labelW - 8, y: y0 + rowH / 2 + 4, 'text-anchor': 'end', class: 'blabel' }, dl(r.stadiu)))
     svg.appendChild(el('text', { x: labelW + w + 8, y: y0 + rowH / 2 + 4, class: 'dlabel' }, nf.format(r.numar)))
   })
   document.getElementById('chart-funnel').replaceChildren(svg)
-  fillTable('table-funnel', ['Etapă', 'Lead-uri'], rows.map(r => [r.stadiu, nf.format(r.numar)]))
+  fillTable('table-funnel', [t('thStage'), t('thLeads')], rows.map(r => [dl(r.stadiu), nf.format(r.numar)]))
 }
 
 function renderRevenue(rows, currency, chartId = 'chart-revenue', tableId = 'table-revenue', color = 'var(--series-1)') {
@@ -416,7 +472,7 @@ function renderRevenue(rows, currency, chartId = 'chart-revenue', tableId = 'tab
   const max = niceMax(Math.max(...rows.map(r => r.total)))
   const slot = iw / rows.length
   const bw = Math.min(46, slot - 8)
-  const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Venit pe lună' })
+  const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': t('cardRevenue') })
 
   for (let g = 0; g <= 4; g++) {
     const gy = padT + ih - g / 4 * ih
@@ -439,7 +495,7 @@ function renderRevenue(rows, currency, chartId = 'chart-revenue', tableId = 'tab
     }
   })
   document.getElementById(chartId).replaceChildren(svg)
-  fillTable(tableId, ['Luna', `Venit (${currency})`], rows.map(r => [fmtMonth(r.luna), nf.format(r.total)]))
+  fillTable(tableId, [t('thMonth'), `${t('thRevenue')} (${currency})`], rows.map(r => [fmtMonth(r.luna), nf.format(r.total)]))
 }
 
 function renderHBars(items, opts) {
@@ -463,49 +519,86 @@ function renderHBars(items, opts) {
 }
 
 function renderSources(rows) {
-  renderHBars(rows.map(r => ({ label: r.sursa, value: r.numar })), {
+  renderHBars(rows.map(r => ({ label: dl(r.sursa), value: r.numar })), {
     chartId: 'chart-sources',
     tableId: 'table-sources',
-    ariaLabel: 'Top surse de lead-uri',
-    tableHead: ['Sursă', 'Lead-uri'],
+    ariaLabel: t('cardSources'),
+    tableHead: [t('thSource'), t('thLeads')],
     fmt: v => nf.format(v),
-    tip: r => `${r.label}: <b>${nf.format(r.value)}</b> lead-uri`
+    tip: r => `${r.label}: <b>${nf.format(r.value)}</b> ${t('wLeads')}`
   })
 }
 
 function renderDepartments(rows) {
   document.getElementById('card-departments').hidden = false
-  renderHBars(rows.map(r => ({ label: r.departament, value: r.finalizate30d, extra: r })), {
+  renderHBars(rows.map(r => ({ label: dl(r.departament), value: r.finalizate30d, extra: r })), {
     chartId: 'chart-departments',
     tableId: 'table-departments',
-    ariaLabel: 'Sarcini finalizate pe departament',
-    tableHead: ['Departament', 'Finalizate 30 zile'],
+    ariaLabel: t('cardDeps'),
+    tableHead: [t('thDep'), t('thDone30')],
     labelW: 150,
     fmt: v => nf.format(v),
     tip: r => {
       const e = r.extra
-      const parts = [`${nf.format(e.angajati)} angajați`, `${nf.format(e.sarciniActive)} sarcini active`]
-      if (e.rataLaTimp != null) parts.push(`${e.rataLaTimp}% la timp`)
-      if (e.notaMedie != null) parts.push(`nota AI ${String(e.notaMedie).replace('.', ',')}`)
-      return `<b>${r.label}</b>: ${nf.format(r.value)} finalizate · ` + parts.join(' · ')
+      const parts = [`${nf.format(e.angajati)} ${t('wEmployees')}`, `${nf.format(e.sarciniActive)} ${t('wActive')}`]
+      if (e.rataLaTimp != null) parts.push(`${e.rataLaTimp}% ${t('wOnTime')}`)
+      if (e.notaMedie != null) parts.push(`${t('wAi')} ${String(e.notaMedie).replace('.', ',')}`)
+      return `<b>${r.label}</b>: ${nf.format(r.value)} ${t('wDone')} · ` + parts.join(' · ')
     }
   })
   fillTable('table-departments',
-    ['Departament', 'Angajați', 'Sarcini active', 'Finalizate 30 zile', '% la timp', 'Nota AI'],
+    [t('thDep'), t('thEmployees'), t('thActive'), t('thDone30'), t('thOnTime'), t('thAiScore')],
     rows.map(r => [
-      r.departament, nf.format(r.angajati), nf.format(r.sarciniActive), nf.format(r.finalizate30d),
+      dl(r.departament), nf.format(r.angajati), nf.format(r.sarciniActive), nf.format(r.finalizate30d),
       r.rataLaTimp != null ? r.rataLaTimp + '%' : '—',
       r.notaMedie != null ? String(r.notaMedie).replace('.', ',') : '—'
     ]))
 }
 
+function renderBusiness(biz, currency) {
+  document.getElementById('card-business').hidden = false
+  const tiles = []
+  if (biz.clients) {
+    tiles.push({ label: t('bizClients'), value: nf.format(biz.clients.activi), unit: ` ${t('wFrom')} ${nf.format(biz.clients.total)}` })
+    tiles.push({ label: t('bizRestante'), value: nf.format(biz.clients.restante), unit: '' })
+    tiles.push({ label: t('bizPortal'), value: nf.format(biz.clients.portalActiv), unit: '' })
+  }
+  if (biz.payments) {
+    tiles.push({ label: t('bizIncasat'), value: nf.format(biz.payments.incasatLunaCurenta), unit: currency })
+    tiles.push({
+      label: t('bizLate'), value: nf.format(biz.payments.intarziate30d),
+      unit: biz.payments.medieZileIntarziere != null ? ` · ${t('bizAvgLate').replace('{z}', biz.payments.medieZileIntarziere)}` : ''
+    })
+  }
+  if (biz.tasks) tiles.push({ label: t('bizTasksLate'), value: nf.format(biz.tasks.intarziate), unit: '' })
+  if (biz.adminTasks) tiles.push({ label: t('bizAdminTasks'), value: nf.format(biz.adminTasks.active), unit: '' })
+  document.getElementById('biz-tiles').innerHTML = tiles.map(i =>
+    `<div class="tile"><div class="label">${i.label}</div><div class="value">${i.value}<span class="unit">${i.unit}</span></div></div>`
+  ).join('')
+  const hasProspects = biz.prospects && biz.prospects.byStatus.length
+  document.getElementById('biz-details').hidden = !hasProspects
+  if (hasProspects) {
+    renderHBars(biz.prospects.byStatus.map(r => ({ label: pl(r.status), value: r.numar })), {
+      chartId: 'chart-prospects',
+      tableId: 'table-prospects',
+      ariaLabel: t('prospectsTitle'),
+      tableHead: [t('thStatus'), t('thProspects')],
+      labelW: 190,
+      fmt: v => nf.format(v),
+      tip: r => `${r.label}: <b>${nf.format(r.value)}</b>`
+    })
+  } else {
+    document.getElementById('chart-prospects').innerHTML = ''
+  }
+}
+
 function renderCallCenter(cc) {
   document.getElementById('card-callcenter').hidden = false
   const tiles = [
-    { label: 'Apeluri', value: nf.format(cc.apeluri30d), unit: '' },
-    { label: 'Contactați', value: nf.format(cc.contactati30d), unit: cc.rataContactare != null ? ` (${cc.rataContactare}%)` : '' },
-    { label: 'Reacție medie la lead', value: cc.reactieMedieMinute != null ? nf.format(cc.reactieMedieMinute) : '—', unit: cc.reactieMedieMinute != null ? 'min' : '' },
-    { label: 'Lead-uri preluate', value: cc.procesatePct != null ? cc.procesatePct : '—', unit: cc.procesatePct != null ? '%' : '' }
+    { label: t('ccCalls'), value: nf.format(cc.apeluri30d), unit: '' },
+    { label: t('ccContacted'), value: nf.format(cc.contactati30d), unit: cc.rataContactare != null ? ` (${cc.rataContactare}%)` : '' },
+    { label: t('ccReaction'), value: cc.reactieMedieMinute != null ? nf.format(cc.reactieMedieMinute) : '—', unit: cc.reactieMedieMinute != null ? t('min') : '' },
+    { label: t('ccProcessed'), value: cc.procesatePct != null ? cc.procesatePct : '—', unit: cc.procesatePct != null ? '%' : '' }
   ]
   document.getElementById('cc-tiles').innerHTML = tiles.map(i =>
     `<div class="tile"><div class="label">${i.label}</div><div class="value">${i.value}<span class="unit">${i.unit}</span></div></div>`
@@ -514,18 +607,18 @@ function renderCallCenter(cc) {
     renderHBars(cc.perAgent.map(r => ({ label: r.agent, value: r.apeluri, extra: r })), {
       chartId: 'chart-callcenter',
       tableId: 'table-callcenter',
-      ariaLabel: 'Apeluri pe agent',
-      tableHead: ['Agent', 'Apeluri'],
+      ariaLabel: t('cardCC'),
+      tableHead: [t('thAgent'), t('thCalls')],
       labelW: 150,
       fmt: v => nf.format(v),
-      tip: r => `<b>${r.label}</b>: ${nf.format(r.value)} apeluri · ${nf.format(r.extra.contactati)} contactați · ${nf.format(r.extra.castigati)} câștigați`
+      tip: r => `<b>${r.label}</b>: ${nf.format(r.value)} ${t('wCalls')} · ${nf.format(r.extra.contactati)} ${t('wContacted')} · ${nf.format(r.extra.castigati)} ${t('wWon')}`
     })
     fillTable('table-callcenter',
-      ['Agent', 'Apeluri', 'Contactați', 'Câștigați'],
+      [t('thAgent'), t('thCalls'), t('thContacted'), t('thWon')],
       cc.perAgent.map(r => [r.agent, nf.format(r.apeluri), nf.format(r.contactati), nf.format(r.castigati)]))
   } else {
     document.getElementById('chart-callcenter').innerHTML = ''
-    fillTable('table-callcenter', ['Agent', 'Apeluri', 'Contactați', 'Câștigați'], [])
+    fillTable('table-callcenter', [t('thAgent'), t('thCalls'), t('thContacted'), t('thWon')], [])
   }
 }
 
@@ -538,8 +631,8 @@ function renderOneC(oneC, currency) {
     renderHBars(oneC.topClients.map(r => ({ label: r.client, value: r.total })), {
       chartId: 'chart-1c-clients',
       tableId: 'table-1c-clients',
-      ariaLabel: 'Top clienți în 1C',
-      tableHead: ['Client', `Facturat (${currency})`],
+      ariaLabel: t('card1cCli'),
+      tableHead: [t('thClient'), `${t('thBilled')} (${currency})`],
       width: 460,
       labelW: 150,
       valueSpace: 70,
@@ -550,34 +643,113 @@ function renderOneC(oneC, currency) {
   }
 }
 
-function fillTable(id, head, rows) {
-  document.getElementById(id).innerHTML =
-    `<table><thead><tr>${head.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>` +
-    rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('') +
-    '</tbody></table>'
-}
-
 function renderAll(kpi, live) {
+  lastKpi = kpi
+  lastLive = live
   const badge = document.getElementById('badge')
-  badge.textContent = live ? 'DATE LIVE' : 'DEMO · date exemplu'
+  badge.textContent = live ? t('live') : t('demo')
   badge.classList.toggle('live', live)
   const when = new Date(kpi.generatedAt)
-  const autoNote = live ? ` · reîmprospătare automată la ${REFRESH_SECONDS} s` : ''
+  const autoNote = live ? ` · ${t('auto').replace('{s}', REFRESH_SECONDS)}` : ''
   document.getElementById('sub').textContent =
-    `Vânzări și lead-uri din sistemul de automatizare direct în Telegram · actualizat ${when.toLocaleString('ro-RO', { dateStyle: 'medium', timeStyle: 'short' })}${autoNote}`
-  if (kpi.revenueHint) document.getElementById('hint-revenue').textContent = kpi.revenueHint
+    `${t('sub')} · ${t('updated')} ${when.toLocaleString(locale(), { dateStyle: 'medium', timeStyle: 'short' })}${autoNote}`
+  if (kpi.revenueHint) document.getElementById('hint-revenue').textContent = dl(kpi.revenueHint)
   renderTiles(kpi)
   renderLine(kpi.leadsPerDay)
   renderFunnel(kpi.funnel)
   renderRevenue(kpi.revenueByMonth, kpi.currency)
   renderSources(kpi.topSources)
+  if (kpi.business) renderBusiness(kpi.business, kpi.currency)
   if (kpi.callCenter) renderCallCenter(kpi.callCenter)
   if (kpi.departments && kpi.departments.length) renderDepartments(kpi.departments)
   if (kpi.oneC) renderOneC(kpi.oneC, kpi.currency)
 }
 
+const DEMO = (() => {
+  const counts = [4,3,5,2,6,4,5,7,3,6,8,5,7,9,6,4,8,10,7,9,11,8,6,12,9,11,13,10,12,14]
+  const start = new Date('2026-06-24T00:00:00Z')
+  const leadsPerDay = counts.map((n, i) => ({
+    zi: new Date(start.getTime() + i * 86400000).toISOString().slice(0, 10),
+    numar: n
+  }))
+  return {
+    generatedAt: '2026-07-24T09:00:00Z',
+    currency: 'MDL',
+    totals: { leads30d: 224, won30d: 38, conversionRate: 17.0, revenue30d: 214500, avgResponseMinutes: 12 },
+    leadsPerDay,
+    funnel: [
+      { stadiu: 'Nou', numar: 224 },
+      { stadiu: 'Contactat', numar: 163 },
+      { stadiu: 'Ofertă trimisă', numar: 91 },
+      { stadiu: 'Câștigat', numar: 38 }
+    ],
+    revenueByMonth: [
+      { luna: '2026-02', total: 96500 },
+      { luna: '2026-03', total: 118200 },
+      { luna: '2026-04', total: 104700 },
+      { luna: '2026-05', total: 141300 },
+      { luna: '2026-06', total: 168900 },
+      { luna: '2026-07', total: 214500 }
+    ],
+    topSources: [
+      { sursa: 'Telegram', numar: 74 },
+      { sursa: 'Recomandări', numar: 41 },
+      { sursa: 'Instagram', numar: 32 },
+      { sursa: 'Facebook', numar: 24 },
+      { sursa: 'Site', numar: 15 }
+    ],
+    business: {
+      clients: { total: 42, activi: 38, restante: 6, portalActiv: 29 },
+      payments: { incasatLunaCurenta: 21430, intarziate30d: 4, medieZileIntarziere: 5 },
+      tasks: { active: 12, intarziate: 3 },
+      adminTasks: { active: 4 },
+      prospects: {
+        total: 57,
+        byStatus: [
+          { status: 'NOU', numar: 21 },
+          { status: 'CONTACTAT', numar: 14 },
+          { status: 'PREZENTARE_FACUTA', numar: 11 },
+          { status: 'INSCRIS', numar: 6 },
+          { status: 'ARHIVAT', numar: 5 }
+        ]
+      }
+    },
+    departments: [
+      { departament: 'Vânzări', angajati: 3, sarciniActive: 5, finalizate30d: 24, laTimp30d: 21, rataLaTimp: 88, notaMedie: 8.4 },
+      { departament: 'Administrativ', angajati: 2, sarciniActive: 3, finalizate30d: 17, laTimp30d: 15, rataLaTimp: 88, notaMedie: 7.9 },
+      { departament: 'Contabilitate', angajati: 1, sarciniActive: 2, finalizate30d: 9, laTimp30d: 9, rataLaTimp: 100, notaMedie: 9.1 }
+    ],
+    callCenter: {
+      apeluri30d: 186, contactati30d: 124, castigati30d: 21,
+      rataContactare: 67, reactieMedieMinute: 14, procesatePct: 93,
+      perAgent: [
+        { agent: 'Ana Rusu', apeluri: 78, contactati: 55, castigati: 9 },
+        { agent: 'Ion Cebanu', apeluri: 64, contactati: 41, castigati: 7 },
+        { agent: 'Maria Popa', apeluri: 44, contactati: 28, castigati: 5 }
+      ]
+    },
+    oneC: {
+      revenue30d: 268400,
+      revenueByMonth: [
+        { luna: '2026-02', total: 132800 },
+        { luna: '2026-03', total: 151400 },
+        { luna: '2026-04', total: 128900 },
+        { luna: '2026-05', total: 176300 },
+        { luna: '2026-06', total: 203700 },
+        { luna: '2026-07', total: 268400 }
+      ],
+      topClients: [
+        { client: 'Alfa Construct SRL', total: 184200 },
+        { client: 'MegaTrade SRL', total: 121500 },
+        { client: 'Danube Logistic SRL', total: 96800 },
+        { client: 'Vitalux Grup SRL', total: 74300 },
+        { client: 'Rontex Impex SRL', total: 52100 }
+      ]
+    }
+  }
+})()
+
 const REFRESH_SECONDS = Math.max(15, parseInt(new URLSearchParams(location.search).get('refresh') || '60', 10) || 60)
-let lastGoodAt = null
 
 async function fetchKpi() {
   const ctrl = new AbortController()
@@ -593,8 +765,8 @@ async function fetchKpi() {
 
 function setOfflineBadge() {
   const badge = document.getElementById('badge')
-  const ora = lastGoodAt ? lastGoodAt.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }) : ''
-  badge.textContent = 'FĂRĂ CONEXIUNE · ultimele date ' + ora
+  const ora = lastGoodAt ? lastGoodAt.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' }) : ''
+  badge.textContent = t('offline') + ' ' + ora
   badge.classList.remove('live')
 }
 
@@ -609,24 +781,46 @@ async function refresh(first) {
   }
 }
 
+const themeBtn = document.getElementById('theme')
+const themeOrder = ['auto', 'light', 'dark']
+let themeIdx = 0
+function themeLabel() {
+  return themeOrder[themeIdx] === 'auto' ? t('themeAuto') : themeOrder[themeIdx] === 'light' ? t('themeLight') : t('themeDark')
+}
+themeBtn.addEventListener('click', () => {
+  themeIdx = (themeIdx + 1) % themeOrder.length
+  const mode = themeOrder[themeIdx]
+  if (mode === 'auto') delete document.documentElement.dataset.theme
+  else document.documentElement.dataset.theme = mode
+  themeBtn.textContent = themeLabel()
+})
+
+function applyLang() {
+  document.documentElement.lang = LANG
+  document.title = t('title')
+  document.querySelectorAll('[data-i18n]').forEach(node => { node.textContent = t(node.dataset.i18n) })
+  document.getElementById('badge').textContent = t('loading')
+  document.getElementById('refresh-now').textContent = t('refresh')
+  document.getElementById('lang').textContent = t('langBtn')
+  themeBtn.textContent = themeLabel()
+  nf = new Intl.NumberFormat(locale())
+}
+
+document.getElementById('lang').addEventListener('click', () => {
+  LANG = LANG === 'ro' ? 'ru' : 'ro'
+  try { localStorage.setItem('gocrm_lang', LANG) } catch {}
+  applyLang()
+  if (lastKpi) renderAll(lastKpi, lastLive)
+})
+
 async function load() {
+  applyLang()
   await refresh(true)
   if (location.protocol !== 'file:') {
     setInterval(() => refresh(false), REFRESH_SECONDS * 1000)
   }
   document.getElementById('refresh-now').addEventListener('click', () => refresh(false))
 }
-
-const themeBtn = document.getElementById('theme')
-const themeOrder = ['auto', 'light', 'dark']
-let themeIdx = 0
-themeBtn.addEventListener('click', () => {
-  themeIdx = (themeIdx + 1) % themeOrder.length
-  const mode = themeOrder[themeIdx]
-  if (mode === 'auto') delete document.documentElement.dataset.theme
-  else document.documentElement.dataset.theme = mode
-  themeBtn.textContent = 'Temă: ' + (mode === 'auto' ? 'auto' : mode === 'light' ? 'luminoasă' : 'întunecată')
-})
 
 load()
 </script>

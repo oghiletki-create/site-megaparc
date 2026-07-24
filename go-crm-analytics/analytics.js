@@ -16,6 +16,7 @@ const defaultSchema = {
   oneCTable: null,
   departments: null,
   callCenter: null,
+  business: null,
   currency: 'MDL'
 }
 
@@ -242,6 +243,63 @@ async function collectKpi(queryAll, overrides = {}) {
     }
   }
 
+  let business = null
+  if (s.business) {
+    const b = {
+      clientsTable: 'clients', paymentsTable: 'payments', tasksTable: 'tasks',
+      adminTasksTable: 'admin_tasks', prospectsTable: 'prospects', ...s.business
+    }
+    business = {}
+    try {
+      const cl = await queryAll(
+        `SELECT COUNT(*) AS total,
+                SUM(CASE WHEN status = 'activ' THEN 1 ELSE 0 END) AS activi,
+                SUM(CASE WHEN julianday(due_date) < julianday('now') THEN 1 ELSE 0 END) AS restante,
+                SUM(CASE WHEN telegram_id != '' THEN 1 ELSE 0 END) AS portal
+         FROM ${b.clientsTable}`
+      )
+      business.clients = cl[0] ? {
+        total: cl[0].total || 0, activi: cl[0].activi || 0,
+        restante: cl[0].restante || 0, portalActiv: cl[0].portal || 0
+      } : null
+    } catch { business.clients = null }
+    try {
+      const luna = await queryAll(
+        `SELECT COALESCE(SUM(amount_eur), 0) AS suma FROM ${b.paymentsTable} WHERE strftime('%Y-%m', date) = strftime('%Y-%m', 'now')`
+      )
+      const late = await queryAll(
+        `SELECT COUNT(*) AS numar, AVG(days_late) AS medie FROM ${b.paymentsTable} WHERE days_late > 0 AND julianday(date) >= julianday('now', '-29 days')`
+      )
+      business.payments = {
+        incasatLunaCurenta: luna[0] ? luna[0].suma : 0,
+        intarziate30d: late[0] ? late[0].numar || 0 : 0,
+        medieZileIntarziere: late[0] && late[0].medie != null ? Math.round(late[0].medie) : null
+      }
+    } catch { business.payments = null }
+    try {
+      const tk = await queryAll(
+        `SELECT SUM(CASE WHEN done = 0 THEN 1 ELSE 0 END) AS active,
+                SUM(CASE WHEN done = 0 AND deadline IS NOT NULL AND deadline != '' AND julianday(deadline) < julianday('now') THEN 1 ELSE 0 END) AS intarziate
+         FROM ${b.tasksTable}`
+      )
+      business.tasks = tk[0] ? { active: tk[0].active || 0, intarziate: tk[0].intarziate || 0 } : null
+    } catch { business.tasks = null }
+    try {
+      const at = await queryAll(`SELECT COUNT(*) AS active FROM ${b.adminTasksTable} WHERE done = 0`)
+      business.adminTasks = at[0] ? { active: at[0].active || 0 } : null
+    } catch { business.adminTasks = null }
+    try {
+      const pr = await queryAll(
+        `SELECT status, COUNT(*) AS numar FROM ${b.prospectsTable} GROUP BY status ORDER BY numar DESC`
+      )
+      const totalProspecti = pr.reduce((acc, r) => acc + r.numar, 0)
+      business.prospects = totalProspecti > 0 ? { total: totalProspecti, byStatus: pr } : null
+    } catch { business.prospects = null }
+    if (!business.clients && !business.payments && !business.tasks && !business.adminTasks && !business.prospects) {
+      business = null
+    }
+  }
+
   return {
     generatedAt: new Date().toISOString(),
     currency: s.currency,
@@ -259,6 +317,7 @@ async function collectKpi(queryAll, overrides = {}) {
     topSources,
     departments,
     callCenter,
+    business,
     oneC
   }
 }
