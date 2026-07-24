@@ -14,6 +14,8 @@ const defaultSchema = {
   revenueAmountColumn: 'amount',
   revenueHint: null,
   oneCTable: null,
+  departments: null,
+  callCenter: null,
   currency: 'MDL'
 }
 
@@ -136,6 +138,110 @@ async function collectKpi(queryAll, overrides = {}) {
     }
   }
 
+  let departments = null
+  if (s.departments) {
+    const d = { employeesTable: 'employees', tasksTable: 'tasks', ...s.departments }
+    try {
+      const emp = await queryAll(
+        `SELECT COALESCE(NULLIF(department, ''), 'Fără departament') AS departament, COUNT(*) AS angajati FROM ${d.employeesTable} GROUP BY departament`
+      )
+      const taskRows = await queryAll(
+        `SELECT COALESCE(NULLIF(e.department, ''), 'Fără departament') AS departament,
+           SUM(CASE WHEN t.done = 0 THEN 1 ELSE 0 END) AS active,
+           SUM(CASE WHEN t.done = 1 AND t.done_at IS NOT NULL AND date(t.done_at) >= date('now', '-29 days') THEN 1 ELSE 0 END) AS finalizate,
+           SUM(CASE WHEN t.done = 1 AND t.done_at IS NOT NULL AND date(t.done_at) >= date('now', '-29 days') AND (t.deadline IS NULL OR t.deadline = '' OR t.done_at <= t.deadline) THEN 1 ELSE 0 END) AS laTimp
+         FROM ${d.tasksTable} t LEFT JOIN ${d.employeesTable} e ON e.id = t.employee_id GROUP BY departament`
+      )
+      const evalRows = await queryAll(
+        `SELECT COALESCE(NULLIF(e.department, ''), 'Fără departament') AS departament, t.ai_evaluation AS evaluare
+         FROM ${d.tasksTable} t LEFT JOIN ${d.employeesTable} e ON e.id = t.employee_id
+         WHERE t.ai_evaluation IS NOT NULL AND t.ai_evaluation != '' AND t.done_at IS NOT NULL AND date(t.done_at) >= date('now', '-29 days')`
+      )
+      const noteByDep = new Map()
+      for (const r of evalRows) {
+        const m = /Nota\s+(\d+)\s*\/\s*10/i.exec(String(r.evaluare))
+        if (!m) continue
+        if (!noteByDep.has(r.departament)) noteByDep.set(r.departament, [])
+        noteByDep.get(r.departament).push(Number(m[1]))
+      }
+      const byDep = new Map()
+      for (const r of emp) {
+        byDep.set(r.departament, { departament: r.departament, angajati: r.angajati, sarciniActive: 0, finalizate30d: 0, laTimp30d: 0 })
+      }
+      for (const r of taskRows) {
+        const row = byDep.get(r.departament) || { departament: r.departament, angajati: 0, sarciniActive: 0, finalizate30d: 0, laTimp30d: 0 }
+        row.sarciniActive = r.active || 0
+        row.finalizate30d = r.finalizate || 0
+        row.laTimp30d = r.laTimp || 0
+        byDep.set(r.departament, row)
+      }
+      departments = [...byDep.values()].map(r => {
+        const note = noteByDep.get(r.departament)
+        return {
+          ...r,
+          rataLaTimp: r.finalizate30d > 0 ? Math.round(r.laTimp30d / r.finalizate30d * 100) : null,
+          notaMedie: note && note.length ? +(note.reduce((a, b) => a + b, 0) / note.length).toFixed(1) : null
+        }
+      }).sort((a, b) => b.finalizate30d - a.finalizate30d)
+    } catch {
+      departments = null
+    }
+  }
+
+  let callCenter = null
+  if (s.callCenter) {
+    const c = {
+      activitiesTable: 'lead_activities', employeesTable: 'employees',
+      callAction: 'status_calling', contactAction: 'status_contacted', wonAction: 'status_won',
+      newStatuses: ['new'], ...s.callCenter
+    }
+    try {
+      const actions = [c.callAction, c.contactAction, c.wonAction]
+      const tot = await queryAll(
+        `SELECT SUM(CASE WHEN action = ? THEN 1 ELSE 0 END) AS apeluri,
+                SUM(CASE WHEN action = ? THEN 1 ELSE 0 END) AS contactati,
+                SUM(CASE WHEN action = ? THEN 1 ELSE 0 END) AS castigati
+         FROM ${c.activitiesTable} WHERE date(created_at) >= date('now', '-29 days')`,
+        actions
+      )
+      const perAgent = await queryAll(
+        `SELECT COALESCE(NULLIF(e.name, ''), 'Agent ' || a.agent_id) AS agent,
+                SUM(CASE WHEN a.action = ? THEN 1 ELSE 0 END) AS apeluri,
+                SUM(CASE WHEN a.action = ? THEN 1 ELSE 0 END) AS contactati,
+                SUM(CASE WHEN a.action = ? THEN 1 ELSE 0 END) AS castigati
+         FROM ${c.activitiesTable} a LEFT JOIN ${c.employeesTable} e ON e.telegram_id = a.agent_id
+         WHERE date(a.created_at) >= date('now', '-29 days') AND a.agent_id != ''
+         GROUP BY agent HAVING apeluri + contactati + castigati > 0
+         ORDER BY apeluri DESC, contactati DESC LIMIT 8`,
+        actions
+      )
+      const reaction = await queryAll(
+        `SELECT AVG((julianday(fa.prima) - julianday(l.${s.createdAtColumn})) * 1440) AS minute
+         FROM ${s.leadsTable} l
+         JOIN (SELECT lead_id, MIN(created_at) AS prima FROM ${c.activitiesTable} GROUP BY lead_id) fa ON fa.lead_id = l.id
+         WHERE ${day} >= date('now', '-29 days') AND julianday(fa.prima) >= julianday(l.${s.createdAtColumn})`
+      )
+      const processed = await queryAll(
+        `SELECT COUNT(*) AS total, SUM(CASE WHEN ${s.statusColumn} NOT IN (${placeholders(c.newStatuses)}) THEN 1 ELSE 0 END) AS procesate
+         FROM ${s.leadsTable} WHERE ${day} >= date('now', '-29 days')`,
+        c.newStatuses
+      )
+      const apeluri = (tot[0] && tot[0].apeluri) || 0
+      const contactati = (tot[0] && tot[0].contactati) || 0
+      callCenter = {
+        apeluri30d: apeluri,
+        contactati30d: contactati,
+        castigati30d: (tot[0] && tot[0].castigati) || 0,
+        rataContactare: apeluri > 0 ? Math.round(contactati / apeluri * 100) : null,
+        reactieMedieMinute: reaction[0] && reaction[0].minute != null ? Math.round(reaction[0].minute) : null,
+        procesatePct: processed[0] && processed[0].total > 0 ? Math.round(processed[0].procesate / processed[0].total * 100) : null,
+        perAgent
+      }
+    } catch {
+      callCenter = null
+    }
+  }
+
   return {
     generatedAt: new Date().toISOString(),
     currency: s.currency,
@@ -151,6 +257,8 @@ async function collectKpi(queryAll, overrides = {}) {
     funnel,
     revenueByMonth,
     topSources,
+    departments,
+    callCenter,
     oneC
   }
 }

@@ -161,6 +161,19 @@ td:last-child, th:last-child { text-align: right; }
       <div id="chart-sources"></div>
       <details><summary>Vezi tabelul</summary><div id="table-sources"></div></details>
     </div>
+    <div class="card wide" id="card-callcenter" hidden>
+      <h2>Call center</h2>
+      <p class="hint">Prelucrarea lead-urilor · ultimele 30 de zile</p>
+      <div class="tiles" id="cc-tiles" style="margin-bottom:14px"></div>
+      <div id="chart-callcenter"></div>
+      <details><summary>Vezi tabelul</summary><div id="table-callcenter"></div></details>
+    </div>
+    <div class="card wide" id="card-departments" hidden>
+      <h2>Departamente</h2>
+      <p class="hint">Sarcini finalizate · ultimele 30 de zile</p>
+      <div id="chart-departments"></div>
+      <details><summary>Vezi tabelul</summary><div id="table-departments"></div></details>
+    </div>
     <div class="card" id="card-1c-revenue" hidden>
       <h2>Venit facturat în 1C</h2>
       <p class="hint">Documente de vânzare din 1C · ultimele 6 luni</p>
@@ -211,6 +224,20 @@ const DEMO = (() => {
       { sursa: 'Facebook', numar: 24 },
       { sursa: 'Site', numar: 15 }
     ],
+    departments: [
+      { departament: 'Vânzări', angajati: 3, sarciniActive: 5, finalizate30d: 24, laTimp30d: 21, rataLaTimp: 88, notaMedie: 8.4 },
+      { departament: 'Administrativ', angajati: 2, sarciniActive: 3, finalizate30d: 17, laTimp30d: 15, rataLaTimp: 88, notaMedie: 7.9 },
+      { departament: 'Contabilitate', angajati: 1, sarciniActive: 2, finalizate30d: 9, laTimp30d: 9, rataLaTimp: 100, notaMedie: 9.1 }
+    ],
+    callCenter: {
+      apeluri30d: 186, contactati30d: 124, castigati30d: 21,
+      rataContactare: 67, reactieMedieMinute: 14, procesatePct: 93,
+      perAgent: [
+        { agent: 'Ana Rusu', apeluri: 78, contactati: 55, castigati: 9 },
+        { agent: 'Ion Cebanu', apeluri: 64, contactati: 41, castigati: 7 },
+        { agent: 'Maria Popa', apeluri: 44, contactati: 28, castigati: 5 }
+      ]
+    },
     oneC: {
       revenue30d: 268400,
       revenueByMonth: [
@@ -446,6 +473,62 @@ function renderSources(rows) {
   })
 }
 
+function renderDepartments(rows) {
+  document.getElementById('card-departments').hidden = false
+  renderHBars(rows.map(r => ({ label: r.departament, value: r.finalizate30d, extra: r })), {
+    chartId: 'chart-departments',
+    tableId: 'table-departments',
+    ariaLabel: 'Sarcini finalizate pe departament',
+    tableHead: ['Departament', 'Finalizate 30 zile'],
+    labelW: 150,
+    fmt: v => nf.format(v),
+    tip: r => {
+      const e = r.extra
+      const parts = [`${nf.format(e.angajati)} angajați`, `${nf.format(e.sarciniActive)} sarcini active`]
+      if (e.rataLaTimp != null) parts.push(`${e.rataLaTimp}% la timp`)
+      if (e.notaMedie != null) parts.push(`nota AI ${String(e.notaMedie).replace('.', ',')}`)
+      return `<b>${r.label}</b>: ${nf.format(r.value)} finalizate · ` + parts.join(' · ')
+    }
+  })
+  fillTable('table-departments',
+    ['Departament', 'Angajați', 'Sarcini active', 'Finalizate 30 zile', '% la timp', 'Nota AI'],
+    rows.map(r => [
+      r.departament, nf.format(r.angajati), nf.format(r.sarciniActive), nf.format(r.finalizate30d),
+      r.rataLaTimp != null ? r.rataLaTimp + '%' : '—',
+      r.notaMedie != null ? String(r.notaMedie).replace('.', ',') : '—'
+    ]))
+}
+
+function renderCallCenter(cc) {
+  document.getElementById('card-callcenter').hidden = false
+  const tiles = [
+    { label: 'Apeluri', value: nf.format(cc.apeluri30d), unit: '' },
+    { label: 'Contactați', value: nf.format(cc.contactati30d), unit: cc.rataContactare != null ? ` (${cc.rataContactare}%)` : '' },
+    { label: 'Reacție medie la lead', value: cc.reactieMedieMinute != null ? nf.format(cc.reactieMedieMinute) : '—', unit: cc.reactieMedieMinute != null ? 'min' : '' },
+    { label: 'Lead-uri preluate', value: cc.procesatePct != null ? cc.procesatePct : '—', unit: cc.procesatePct != null ? '%' : '' }
+  ]
+  document.getElementById('cc-tiles').innerHTML = tiles.map(i =>
+    `<div class="tile"><div class="label">${i.label}</div><div class="value">${i.value}<span class="unit">${i.unit}</span></div></div>`
+  ).join('')
+  if (cc.perAgent && cc.perAgent.length) {
+    renderHBars(cc.perAgent.map(r => ({ label: r.agent, value: r.apeluri, extra: r })), {
+      chartId: 'chart-callcenter',
+      tableId: 'table-callcenter',
+      ariaLabel: 'Apeluri pe agent',
+      tableHead: ['Agent', 'Apeluri'],
+      labelW: 150,
+      fmt: v => nf.format(v),
+      tip: r => `<b>${r.label}</b>: ${nf.format(r.value)} apeluri · ${nf.format(r.extra.contactati)} contactați · ${nf.format(r.extra.castigati)} câștigați`
+    })
+    fillTable('table-callcenter',
+      ['Agent', 'Apeluri', 'Contactați', 'Câștigați'],
+      cc.perAgent.map(r => [r.agent, nf.format(r.apeluri), nf.format(r.contactati), nf.format(r.castigati)]))
+  } else {
+    document.getElementById('chart-callcenter').innerHTML = ''
+    fillTable('table-callcenter', ['Agent', 'Apeluri', 'Contactați', 'Câștigați'], [])
+  }
+}
+
 function renderOneC(oneC, currency) {
   document.getElementById('card-1c-revenue').hidden = false
   renderRevenue(oneC.revenueByMonth, currency, 'chart-1c-revenue', 'table-1c-revenue', 'var(--series-2)')
@@ -488,6 +571,8 @@ function renderAll(kpi, live) {
   renderFunnel(kpi.funnel)
   renderRevenue(kpi.revenueByMonth, kpi.currency)
   renderSources(kpi.topSources)
+  if (kpi.callCenter) renderCallCenter(kpi.callCenter)
+  if (kpi.departments && kpi.departments.length) renderDepartments(kpi.departments)
   if (kpi.oneC) renderOneC(kpi.oneC, kpi.currency)
 }
 
