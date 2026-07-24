@@ -127,6 +127,84 @@ setInterval(async () => {
 }, 60000)
 ```
 
+## Conectarea cu 1C (date automate din contabilitate)
+
+Modulul `sync-1c.js` trage automat documentele de vânzare din 1C:Enterprise
+(8.3+) în tabelul local `vanzari_1c`, iar dashboard-ul și raportul Telegram
+afișează secțiunea 1C de la sine: venit facturat pe 30 de zile, venit pe lună
+și top clienți. Sursa recomandată este interfața standard **OData** a 1C.
+
+### Pasul A — publică OData în 1C (o singură dată, la administratorul 1C)
+
+1. Baza 1C trebuie publicată pe un server web (Apache sau IIS): în
+   Configurator → «Администрирование → Публикация на веб-сервере», cu bifa
+   pentru interfața OData («Публиковать стандартный интерфейс OData»).
+2. În modul enterprise, activează entitățile expuse: «Все функции →
+   Обработки → Настройка состава стандартного интерфейса OData» și adaugă
+   documentul de vânzări (în configurațiile tipice:
+   `РеализацияТоваровУслуг`).
+3. Creează un utilizator 1C dedicat, doar cu drept de citire pe documentele
+   de vânzare — el va fi folosit de conector.
+4. Verifică în browser:
+   `http://server1c/numele_bazei/odata/standard.odata/Document_РеализацияТоваровУслуг?$format=json`
+   — trebuie să întorci JSON, cu autentificarea utilizatorului creat.
+
+### Pasul B — pornește sincronizarea în GO CRM
+
+Conectorul are nevoie și de o funcție de scriere `execute(sql, params)`:
+
+```js
+const execute = async (sql, params = []) => db.prepare(sql).run(...params)
+```
+
+Apoi, în `bot.js`:
+
+```js
+const { start1cSync } = require('./go-crm-analytics/sync-1c')
+
+start1cSync(execute, queryAll, {
+  baseUrl: 'http://server1c/numele_bazei/odata/standard.odata',
+  username: 'api_gocrm',
+  password: process.env.ONEC_PASSWORD,
+  intervalMinutes: 30
+})
+```
+
+și adaugă în schema transmisă la `collectKpi` / `createDashboardServer`:
+
+```js
+const schema = { ...restul_mapării, oneCTable: 'vanzari_1c' }
+```
+
+Prima rulare aduce istoricul (implicit ~13 luni, `sinceDays: 400`), apoi la
+fiecare 30 de minute aduce doar documentele noi sau modificate. Dacă numele
+documentului sau al câmpurilor diferă în configurația voastră 1C, transmite-le
+în opțiuni (`entity`, `amountField`, `dateField`, `numberField`). Câmpul
+`clientField` funcționează doar cu un atribut text direct pe document; numele
+clientului din referința `Контрагент` nu vine implicit prin OData — dacă îl
+vrei în topul de clienți, folosește varianta CSV de mai jos, unde exportul din
+1C poate include orice coloană.
+
+### Alternativă fără server web: export CSV programat din 1C
+
+Dacă baza 1C e „file-mode" și nu poate fi publicată pe web, configurează în 1C
+un export programat (регламентное задание) care scrie un CSV cu separator `;`
+și coloanele `id;numar;data;suma;client`, apoi importă-l periodic:
+
+```js
+const { import1cCsv } = require('./go-crm-analytics/sync-1c')
+setInterval(() => {
+  try { import1cCsv(execute, '/cale/spre/export_1c.csv') } catch {}
+}, 30 * 60000)
+```
+
+### Securitatea conexiunii 1C
+
+- Utilizatorul OData: doar drept de citire, doar pe obiectele necesare.
+- Parola stă în variabila de mediu `ONEC_PASSWORD`, nu în cod.
+- Dacă serverul 1C și GO CRM nu sunt în aceeași rețea, expune OData doar prin
+  VPN sau tunel HTTPS — niciodată direct în internet fără TLS.
+
 ## Securitate
 
 - Implicit serverul ascultă doar pe `127.0.0.1` — nu este expus în internet.

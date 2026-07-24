@@ -9,6 +9,7 @@ const defaultSchema = {
   stageOrder: ['nou', 'contactat', 'oferta', 'castigat'],
   stageLabels: { nou: 'Nou', contactat: 'Contactat', oferta: 'Ofertă', castigat: 'Câștigat' },
   wonStatuses: ['castigat'],
+  oneCTable: null,
   currency: 'MDL'
 }
 
@@ -86,6 +87,28 @@ async function collectKpi(queryAll, overrides = {}) {
     avgResponseMinutes = rt[0] && rt[0].minute != null ? Math.round(rt[0].minute) : null
   }
 
+  let oneC = null
+  if (s.oneCTable) {
+    try {
+      const rev = await queryAll(
+        `SELECT COALESCE(SUM(suma), 0) AS venit FROM ${s.oneCTable} WHERE date(data) >= date('now', '-29 days')`
+      )
+      const byMonth = await queryAll(
+        `SELECT strftime('%Y-%m', data) AS luna, SUM(suma) AS total FROM ${s.oneCTable} WHERE strftime('%Y-%m', data) >= strftime('%Y-%m', 'now', '-5 months') GROUP BY luna ORDER BY luna`
+      )
+      const topClients = await queryAll(
+        `SELECT COALESCE(client, 'nespecificat') AS client, SUM(suma) AS total FROM ${s.oneCTable} WHERE date(data) >= date('now', '-89 days') GROUP BY client ORDER BY total DESC LIMIT 5`
+      )
+      oneC = {
+        revenue30d: rev[0] ? rev[0].venit : 0,
+        revenueByMonth: byMonth,
+        topClients: topClients.some(c => c.client !== 'nespecificat') ? topClients : []
+      }
+    } catch {
+      oneC = null
+    }
+  }
+
   return {
     generatedAt: new Date().toISOString(),
     currency: s.currency,
@@ -99,7 +122,8 @@ async function collectKpi(queryAll, overrides = {}) {
     leadsPerDay,
     funnel,
     revenueByMonth,
-    topSources
+    topSources,
+    oneC
   }
 }
 

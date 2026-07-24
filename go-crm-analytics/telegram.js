@@ -30,6 +30,16 @@ function formatRaport(kpi) {
       lines.push(`• ${src.sursa}: <b>${nf.format(src.numar)}</b>`)
     }
   }
+  if (kpi.oneC) {
+    lines.push('')
+    lines.push(`🏢 Venit facturat în 1C (30 zile): <b>${nf.format(kpi.oneC.revenue30d)} ${kpi.currency}</b>`)
+    if (kpi.oneC.topClients.length) {
+      lines.push('<b>Top clienți 1C (90 zile):</b>')
+      for (const c of kpi.oneC.topClients) {
+        lines.push(`• ${c.client}: <b>${nf.format(c.total)} ${kpi.currency}</b>`)
+      }
+    }
+  }
   return lines.join('\n')
 }
 

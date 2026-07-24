@@ -16,6 +16,7 @@
   --baseline: #c3c2b7;
   --border: rgba(11,11,11,0.10);
   --series-1: #2a78d6;
+  --series-2: #eb6834;
   --delta-good: #006300;
   --funnel-1: #86b6ef;
   --funnel-2: #5598e7;
@@ -34,6 +35,7 @@
     --baseline: #383835;
     --border: rgba(255,255,255,0.10);
     --series-1: #3987e5;
+    --series-2: #d95926;
     --delta-good: #0ca30c;
     --funnel-1: #184f95;
     --funnel-2: #256abf;
@@ -52,6 +54,7 @@
   --baseline: #383835;
   --border: rgba(255,255,255,0.10);
   --series-1: #3987e5;
+  --series-2: #d95926;
   --delta-good: #0ca30c;
   --funnel-1: #184f95;
   --funnel-2: #256abf;
@@ -154,6 +157,18 @@ td:last-child, th:last-child { text-align: right; }
       <div id="chart-sources"></div>
       <details><summary>Vezi tabelul</summary><div id="table-sources"></div></details>
     </div>
+    <div class="card" id="card-1c-revenue" hidden>
+      <h2>Venit facturat în 1C</h2>
+      <p class="hint">Documente de vânzare din 1C · ultimele 6 luni</p>
+      <div id="chart-1c-revenue"></div>
+      <details><summary>Vezi tabelul</summary><div id="table-1c-revenue"></div></details>
+    </div>
+    <div class="card" id="card-1c-clients" hidden>
+      <h2>Top clienți în 1C</h2>
+      <p class="hint">După suma facturată · 90 de zile</p>
+      <div id="chart-1c-clients"></div>
+      <details><summary>Vezi tabelul</summary><div id="table-1c-clients"></div></details>
+    </div>
   </div>
 </div>
 <div id="tooltip"></div>
@@ -191,7 +206,25 @@ const DEMO = (() => {
       { sursa: 'Instagram', numar: 32 },
       { sursa: 'Facebook', numar: 24 },
       { sursa: 'Site', numar: 15 }
-    ]
+    ],
+    oneC: {
+      revenue30d: 268400,
+      revenueByMonth: [
+        { luna: '2026-02', total: 132800 },
+        { luna: '2026-03', total: 151400 },
+        { luna: '2026-04', total: 128900 },
+        { luna: '2026-05', total: 176300 },
+        { luna: '2026-06', total: 203700 },
+        { luna: '2026-07', total: 268400 }
+      ],
+      topClients: [
+        { client: 'Alfa Construct SRL', total: 184200 },
+        { client: 'MegaTrade SRL', total: 121500 },
+        { client: 'Danube Logistic SRL', total: 96800 },
+        { client: 'Vitalux Grup SRL', total: 74300 },
+        { client: 'Rontex Impex SRL', total: 52100 }
+      ]
+    }
   }
 })()
 
@@ -265,6 +298,9 @@ function renderTiles(kpi) {
   ]
   if (t.avgResponseMinutes != null) {
     items.push({ label: 'Timp mediu de răspuns', value: nf.format(t.avgResponseMinutes), unit: 'min' })
+  }
+  if (kpi.oneC) {
+    items.push({ label: 'Venit facturat 1C · 30 zile', value: nf.format(kpi.oneC.revenue30d), unit: kpi.currency })
   }
   document.getElementById('tiles').innerHTML = items.map(i =>
     `<div class="tile"><div class="label">${i.label}</div><div class="value">${i.value}<span class="unit">${i.unit}</span></div></div>`
@@ -343,7 +379,7 @@ function renderFunnel(rows) {
   fillTable('table-funnel', ['Etapă', 'Lead-uri'], rows.map(r => [r.stadiu, nf.format(r.numar)]))
 }
 
-function renderRevenue(rows, currency) {
+function renderRevenue(rows, currency, chartId = 'chart-revenue', tableId = 'table-revenue', color = 'var(--series-1)') {
   const W = 460, H = 240, padL = 52, padR = 10, padT = 22, padB = 26
   const iw = W - padL - padR, ih = H - padT - padB
   const max = niceMax(Math.max(...rows.map(r => r.total)))
@@ -362,7 +398,7 @@ function renderRevenue(rows, currency) {
     const h = Math.max(2, r.total / max * ih)
     const x0 = padL + i * slot + (slot - bw) / 2
     const y0 = padT + ih - h
-    const p = el('path', { d: roundedTop(x0, y0, bw, h, 4), fill: 'var(--series-1)' })
+    const p = el('path', { d: roundedTop(x0, y0, bw, h, 4), fill: color })
     p.addEventListener('mousemove', ev => showTip(`${fmtMonth(r.luna)}: <b>${nf.format(r.total)}</b> ${currency}`, ev.clientX, ev.clientY))
     p.addEventListener('mouseleave', hideTip)
     svg.appendChild(p)
@@ -371,28 +407,60 @@ function renderRevenue(rows, currency) {
       svg.appendChild(el('text', { x: x0 + bw / 2, y: y0 - 6, 'text-anchor': 'middle', class: 'dlabel' }, fmtK(r.total)))
     }
   })
-  document.getElementById('chart-revenue').replaceChildren(svg)
-  fillTable('table-revenue', ['Luna', `Venit (${currency})`], rows.map(r => [fmtMonth(r.luna), nf.format(r.total)]))
+  document.getElementById(chartId).replaceChildren(svg)
+  fillTable(tableId, ['Luna', `Venit (${currency})`], rows.map(r => [fmtMonth(r.luna), nf.format(r.total)]))
+}
+
+function renderHBars(items, opts) {
+  const W = opts.width || 960, rowH = 26, gap = 8, padT = 4, labelW = opts.labelW || 120
+  const H = padT + items.length * (rowH + gap)
+  const max = Math.max(...items.map(r => r.value))
+  const iw = W - labelW - (opts.valueSpace || 60)
+  const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': opts.ariaLabel })
+  items.forEach((r, i) => {
+    const y0 = padT + i * (rowH + gap)
+    const w = Math.max(4, r.value / max * iw)
+    const p = el('path', { d: roundedRight(labelW, y0, w, rowH, 4), fill: opts.color || 'var(--series-1)' })
+    p.addEventListener('mousemove', ev => showTip(opts.tip(r), ev.clientX, ev.clientY))
+    p.addEventListener('mouseleave', hideTip)
+    svg.appendChild(p)
+    svg.appendChild(el('text', { x: labelW - 8, y: y0 + rowH / 2 + 4, 'text-anchor': 'end', class: 'blabel' }, r.label))
+    svg.appendChild(el('text', { x: labelW + w + 8, y: y0 + rowH / 2 + 4, class: 'dlabel' }, opts.fmt(r.value)))
+  })
+  document.getElementById(opts.chartId).replaceChildren(svg)
+  fillTable(opts.tableId, opts.tableHead, items.map(r => [r.label, opts.fmt(r.value)]))
 }
 
 function renderSources(rows) {
-  const W = 960, rowH = 26, gap = 8, padT = 4, labelW = 120
-  const H = padT + rows.length * (rowH + gap)
-  const max = Math.max(...rows.map(r => r.numar))
-  const iw = W - labelW - 60
-  const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Top surse de lead-uri' })
-  rows.forEach((r, i) => {
-    const y0 = padT + i * (rowH + gap)
-    const w = Math.max(4, r.numar / max * iw)
-    const p = el('path', { d: roundedRight(labelW, y0, w, rowH, 4), fill: 'var(--series-1)' })
-    p.addEventListener('mousemove', ev => showTip(`${r.sursa}: <b>${nf.format(r.numar)}</b> lead-uri`, ev.clientX, ev.clientY))
-    p.addEventListener('mouseleave', hideTip)
-    svg.appendChild(p)
-    svg.appendChild(el('text', { x: labelW - 8, y: y0 + rowH / 2 + 4, 'text-anchor': 'end', class: 'blabel' }, r.sursa))
-    svg.appendChild(el('text', { x: labelW + w + 8, y: y0 + rowH / 2 + 4, class: 'dlabel' }, nf.format(r.numar)))
+  renderHBars(rows.map(r => ({ label: r.sursa, value: r.numar })), {
+    chartId: 'chart-sources',
+    tableId: 'table-sources',
+    ariaLabel: 'Top surse de lead-uri',
+    tableHead: ['Sursă', 'Lead-uri'],
+    fmt: v => nf.format(v),
+    tip: r => `${r.label}: <b>${nf.format(r.value)}</b> lead-uri`
   })
-  document.getElementById('chart-sources').replaceChildren(svg)
-  fillTable('table-sources', ['Sursă', 'Lead-uri'], rows.map(r => [r.sursa, nf.format(r.numar)]))
+}
+
+function renderOneC(oneC, currency) {
+  document.getElementById('card-1c-revenue').hidden = false
+  renderRevenue(oneC.revenueByMonth, currency, 'chart-1c-revenue', 'table-1c-revenue', 'var(--series-2)')
+  const hasClients = oneC.topClients && oneC.topClients.length > 0
+  document.getElementById('card-1c-clients').hidden = !hasClients
+  if (hasClients) {
+    renderHBars(oneC.topClients.map(r => ({ label: r.client, value: r.total })), {
+      chartId: 'chart-1c-clients',
+      tableId: 'table-1c-clients',
+      ariaLabel: 'Top clienți în 1C',
+      tableHead: ['Client', `Facturat (${currency})`],
+      width: 460,
+      labelW: 150,
+      valueSpace: 70,
+      color: 'var(--series-2)',
+      fmt: v => fmtK(v),
+      tip: r => `${r.label}: <b>${nf.format(r.value)}</b> ${currency}`
+    })
+  }
 }
 
 function fillTable(id, head, rows) {
@@ -414,6 +482,7 @@ function renderAll(kpi, live) {
   renderFunnel(kpi.funnel)
   renderRevenue(kpi.revenueByMonth, kpi.currency)
   renderSources(kpi.topSources)
+  if (kpi.oneC) renderOneC(kpi.oneC, kpi.currency)
 }
 
 async function load() {
