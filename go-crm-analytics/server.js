@@ -43,4 +43,29 @@ function createDashboardServer(queryAll, options = {}) {
   return server
 }
 
-module.exports = { createDashboardServer }
+function registerDashboardRoutes(app, queryAll, options = {}) {
+  const schema = options.schema || {}
+  const token = options.token || null
+  const htmlPath = path.join(__dirname, 'dashboard.html')
+  const allowed = (req, res) => {
+    if (token && req.query.token !== token) {
+      res.status(403).send('Acces interzis')
+      return false
+    }
+    return true
+  }
+  app.get('/api/kpi', async (req, res) => {
+    if (!allowed(req, res)) return
+    try {
+      res.json(await collectKpi(queryAll, schema))
+    } catch (err) {
+      res.status(500).json({ error: err.message })
+    }
+  })
+  app.get('/dashboard', (req, res) => {
+    if (!allowed(req, res)) return
+    res.type('html').send(fs.readFileSync(htmlPath, 'utf8'))
+  })
+}
+
+module.exports = { createDashboardServer, registerDashboardRoutes }

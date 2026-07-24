@@ -9,6 +9,10 @@ const defaultSchema = {
   stageOrder: ['nou', 'contactat', 'oferta', 'castigat'],
   stageLabels: { nou: 'Nou', contactat: 'Contactat', oferta: 'Ofertă', castigat: 'Câștigat' },
   wonStatuses: ['castigat'],
+  revenueTable: null,
+  revenueDateColumn: 'date',
+  revenueAmountColumn: 'amount',
+  revenueHint: null,
   oneCTable: null,
   currency: 'MDL'
 }
@@ -18,9 +22,15 @@ function dayExpr(s, col) {
   return s.timestampFormat === 'unix' ? `date(${c}, 'unixepoch')` : `date(${c})`
 }
 
-function monthExpr(s) {
-  const c = s.createdAtColumn
+function monthExpr(s, col) {
+  const c = col || s.createdAtColumn
   return s.timestampFormat === 'unix' ? `strftime('%Y-%m', ${c}, 'unixepoch')` : `strftime('%Y-%m', ${c})`
+}
+
+function normalizeStages(s) {
+  return s.stageOrder.map(entry => typeof entry === 'string'
+    ? { label: (s.stageLabels && s.stageLabels[entry]) || entry, statuses: [entry] }
+    : { label: entry.label, statuses: entry.statuses })
 }
 
 function placeholders(list) {
@@ -55,25 +65,42 @@ async function collectKpi(queryAll, overrides = {}) {
     `SELECT ${s.statusColumn} AS stadiu, COUNT(*) AS numar FROM ${s.leadsTable} WHERE ${day} >= date('now', '-89 days') GROUP BY stadiu`
   )
   const countByStage = new Map(statusRows.map(r => [String(r.stadiu), r.numar]))
+  const stages = normalizeStages(s)
   const funnel = []
   let cumulative = 0
-  for (let i = s.stageOrder.length - 1; i >= 0; i--) {
-    const key = s.stageOrder[i]
-    cumulative += countByStage.get(key) || 0
-    funnel.unshift({ stadiu: s.stageLabels[key] || key, numar: cumulative })
+  for (let i = stages.length - 1; i >= 0; i--) {
+    cumulative += stages[i].statuses.reduce((acc, st) => acc + (countByStage.get(st) || 0), 0)
+    funnel.unshift({ stadiu: stages[i].label, numar: cumulative })
   }
 
   const wonRows = await queryAll(
-    `SELECT COUNT(*) AS numar, COALESCE(SUM(${s.amountColumn}), 0) AS venit FROM ${s.leadsTable} WHERE ${s.statusColumn} IN (${placeholders(won)}) AND ${day} >= date('now', '-29 days')`,
+    `SELECT COUNT(*) AS numar FROM ${s.leadsTable} WHERE ${s.statusColumn} IN (${placeholders(won)}) AND ${day} >= date('now', '-29 days')`,
     won
   )
   const won30d = wonRows[0] ? wonRows[0].numar : 0
-  const revenue30d = wonRows[0] ? wonRows[0].venit : 0
 
-  const revenueByMonth = await queryAll(
-    `SELECT ${month} AS luna, SUM(${s.amountColumn}) AS total FROM ${s.leadsTable} WHERE ${s.statusColumn} IN (${placeholders(won)}) AND ${month} >= strftime('%Y-%m', 'now', '-5 months') GROUP BY luna ORDER BY luna`,
-    won
-  )
+  let revenue30d, revenueByMonth
+  if (s.revenueTable) {
+    const rDay = dayExpr(s, s.revenueDateColumn)
+    const rMonth = monthExpr(s, s.revenueDateColumn)
+    const rev = await queryAll(
+      `SELECT COALESCE(SUM(${s.revenueAmountColumn}), 0) AS venit FROM ${s.revenueTable} WHERE ${rDay} >= date('now', '-29 days')`
+    )
+    revenue30d = rev[0] ? rev[0].venit : 0
+    revenueByMonth = await queryAll(
+      `SELECT ${rMonth} AS luna, SUM(${s.revenueAmountColumn}) AS total FROM ${s.revenueTable} WHERE ${rMonth} >= strftime('%Y-%m', 'now', '-5 months') GROUP BY luna ORDER BY luna`
+    )
+  } else {
+    const rev = await queryAll(
+      `SELECT COALESCE(SUM(${s.amountColumn}), 0) AS venit FROM ${s.leadsTable} WHERE ${s.statusColumn} IN (${placeholders(won)}) AND ${day} >= date('now', '-29 days')`,
+      won
+    )
+    revenue30d = rev[0] ? rev[0].venit : 0
+    revenueByMonth = await queryAll(
+      `SELECT ${month} AS luna, SUM(${s.amountColumn}) AS total FROM ${s.leadsTable} WHERE ${s.statusColumn} IN (${placeholders(won)}) AND ${month} >= strftime('%Y-%m', 'now', '-5 months') GROUP BY luna ORDER BY luna`,
+      won
+    )
+  }
 
   const topSources = await queryAll(
     `SELECT COALESCE(${s.sourceColumn}, 'necunoscut') AS sursa, COUNT(*) AS numar FROM ${s.leadsTable} WHERE ${day} >= date('now', '-29 days') GROUP BY sursa ORDER BY numar DESC LIMIT 5`
@@ -112,6 +139,7 @@ async function collectKpi(queryAll, overrides = {}) {
   return {
     generatedAt: new Date().toISOString(),
     currency: s.currency,
+    revenueHint: s.revenueHint,
     totals: {
       leads30d,
       won30d,

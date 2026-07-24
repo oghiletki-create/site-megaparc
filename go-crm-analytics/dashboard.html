@@ -21,7 +21,8 @@
   --funnel-1: #86b6ef;
   --funnel-2: #5598e7;
   --funnel-3: #2a78d6;
-  --funnel-4: #184f95;
+  --funnel-4: #1c5cab;
+  --funnel-5: #104281;
 }
 @media (prefers-color-scheme: dark) {
   :root:where(:not([data-theme="light"])) {
@@ -41,6 +42,7 @@
     --funnel-2: #256abf;
     --funnel-3: #3987e5;
     --funnel-4: #6da7ec;
+    --funnel-5: #9ec5f4;
   }
 }
 :root[data-theme="dark"] {
@@ -60,6 +62,7 @@
   --funnel-2: #256abf;
   --funnel-3: #3987e5;
   --funnel-4: #6da7ec;
+  --funnel-5: #9ec5f4;
 }
 * { box-sizing: border-box; margin: 0; }
 body {
@@ -147,7 +150,7 @@ td:last-child, th:last-child { text-align: right; }
     </div>
     <div class="card">
       <h2>Venit pe lună</h2>
-      <p class="hint">Vânzări încheiate · ultimele 6 luni</p>
+      <p class="hint" id="hint-revenue">Vânzări încheiate · ultimele 6 luni</p>
       <div id="chart-revenue"></div>
       <details><summary>Vezi tabelul</summary><div id="table-revenue"></div></details>
     </div>
@@ -367,7 +370,7 @@ function renderFunnel(rows) {
   rows.forEach((r, i) => {
     const y0 = padT + i * (rowH + gap)
     const w = Math.max(4, r.numar / max * iw)
-    const p = el('path', { d: roundedRight(labelW, y0, w, rowH, 4), fill: `var(--funnel-${Math.min(i + 1, 4)})` })
+    const p = el('path', { d: roundedRight(labelW, y0, w, rowH, 4), fill: `var(--funnel-${Math.min(i + 1, 5)})` })
     const pct = Math.round(r.numar / max * 100)
     p.addEventListener('mousemove', ev => showTip(`${r.stadiu}: <b>${nf.format(r.numar)}</b> (${pct}% din total)`, ev.clientX, ev.clientY))
     p.addEventListener('mouseleave', hideTip)
@@ -477,6 +480,7 @@ function renderAll(kpi, live) {
   const when = new Date(kpi.generatedAt)
   document.getElementById('sub').textContent =
     `Vânzări și lead-uri din sistemul de automatizare direct în Telegram · actualizat ${when.toLocaleString('ro-RO', { dateStyle: 'medium', timeStyle: 'short' })}`
+  if (kpi.revenueHint) document.getElementById('hint-revenue').textContent = kpi.revenueHint
   renderTiles(kpi)
   renderLine(kpi.leadsPerDay)
   renderFunnel(kpi.funnel)
