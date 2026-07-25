@@ -1,71 +1,141 @@
-const http = require('http')
 const fs = require('fs')
+const http = require('http')
 const path = require('path')
 const { collectKpi } = require('./analytics')
+const { ICON_192, ICON_512 } = require('./icons')
 
-function createDashboardServer(queryAll, options = {}) {
-  const port = options.port || 8090
-  const host = options.host || '127.0.0.1'
-  const schema = options.schema || {}
-  const token = options.token || null
-  const htmlPath = path.join(__dirname, 'dashboard.html')
+const html = fs.readFileSync(path.join(__dirname, 'panou.html'), 'utf8')
 
+const SW = `const CACHE = 'go-crm-panou-v1'
+const SHELL = './'
+
+self.addEventListener('install', event => {
+  self.skipWaiting()
+  event.waitUntil(caches.open(CACHE).then(c => c.add(SHELL)).catch(() => {}))
+})
+
+self.addEventListener('activate', event => {
+  event.waitUntil(caches.keys().then(keys =>
+    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+  ).then(() => self.clients.claim()))
+})
+
+self.addEventListener('fetch', event => {
+  const req = event.request
+  if (req.method !== 'GET') return
+  event.respondWith(
+    fetch(req).then(res => {
+      const copy = res.clone()
+      caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {})
+      return res
+    }).catch(() => caches.match(req).then(hit => hit || caches.match(SHELL)))
+  )
+})
+`
+
+function manifestFor(query, opts) {
+  const suffix = query ? '?' + query : ''
+  return {
+    name: (opts.company ? opts.company + ' — ' : '') + 'GO CRM · Panou analitic',
+    short_name: 'GO CRM',
+    description: 'Raportare live din CRM-ul din Telegram',
+    start_url: './' + suffix,
+    scope: './',
+    display: 'standalone',
+    orientation: 'any',
+    background_color: '#f9f9f7',
+    theme_color: '#2a78d6',
+    lang: 'ro',
+    icons: [
+      { src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+      { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
+    ]
+  }
+}
+
+function schemaOf(opts) {
+  return typeof opts.schema === 'function' ? opts.schema() : (opts.schema || {})
+}
+
+function tokenOk(token, provided) {
+  return !token || String(provided || '') === String(token)
+}
+
+function queryOf(originalUrl) {
+  const i = originalUrl.indexOf('?')
+  return i === -1 ? '' : originalUrl.slice(i)
+}
+
+function registerPanelRoutes(app, queryAll, options = {}) {
+  const opts = { basePath: '/panou', ...options }
+  const base = opts.basePath
+  const guard = (req, res, next) => {
+    if (tokenOk(opts.token, req.query.token)) return next()
+    res.status(403).type('text/plain').send('403')
+  }
+  const sendKpi = async (req, res) => {
+    try {
+      res.set('Cache-Control', 'no-store')
+      res.json(await collectKpi(queryAll, schemaOf(opts)))
+    } catch (err) {
+      res.status(500).json({ error: String((err && err.message) || err) })
+    }
+  }
+
+  app.get(base, (req, res, next) => {
+    if (req.path !== base) return next()
+    res.redirect(302, base + '/' + queryOf(req.originalUrl))
+  })
+  app.get(base + '/', guard, (req, res) => res.type('html').send(html))
+  app.get(base + '/api', guard, sendKpi)
+  app.get(base + '/manifest.webmanifest', guard, (req, res) => {
+    res.type('application/manifest+json')
+    res.send(JSON.stringify(manifestFor(queryOf(req.originalUrl).replace(/^\?/, ''), opts)))
+  })
+  app.get(base + '/sw.js', (req, res) => res.type('application/javascript').send(SW))
+  app.get(base + '/icon-192.png', (req, res) => res.type('png').send(Buffer.from(ICON_192, 'base64')))
+  app.get(base + '/icon-512.png', (req, res) => res.type('png').send(Buffer.from(ICON_512, 'base64')))
+
+  app.get('/dashboard', (req, res) => res.redirect(302, base + '/' + queryOf(req.originalUrl)))
+  app.get('/api/kpi', guard, sendKpi)
+}
+
+function createPanelServer(queryAll, options = {}) {
+  const opts = { port: 8080, host: '0.0.0.0', basePath: '/panou', ...options }
+  const base = opts.basePath
   const server = http.createServer(async (req, res) => {
-    const url = new URL(req.url, `http://${req.headers.host}`)
-    if (token && url.searchParams.get('token') !== token) {
-      res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' })
-      res.end('Acces interzis')
-      return
+    const url = new URL(req.url, 'http://localhost')
+    const p = url.pathname
+    const send = (code, type, body) => { res.writeHead(code, { 'Content-Type': type }); res.end(body) }
+    if (p === base + '/sw.js') return send(200, 'application/javascript', SW)
+    if (p === base + '/icon-192.png') return send(200, 'image/png', Buffer.from(ICON_192, 'base64'))
+    if (p === base + '/icon-512.png') return send(200, 'image/png', Buffer.from(ICON_512, 'base64'))
+    if (!tokenOk(opts.token, url.searchParams.get('token'))) return send(403, 'text/plain', '403')
+    if (p === base || p === '/dashboard') {
+      res.writeHead(302, { Location: base + '/' + (url.search || '') })
+      return res.end()
     }
-    if (url.pathname === '/api/kpi') {
+    if (p === base + '/') return send(200, 'text/html; charset=utf-8', html)
+    if (p === base + '/manifest.webmanifest') {
+      return send(200, 'application/manifest+json', JSON.stringify(manifestFor(url.search.replace(/^\?/, ''), opts)))
+    }
+    if (p === base + '/api' || p === '/api/kpi') {
       try {
-        const kpi = await collectKpi(queryAll, schema)
-        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' })
-        res.end(JSON.stringify(kpi))
+        return send(200, 'application/json', JSON.stringify(await collectKpi(queryAll, schemaOf(opts))))
       } catch (err) {
-        res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' })
-        res.end(JSON.stringify({ error: err.message }))
+        return send(500, 'application/json', JSON.stringify({ error: String((err && err.message) || err) }))
       }
-      return
     }
-    if (url.pathname === '/' || url.pathname === '/dashboard') {
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
-      res.end(fs.readFileSync(htmlPath))
-      return
-    }
-    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' })
-    res.end('Pagina nu există')
+    send(404, 'text/plain', '404')
   })
-
-  server.listen(port, host, () => {
-    console.log(`Panou analitic GO CRM: http://${host}:${port}/`)
-  })
+  server.listen(opts.port, opts.host)
   return server
 }
 
-function registerDashboardRoutes(app, queryAll, options = {}) {
-  const schema = options.schema || {}
-  const token = options.token || null
-  const htmlPath = path.join(__dirname, 'dashboard.html')
-  const allowed = (req, res) => {
-    if (token && req.query.token !== token) {
-      res.status(403).send('Acces interzis')
-      return false
-    }
-    return true
-  }
-  app.get('/api/kpi', async (req, res) => {
-    if (!allowed(req, res)) return
-    try {
-      res.json(await collectKpi(queryAll, schema))
-    } catch (err) {
-      res.status(500).json({ error: err.message })
-    }
-  })
-  app.get('/dashboard', (req, res) => {
-    if (!allowed(req, res)) return
-    res.type('html').send(fs.readFileSync(htmlPath, 'utf8'))
-  })
+module.exports = {
+  registerPanelRoutes,
+  createPanelServer,
+  registerDashboardRoutes: registerPanelRoutes,
+  createDashboardServer: createPanelServer
 }
-
-module.exports = { createDashboardServer, registerDashboardRoutes }

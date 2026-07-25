@@ -1,88 +1,77 @@
 const nf = new Intl.NumberFormat('ro-RO')
 
 function bar(value, max, width = 10) {
-  const filled = max > 0 ? Math.round(value / max * width) : 0
-  return '▰'.repeat(filled) + '▱'.repeat(width - filled)
+  const filled = max > 0 ? Math.max(0, Math.round(value / max * width)) : 0
+  return '▰'.repeat(Math.min(filled, width)) + '▱'.repeat(Math.max(0, width - filled))
+}
+
+function ro(o) {
+  if (o == null) return ''
+  return typeof o === 'string' ? o : (o.ro || '')
+}
+
+function fmtValue(value, fmt, currency) {
+  if (value == null) return '—'
+  if (fmt === 'money') return nf.format(Math.round(value)) + ' ' + currency
+  if (fmt === 'pct') return value + '%'
+  if (fmt === 'min') return nf.format(value) + ' min'
+  if (fmt === 'days') return nf.format(value) + ' zile'
+  return nf.format(value)
+}
+
+function cell(c, currency) {
+  if (c == null) return '—'
+  if (typeof c === 'number') return nf.format(c)
+  if (typeof c === 'string') return c
+  if (c.month) return c.month
+  if (c.day) return c.day
+  if (c.v !== undefined) return fmtValue(c.v, c.fmt, currency)
+  return ro(c)
 }
 
 function formatRaport(kpi) {
-  const t = kpi.totals
-  const lines = []
-  lines.push('<b>📊 GO CRM — Raport ultimele 30 de zile</b>')
-  lines.push('')
-  lines.push(`👥 Lead-uri noi: <b>${nf.format(t.leads30d)}</b>`)
-  lines.push(`✅ Vânzări încheiate: <b>${nf.format(t.won30d)}</b>`)
-  lines.push(`📈 Rată de conversie: <b>${String(t.conversionRate).replace('.', ',')}%</b>`)
-  lines.push(`💰 Venit: <b>${nf.format(t.revenue30d)} ${kpi.currency}</b>`)
-  if (t.avgResponseMinutes != null) {
-    lines.push(`⏱ Timp mediu de răspuns: <b>${nf.format(t.avgResponseMinutes)} min</b>`)
+  const currency = kpi.currency || 'EUR'
+  const when = new Date(kpi.generatedAt).toLocaleString('ro-RO', {
+    day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit'
+  })
+  let out = '📊 <b>PANOU ANALITIC</b>\n<i>' + when + '</i>\n'
+  if (!kpi.sections || !kpi.sections.length) {
+    return out + '\nNiciun modul activ în meniu. Activează un modul și raportul îl include automat.'
   }
-  lines.push('')
-  lines.push('<b>Pâlnia de vânzări (90 zile):</b>')
-  const maxFunnel = kpi.funnel.length ? kpi.funnel[0].numar : 0
-  for (const f of kpi.funnel) {
-    lines.push(`${bar(f.numar, maxFunnel)} ${f.stadiu}: <b>${nf.format(f.numar)}</b>`)
-  }
-  if (kpi.topSources.length) {
-    lines.push('')
-    lines.push('<b>Top surse de lead-uri:</b>')
-    for (const src of kpi.topSources) {
-      lines.push(`• ${src.sursa}: <b>${nf.format(src.numar)}</b>`)
+  for (const section of kpi.sections) {
+    out += '\n<b>' + ro(section.title).toUpperCase() + '</b>\n'
+    out += '<i>' + ro(section.hint) + '</i>\n'
+    for (const tile of section.tiles || []) {
+      out += '• ' + ro(tile.label) + ': <b>' + fmtValue(tile.value, tile.fmt, currency) + '</b>'
+      if (tile.note) out += ' <i>(' + ro(tile.note) + ')</i>'
+      out += '\n'
     }
-  }
-  if (kpi.business) {
-    const b = kpi.business
-    lines.push('')
-    lines.push('<b>📦 Activitate generală:</b>')
-    if (b.clients) {
-      lines.push(`🧑‍💼 Clienți activi: <b>${nf.format(b.clients.activi)}</b> din ${nf.format(b.clients.total)} · Restanțieri: <b>${nf.format(b.clients.restante)}</b> · Pe Telegram: <b>${nf.format(b.clients.portalActiv)}</b>`)
+    const chart = section.chart
+    if (chart && chart.rows && chart.rows.length && (chart.type === 'bars-h' || chart.type === 'funnel')) {
+      const max = Math.max(...chart.rows.map(r => r.value), 1)
+      for (const row of chart.rows.slice(0, 6)) {
+        out += '  <code>' + bar(row.value, max) + '</code> ' + ro(row.label) +
+          ' — ' + fmtValue(row.value, chart.fmt, currency) + '\n'
+      }
+    } else if (chart && chart.rows && chart.rows.length && chart.type === 'bars-v') {
+      const rows = chart.rows.slice(-6)
+      const max = Math.max(...rows.map(r => r.value), 1)
+      for (const row of rows) {
+        out += '  <code>' + bar(row.value, max) + '</code> ' + row.key +
+          ' — ' + fmtValue(row.value, chart.fmt, currency) + '\n'
+      }
+    } else if (chart && chart.type === 'line' && chart.rows.length) {
+      const total = chart.rows.reduce((a, r) => a + r.value, 0)
+      const best = chart.rows.reduce((b, r) => r.value > b.value ? r : b, chart.rows[0])
+      out += '  Total 30 zile: <b>' + nf.format(total) + '</b> · vârf ' + best.key + ': <b>' + nf.format(best.value) + '</b>\n'
     }
-    if (b.payments) {
-      const medie = b.payments.medieZileIntarziere != null ? ` (medie ${b.payments.medieZileIntarziere} zile)` : ''
-      lines.push(`💵 Încasat luna curentă: <b>${nf.format(b.payments.incasatLunaCurenta)} ${kpi.currency}</b> · Plăți întârziate 30 zile: <b>${nf.format(b.payments.intarziate30d)}</b>${medie}`)
-    }
-    if (b.tasks) {
-      lines.push(`📋 Sarcini active: <b>${nf.format(b.tasks.active)}</b>, din care întârziate: <b>${nf.format(b.tasks.intarziate)}</b>` + (b.adminTasks ? ` · Sarcini admin: <b>${nf.format(b.adminTasks.active)}</b>` : ''))
-    }
-    if (b.prospects) {
-      lines.push(`🎯 Prospecți: <b>${nf.format(b.prospects.total)}</b> (` + b.prospects.byStatus.map(p => `${p.status}: ${p.numar}`).join(', ') + ')')
-    }
-  }
-  if (kpi.callCenter) {
-    const cc = kpi.callCenter
-    lines.push('')
-    lines.push('<b>☎️ Call center (30 zile):</b>')
-    lines.push(`📞 Apeluri: <b>${nf.format(cc.apeluri30d)}</b> · Contactați: <b>${nf.format(cc.contactati30d)}</b>${cc.rataContactare != null ? ' (' + cc.rataContactare + '%)' : ''}`)
-    const calitate = []
-    if (cc.reactieMedieMinute != null) calitate.push(`⚡ Reacție medie la lead: <b>${nf.format(cc.reactieMedieMinute)} min</b>`)
-    if (cc.procesatePct != null) calitate.push(`📥 Lead-uri preluate: <b>${cc.procesatePct}%</b>`)
-    if (calitate.length) lines.push(calitate.join(' · '))
-    for (const a of cc.perAgent.slice(0, 5)) {
-      lines.push(`• ${a.agent}: <b>${nf.format(a.apeluri)}</b> apeluri, <b>${nf.format(a.contactati)}</b> contactați, <b>${nf.format(a.castigati)}</b> câștigați`)
-    }
-  }
-  if (kpi.departments && kpi.departments.length) {
-    lines.push('')
-    lines.push('<b>🏬 Departamente (30 zile):</b>')
-    for (const d of kpi.departments) {
-      const parts = [`<b>${nf.format(d.finalizate30d)}</b> sarcini finalizate`]
-      if (d.rataLaTimp != null) parts.push(`<b>${d.rataLaTimp}%</b> la timp`)
-      if (d.notaMedie != null) parts.push(`nota AI <b>${String(d.notaMedie).replace('.', ',')}</b>`)
-      parts.push(`${nf.format(d.sarciniActive)} active`)
-      lines.push(`• ${d.departament}: ` + parts.join(', '))
-    }
-  }
-  if (kpi.oneC) {
-    lines.push('')
-    lines.push(`🏢 Venit facturat în 1C (30 zile): <b>${nf.format(kpi.oneC.revenue30d)} ${kpi.currency}</b>`)
-    if (kpi.oneC.topClients.length) {
-      lines.push('<b>Top clienți 1C (90 zile):</b>')
-      for (const c of kpi.oneC.topClients) {
-        lines.push(`• ${c.client}: <b>${nf.format(c.total)} ${kpi.currency}</b>`)
+    if (!section.tiles.length && !chart && section.table) {
+      for (const row of section.table.rows.slice(0, 6)) {
+        out += '  • ' + row.map(c => cell(c, currency)).join(' · ') + '\n'
       }
     }
   }
-  return lines.join('\n')
+  return out
 }
 
 module.exports = { formatRaport }

@@ -12,6 +12,20 @@ Valabilă pentru TOATE proiectele/boții (crm-go-bot și orice instanță):
    Megaparc; Alexandru Muravschi (416540704) = doar instanța Metalica Zuev.
 4. La orice bot nou, lista de admini pornește goală — decide Oleg.
 
+## ⚠️ REGULĂ GLOBALĂ — panoul analitic (Oleg, 2026-07-25)
+
+Valabilă pentru TOATE proiectele/boții:
+
+1. Panoul analitic (`go-crm-analytics/`, oglindit în `analytics/` la fiecare bot)
+   face parte din **codul de bază**. E singura suprafață de raportare — nu se mai
+   construiește un al doilea dashboard.
+2. **Conținutul panoului = strict meniul din Telegram** al botului respectiv.
+   Sursa unică: `menu.js` — același descriptor face butoanele din `/start` și
+   secțiunile panoului.
+3. **Boți noi**: panoul se activează implicit (Oleg setează `DASHBOARD_TOKEN`).
+   **Boți existenți**: doar **A-casa** și **EcoFloor** (Metalica Zuev e deja făcut).
+4. Panoul e aplicație web instalabilă (PWA) — se fixează în bara de activități.
+
 ## Memorie — context clienți/prospecți
 
 - **Art Granit (artgranit.md)** — prospect (blaturi piatră, reprezentant Cosentino).
