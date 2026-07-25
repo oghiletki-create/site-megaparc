@@ -509,7 +509,8 @@ function renderAll() {
   CURRENCY = lastKpi.currency || 'EUR'
   document.documentElement.lang = LANG
   document.title = t('title')
-  document.getElementById('title').textContent = lastKpi.company ? lastKpi.company + ' — ' + t('title') : t('title')
+  const company = lastKpi.company && !/^go\s*crm$/i.test(lastKpi.company.trim()) ? lastKpi.company : null
+  document.getElementById('title').textContent = company ? company + ' — ' + t('title') : t('title')
   document.getElementById('lang').textContent = t('langBtn')
   document.getElementById('install').textContent = t('install')
   const badge = document.getElementById('badge')

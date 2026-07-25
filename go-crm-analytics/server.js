@@ -35,8 +35,9 @@ self.addEventListener('fetch', event => {
 
 function manifestFor(query, opts) {
   const suffix = query ? '?' + query : ''
+  const company = opts.company && !/^go\s*crm$/i.test(String(opts.company).trim()) ? opts.company : null
   return {
-    name: (opts.company ? opts.company + ' — ' : '') + 'GO CRM · Panou analitic',
+    name: (company ? company + ' — ' : '') + 'GO CRM · Panou analitic',
     short_name: 'GO CRM',
     description: 'Raportare live din CRM-ul din Telegram',
     start_url: './' + suffix,
