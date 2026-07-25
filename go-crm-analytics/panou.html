@@ -114,7 +114,9 @@ nav a:hover { color: var(--text-primary); border-color: var(--baseline); }
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 14px; }
 .tile { background: var(--page); border: 1px solid var(--grid); border-radius: 10px; padding: 12px 14px; }
 .tile .label { font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; }
-.tile .value { font-size: 24px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.tile .value { font-size: 24px; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.tile .value.long { font-size: 20px; }
+.tile .value.xlong { font-size: 17px; }
 .tile .unit { font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-left: 2px; }
 .tile .note { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
 svg { display: block; width: 100%; height: auto; }
@@ -326,7 +328,9 @@ function renderTiles(host, tiles) {
       : nf.format(i.value)
     const showUnit = unit && i.value != null ? `<span class="unit">${unit}</span>` : ''
     const note = i.note ? `<div class="note">${escapeHtml(loc(i.note))}</div>` : ''
-    return `<div class="tile"><div class="label">${escapeHtml(loc(i.label))}</div><div class="value">${value}${showUnit}</div>${note}</div>`
+    const len = String(value).length + unit.length
+    const size = len > 13 ? ' xlong' : len > 10 ? ' long' : ''
+    return `<div class="tile"><div class="label">${escapeHtml(loc(i.label))}</div><div class="value${size}">${value}${showUnit}</div>${note}</div>`
   }).join('')
   host.appendChild(box)
 }
