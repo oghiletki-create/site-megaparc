@@ -72,6 +72,37 @@ Valabilă pentru TOATE proiectele, boții, panourile, ofertele și prezentările
 > (`connect_rejected` la `goproperty.digital:443` — verificat prin WebFetch, curl și
 > Chromium). Se completează din ce trimite Oleg: fundal, text, accent, fonturi.
 
+## 📋 CE EXISTĂ DEJA în codul de bază (2026-07-26)
+
+Documentul complet: **`IMPLEMENTARE-BOTI.md` din repo-ul `gocrm-base`** — ce s-a
+construit, ce variabilă pornește fiecare lucru, ce e verificat și ce nu. Se citește
+ÎNAINTE de a promite ceva unui client sau de a rescrie ceva ce există deja.
+
+| ce | se pornește cu | stare |
+|---|---|---|
+| Panoul directorului (server-rendered, grafice reale, o pagină per modul) | `PANEL_TOKEN` + `PANEL_URL` | ✅ |
+| Panoul în Telegram, pe tot ecranul, buton în bara de jos | vine cu `PANEL_TOKEN` | ✅ |
+| Acces limitat pe departament, semnat criptografic | automat, după organigramă | ✅ |
+| Date de demonstrație (firmă inventată, bandă roșie) | `PANEL_DEMO=on` | ✅ |
+| Import & vamă (termene, origine, cost real de intrare) | `MODULES_ON=import` | ✅ |
+| Eligibilitate de plată, inclusiv calificarea clienților noi | modulul `clients` | ✅ |
+| Verificare juridică cu evidență + reverificare săptămânală | modulul `clients` | ✅ |
+| Supraveghere automată a registrelor publice | `VERIF_AUTO=on` | ⚠️ **neconfirmată** |
+
+**Ultima linie contează:** supravegherea automată e scrisă și probată pe pagini
+fabricate, dar citirea registrelor reale **nu s-a putut verifica** — domeniile sunt
+blocate din mediul de dezvoltare. Nu se prezintă clientului ca funcțională până nu
+trece proba `/verifdiag <firmă>` pe serverul lui.
+
+**Ordinea de implementare la un bot existent:** `git pull` → `railway up` →
+variabilele în Railway → `/start` (pune butonul din bara de jos) → `/panou` (linkul,
+doar conducerii) → `/verifdiag` (decide dacă se pornește supravegherea).
+
+**Varianta web:** panoul e deja HTML randat pe server, fără cod care rulează în
+browser. Varianta web e același cod fără învelișul de Telegram — rămâne de decis doar
+autentificarea (linkul cu token ține loc de parolă; merge pentru conducere, nu pentru
+zeci de utilizatori).
+
 ## Memorie — context clienți/prospecți
 
 - **Art Granit (artgranit.md)** — prospect (blaturi piatră, reprezentant Cosentino).
