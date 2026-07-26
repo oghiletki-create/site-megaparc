@@ -26,6 +26,29 @@ Valabilă pentru TOATE proiectele/boții:
    **Boți existenți**: doar **A-casa** și **EcoFloor** (Metalica Zuev e deja făcut).
 4. Panoul e aplicație web instalabilă (PWA) — se fixează în bara de activități.
 
+## ⚠️ REGULĂ GLOBALĂ — coloristica & brandbook (Oleg, 2026-07-26)
+
+Valabilă pentru TOATE proiectele, boții, panourile, ofertele și prezentările:
+
+1. **Sursa unică a identității vizuale: [goproperty.digital](https://goproperty.digital/)**
+   — site-ul lui Oleg. Culorile, fonturile și ritmul de acolo se aplică la tot ce
+   producem. Nu există a doua paletă.
+2. **Nu se inventează palete** și **nu se împrumută de la clienți**. Materialele
+   unui client (site, logo, documente) descriu clientul, nu produsul nostru.
+   Greșeala de evitat: pe 2026-07-26 panoul a fost stilizat după site-ul Megaparc
+   pentru că „site-ul meu” a fost citit greșit — Megaparc e client, nu brandul nostru.
+3. Când o sarcină cere culori și paleta exactă nu e la îndemână, **se cere lui Oleg**
+   (captură de ecran sau codurile hex). Nu se ghicește din alte materiale — în repo
+   există cel puțin patru palete vechi, contradictorii (oferte, prezentări, panou).
+4. Valorile exacte se scriu **aici**, în secțiunea de mai jos, prima dată când sunt
+   confirmate — ca să nu se mai ceară a doua oară.
+
+### Paleta goproperty.digital
+
+> **De completat.** Mediul de execuție are domeniul blocat prin politica de rețea
+> (`connect_rejected` la `goproperty.digital:443` — verificat prin WebFetch, curl și
+> Chromium). Se completează din ce trimite Oleg: fundal, text, accent, fonturi.
+
 ## Memorie — context clienți/prospecți
 
 - **Art Granit (artgranit.md)** — prospect (blaturi piatră, reprezentant Cosentino).
