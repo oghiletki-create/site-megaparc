@@ -26,6 +26,29 @@ Valabilă pentru TOATE proiectele/boții:
    **Boți existenți**: doar **A-casa** și **EcoFloor** (Metalica Zuev e deja făcut).
 4. Panoul e aplicație web instalabilă (PWA) — se fixează în bara de activități.
 
+## ⚠️ REGULĂ GLOBALĂ — conținutul se face pe meseria clientului (Oleg, 2026-07-26)
+
+Valabilă pentru TOATE proiectele/boții:
+
+1. **Forma e una singură, conținutul se schimbă.** Coloristica, tipografia și
+   ritmul vin din goproperty.digital pentru toți clienții, fără excepție (vezi
+   regula de brandbook). Ce se schimbă de la client la client sunt **rapoartele,
+   indicatorii și cuvintele** — după domeniul lui de activitate.
+2. Exemple de citit ca reper, nu ca listă închisă:
+   - **comerț cu metal / import** (Metalica Zuev): loturi la vamă, termen de
+     depozitare temporară, dovezi de origine, cost real de intrare, creanțe;
+   - **dezvoltator imobiliar**: unități libere/rezervate/vândute, rate de la
+     cumpărători, drumul cumpărătorului, încasări pe luni;
+   - **montaj / pardoseli** (EcoFloor): metri pătrați montați, echipe pe șantier,
+     termene, materiale consumate.
+3. **Datele de demonstrație urmează aceeași regulă.** Un dezvoltator căruia îi
+   arăți „Tablă zincată 0,5 mm” nu se recunoaște în produs. Generatorul de
+   demonstrație (`src/lib/panou/demo.js` în gocrm-base) e deocamdată scris pentru
+   comerțul cu metal — la primul client din alt domeniu se face setul lui.
+4. Regula de la 2026-07-25 rămâne: secțiunile panoului ies din **modulele active**
+   ale acelui bot. Domeniul de activitate se alege prin ce module îi pui, nu prin
+   cod paralel pentru fiecare client.
+
 ## ⚠️ REGULĂ GLOBALĂ — coloristica & brandbook (Oleg, 2026-07-26)
 
 Valabilă pentru TOATE proiectele, boții, panourile, ofertele și prezentările:
