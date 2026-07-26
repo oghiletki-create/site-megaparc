@@ -78,16 +78,23 @@ Documentul complet: **`IMPLEMENTARE-BOTI.md` din repo-ul `gocrm-base`** — ce s
 construit, ce variabilă pornește fiecare lucru, ce e verificat și ce nu. Se citește
 ÎNAINTE de a promite ceva unui client sau de a rescrie ceva ce există deja.
 
-| ce | se pornește cu | stare |
-|---|---|---|
-| Panoul directorului (server-rendered, grafice reale, o pagină per modul) | `PANEL_TOKEN` + `PANEL_URL` | ✅ |
-| Panoul în Telegram, pe tot ecranul, buton în bara de jos | vine cu `PANEL_TOKEN` | ✅ |
-| Acces limitat pe departament, semnat criptografic | automat, după organigramă | ✅ |
-| Date de demonstrație (firmă inventată, bandă roșie) | `PANEL_DEMO=on` | ✅ |
-| Import & vamă (termene, origine, cost real de intrare) | `MODULES_ON=import` | ✅ |
-| Eligibilitate de plată, inclusiv calificarea clienților noi | modulul `clients` | ✅ |
-| Verificare juridică cu evidență + reverificare săptămânală | modulul `clients` | ✅ |
-| Supraveghere automată a registrelor publice | `VERIF_AUTO=on` | ⚠️ **neconfirmată** |
+**Ce se pune la toți boții: PANOUL. Atât.** Restul din tabel sunt module și se aleg
+după meseria clientului — nu toți au nevoie de tot ce are Metalica Zuev. Panoul n-are
+conținut propriu: secțiunile lui ies din modulele active, deci se configurează
+modulele, iar panoul urmează. Greșeala de evitat: să se copieze setul lui Metalica la
+alt client „ca să aibă și el” — iese un panou plin de ecrane goale, iar directorul
+care deschide de trei ori un raport fără cifre nu-l mai deschide niciodată.
+
+| ce | la cine | se pornește cu | stare |
+|---|---|---|---|
+| Panoul directorului (server-rendered, grafice reale, o pagină per modul) | la toți | `PANEL_TOKEN` + `PANEL_URL` | ✅ |
+| Panoul în Telegram, pe tot ecranul, buton în bara de jos | la toți | vine cu `PANEL_TOKEN` | ✅ |
+| Acces limitat pe departament, semnat criptografic | la toți | automat, după organigramă | ✅ |
+| Date de demonstrație (firmă inventată, bandă roșie) | la toți, cât timp CRM-ul e gol | `PANEL_DEMO=on` | ✅ |
+| Import & vamă (termene, origine, cost real de intrare) | doar firmele care importă | `MODULES_ON=import` | ✅ |
+| Eligibilitate de plată, inclusiv calificarea clienților noi | doar unde se vinde pe credit | modulul `clients` | ✅ |
+| Verificare juridică cu evidență + reverificare săptămânală | doar unde se vinde pe credit | modulul `clients` | ✅ |
+| Supraveghere automată a registrelor publice | doar unde se vinde pe credit | `VERIF_AUTO=on` | ⚠️ **neconfirmată** |
 
 **Ultima linie contează:** supravegherea automată e scrisă și probată pe pagini
 fabricate, dar citirea registrelor reale **nu s-a putut verifica** — domeniile sunt
