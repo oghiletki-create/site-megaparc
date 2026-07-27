@@ -26,6 +26,90 @@ Valabilă pentru TOATE proiectele/boții:
    **Boți existenți**: doar **A-casa** și **EcoFloor** (Metalica Zuev e deja făcut).
 4. Panoul e aplicație web instalabilă (PWA) — se fixează în bara de activități.
 
+## ⚠️ REGULĂ GLOBALĂ — conținutul se face pe meseria clientului (Oleg, 2026-07-26)
+
+Valabilă pentru TOATE proiectele/boții:
+
+1. **Forma e una singură, conținutul se schimbă.** Coloristica, tipografia și
+   ritmul vin din goproperty.digital pentru toți clienții, fără excepție (vezi
+   regula de brandbook). Ce se schimbă de la client la client sunt **rapoartele,
+   indicatorii și cuvintele** — după domeniul lui de activitate.
+2. Exemple de citit ca reper, nu ca listă închisă:
+   - **comerț cu metal / import** (Metalica Zuev): loturi la vamă, termen de
+     depozitare temporară, dovezi de origine, cost real de intrare, creanțe;
+   - **dezvoltator imobiliar**: unități libere/rezervate/vândute, rate de la
+     cumpărători, drumul cumpărătorului, încasări pe luni;
+   - **montaj / pardoseli** (EcoFloor): metri pătrați montați, echipe pe șantier,
+     termene, materiale consumate.
+3. **Datele de demonstrație urmează aceeași regulă.** Un dezvoltator căruia îi
+   arăți „Tablă zincată 0,5 mm” nu se recunoaște în produs. Generatorul de
+   demonstrație (`src/lib/panou/demo.js` în gocrm-base) e deocamdată scris pentru
+   comerțul cu metal — la primul client din alt domeniu se face setul lui.
+4. Regula de la 2026-07-25 rămâne: secțiunile panoului ies din **modulele active**
+   ale acelui bot. Domeniul de activitate se alege prin ce module îi pui, nu prin
+   cod paralel pentru fiecare client.
+
+## ⚠️ REGULĂ GLOBALĂ — coloristica & brandbook (Oleg, 2026-07-26)
+
+Valabilă pentru TOATE proiectele, boții, panourile, ofertele și prezentările:
+
+1. **Sursa unică a identității vizuale: [goproperty.digital](https://goproperty.digital/)**
+   — site-ul lui Oleg. Culorile, fonturile și ritmul de acolo se aplică la tot ce
+   producem. Nu există a doua paletă.
+2. **Nu se inventează palete** și **nu se împrumută de la clienți**. Materialele
+   unui client (site, logo, documente) descriu clientul, nu produsul nostru.
+   Greșeala de evitat: pe 2026-07-26 panoul a fost stilizat după site-ul Megaparc
+   pentru că „site-ul meu” a fost citit greșit — Megaparc e client, nu brandul nostru.
+3. Când o sarcină cere culori și paleta exactă nu e la îndemână, **se cere lui Oleg**
+   (captură de ecran sau codurile hex). Nu se ghicește din alte materiale — în repo
+   există cel puțin patru palete vechi, contradictorii (oferte, prezentări, panou).
+4. Valorile exacte se scriu **aici**, în secțiunea de mai jos, prima dată când sunt
+   confirmate — ca să nu se mai ceară a doua oară.
+
+### Paleta goproperty.digital
+
+> **De completat.** Mediul de execuție are domeniul blocat prin politica de rețea
+> (`connect_rejected` la `goproperty.digital:443` — verificat prin WebFetch, curl și
+> Chromium). Se completează din ce trimite Oleg: fundal, text, accent, fonturi.
+
+## 📋 CE EXISTĂ DEJA în codul de bază (2026-07-26)
+
+Documentul complet: **`IMPLEMENTARE-BOTI.md` din repo-ul `gocrm-base`** — ce s-a
+construit, ce variabilă pornește fiecare lucru, ce e verificat și ce nu. Se citește
+ÎNAINTE de a promite ceva unui client sau de a rescrie ceva ce există deja.
+
+**Ce se pune la toți boții: PANOUL. Atât.** Restul din tabel sunt module și se aleg
+după meseria clientului — nu toți au nevoie de tot ce are Metalica Zuev. Panoul n-are
+conținut propriu: secțiunile lui ies din modulele active, deci se configurează
+modulele, iar panoul urmează. Greșeala de evitat: să se copieze setul lui Metalica la
+alt client „ca să aibă și el” — iese un panou plin de ecrane goale, iar directorul
+care deschide de trei ori un raport fără cifre nu-l mai deschide niciodată.
+
+| ce | la cine | se pornește cu | stare |
+|---|---|---|---|
+| Panoul directorului (server-rendered, grafice reale, o pagină per modul) | la toți | `PANEL_TOKEN` + `PANEL_URL` | ✅ |
+| Panoul în Telegram, pe tot ecranul, buton în bara de jos | la toți | vine cu `PANEL_TOKEN` | ✅ |
+| Acces limitat pe departament, semnat criptografic | la toți | automat, după organigramă | ✅ |
+| Date de demonstrație (firmă inventată, bandă roșie) | la toți, cât timp CRM-ul e gol | `PANEL_DEMO=on` | ✅ |
+| Import & vamă (termene, origine, cost real de intrare) | doar firmele care importă | `MODULES_ON=import` | ✅ |
+| Eligibilitate de plată, inclusiv calificarea clienților noi | doar unde se vinde pe credit | modulul `clients` | ✅ |
+| Verificare juridică cu evidență + reverificare săptămânală | doar unde se vinde pe credit | modulul `clients` | ✅ |
+| Supraveghere automată a registrelor publice | doar unde se vinde pe credit | `VERIF_AUTO=on` | ⚠️ **neconfirmată** |
+
+**Ultima linie contează:** supravegherea automată e scrisă și probată pe pagini
+fabricate, dar citirea registrelor reale **nu s-a putut verifica** — domeniile sunt
+blocate din mediul de dezvoltare. Nu se prezintă clientului ca funcțională până nu
+trece proba `/verifdiag <firmă>` pe serverul lui.
+
+**Ordinea de implementare la un bot existent:** `git pull` → `railway up` →
+variabilele în Railway → `/start` (pune butonul din bara de jos) → `/panou` (linkul,
+doar conducerii) → `/verifdiag` (decide dacă se pornește supravegherea).
+
+**Varianta web:** panoul e deja HTML randat pe server, fără cod care rulează în
+browser. Varianta web e același cod fără învelișul de Telegram — rămâne de decis doar
+autentificarea (linkul cu token ține loc de parolă; merge pentru conducere, nu pentru
+zeci de utilizatori).
+
 ## Memorie — context clienți/prospecți
 
 - **Art Granit (artgranit.md)** — prospect (blaturi piatră, reprezentant Cosentino).
