@@ -26,6 +26,26 @@ Valabilă pentru TOATE proiectele/boții:
    **Boți existenți**: doar **A-casa** și **EcoFloor** (Metalica Zuev e deja făcut).
 4. Panoul e aplicație web instalabilă (PWA) — se fixează în bara de activități.
 
+## ⚠️ REGULĂ GLOBALĂ — cele trei suprafețe web (Oleg, 2026-07-27)
+
+Valabilă pentru TOATE proiectele/boții. **Trei suprafețe, roluri diferite, a nu se confunda:**
+
+1. **`/panou` — rapoartele, DOAR pentru conducere.** Grafice, doar de citit. Un director de
+   departament vede doar secțiunea lui, semnată criptografic.
+2. **`/panou/lucru` — fișa clientului**, scrisă anume pentru web (căutare după telefon,
+   comentarii după apel, pasul următor obligatoriu).
+3. **`/birou` — TOT restul sistemului**, oglindit din Telegram: oferte, comenzi, sarcini, apeluri,
+   agenda. Pentru cei care stau toată ziua în sistem (vânzări, call center). **Fiecare are acces
+   doar la ce ține de domeniul lui** și poate LUCRA, nu doar privi.
+
+**Intrarea e una singură pentru toate trei:** `/panou/login` — îți alegi numele din listă, codul
+vine în Telegram, sesiunea ține 12 ore. Nu se face a doua listă de utilizatori și nicio parolă.
+
+**Regula de aur a biroului: modulele nu se ating.** Un modul cheamă `ctx.edit(text, butoane)` și
+nu știe unde ajunge ecranul; biroul (`src/lib/web/` în gocrm-base) prinde ieșirea și o desenează ca
+pagină. De aceea orice modul nou apare automat acolo. **Cod paralel „pentru web" = greșeală** —
+drepturile de acces sunt în module și în `ctx`, nu în interfață, și s-ar rupe.
+
 ## ⚠️ REGULĂ GLOBALĂ — conținutul se face pe meseria clientului (Oleg, 2026-07-26)
 
 Valabilă pentru TOATE proiectele/boții:
@@ -95,6 +115,7 @@ care deschide de trei ori un raport fără cifre nu-l mai deschide niciodată.
 | Eligibilitate de plată, inclusiv calificarea clienților noi | doar unde se vinde pe credit | modulul `clients` | ✅ |
 | Verificare juridică cu evidență + reverificare săptămânală | doar unde se vinde pe credit | modulul `clients` | ✅ |
 | Supraveghere automată a registrelor publice | doar unde se vinde pe credit | `VERIF_AUTO=on` | ⚠️ **neconfirmată** |
+| Biroul — restul modulelor pe calculator, unde se lucrează | la toți (fiecare doar domeniul lui) | vine cu `PANEL_LOGIN` | ✅ |
 
 **Ultima linie contează:** supravegherea automată e scrisă și probată pe pagini
 fabricate, dar citirea registrelor reale **nu s-a putut verifica** — domeniile sunt
