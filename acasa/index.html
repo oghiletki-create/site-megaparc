@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A-casa × GO CRM — Demo automatizare AI</title>
+<style>
+  :root{--brand:#243b6b;--brand-d:#182a4e;--brand-l:#eef1f8;--gold:#c9a24b;--ink:#1e2430;--muted:#6b7280;--line:#e4e7ee;--accent:#c9a24b}
+  *{box-sizing:border-box} html,body{margin:0;min-height:100%}
+  body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;background:linear-gradient(160deg,#eef1f7,#e5eaf4);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .wrap{width:100%;max-width:900px;text-align:center}
+  .logo{display:inline-flex;align-items:center;gap:13px;margin-bottom:8px}
+  .logo .mark{width:50px;height:50px;color:var(--brand)}
+  .logo b{font-size:30px;font-weight:800;color:var(--brand-d);letter-spacing:.2px}
+  .logo span{font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);display:block;text-align:left;margin-top:2px}
+  .client{margin:2px 0 0;font-size:13px;color:var(--muted)}
+  .client b{color:var(--brand-d);font-weight:700}
+  h1{font-size:22px;margin:14px 0 4px}
+  p.sub{color:var(--muted);margin:0 0 26px;font-size:14.5px}
+  .cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+  @media(max-width:760px){.cards{grid-template-columns:1fr}}
+  a.card{display:block;text-decoration:none;color:inherit;background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px 20px;box-shadow:0 10px 30px rgba(24,42,78,.10);transition:transform .15s,box-shadow .15s}
+  a.card:hover{transform:translateY(-3px);box-shadow:0 16px 38px rgba(24,42,78,.16);border-color:var(--brand)}
+  .ic{width:58px;height:58px;border-radius:16px;background:var(--brand-l);display:grid;place-items:center;font-size:28px;margin:0 auto 14px}
+  a.card b{font-size:16px;display:block;margin-bottom:6px}
+  a.card em{font-style:normal;color:var(--gold);font-weight:700;font-size:11px;letter-spacing:.5px;text-transform:uppercase;display:block;margin-bottom:8px}
+  a.card span{color:var(--muted);font-size:12.5px;line-height:1.5;display:block}
+  a.card .go{display:inline-block;margin-top:14px;background:var(--brand);color:#fff;border-radius:10px;padding:9px 16px;font-size:12.5px;font-weight:700}
+  .legal{margin-top:26px;color:var(--muted);font-size:11px;line-height:1.5}
+  .badge{background:var(--gold);color:#3a2c00;padding:2px 9px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <svg class="mark" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+      <path d="M9 23 L24 11 L39 23"/><path d="M13 21 V37 H35 V21"/><path d="M21 37 V28 H27 V37"/>
+    </svg>
+    <div><b>GO&nbsp;CRM</b><span>CRM &amp; automatizare AI</span></div>
+  </div>
+  <p class="client">Propunere pentru <b>A-casa</b> · dezvoltator imobiliar</p>
+  <h1>Demo automatizare AI <span class="badge">DEMO</span></h1>
+  <p class="sub">De la primul lead până la predarea cheilor. Alege ce vrei să vezi:</p>
+  <div class="cards">
+    <a class="card" href="demo/">
+      <div class="ic">🏠</div>
+      <em>pentru clienți</em>
+      <b>Asistent de vânzări AI</b>
+      <span>Caută apartament în grilă, calculează ratele, programează vizionarea, arată stadiul construcției. 24/7, RO/RU.</span>
+      <span class="go">Deschide demo →</span>
+    </a>
+    <a class="card" href="demo-ceo/">
+      <div class="ic">📊</div>
+      <em>intern</em>
+      <b>Panou Director General</b>
+      <span>Doar ce-i cere lui decizia: bani &amp; cash-flow, stadiul șantierului și un radar de risc pe praguri — nu activitate operațională brută.</span>
+      <span class="go">Deschide panoul →</span>
+    </a>
+    <a class="card" href="demo-director/">
+      <div class="ic">💼</div>
+      <em>intern</em>
+      <b>Panou Director Vânzări</b>
+      <span>Proiecte, pâlnie de lead-uri, rezervări &amp; contracte, agenți (clasament + comisioane) și ce s-ar automatiza.</span>
+      <span class="go">Deschide panoul →</span>
+    </a>
+  </div>
+  <p class="legal">© 2026 · GO CRM (Ghiletchi Consulting) · Demo confidențial, realizat la comandă. Date ilustrative. Concept, design și implementare = proprietatea dezvoltatorului; reproducerea fără acord interzisă.</p>
+</div>
+</body>
+</html>

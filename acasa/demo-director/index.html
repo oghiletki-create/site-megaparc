@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A-casa × GO CRM — Panou management (demo Director Vânzări)</title>
+<!--
+  DEMO INTERN pentru DIRECTORUL DE VÂNZĂRI (și conducere) — GO CRM pentru A-casa.
+  Arată compania pe proiecte/complexe și pe departamente (vânzări, marketing,
+  juridic & contracte, finanțe & încasări, construcție, post-vânzare), pâlnia de
+  lead-uri, rezervările & contractele și agenții (clasament + comisioane) — plus
+  CE S-AR AUTOMATIZA în fiecare. Date DEMO. Logică/cifre simulate; în producție:
+  date live din CRM + contabilitate + AI (Claude). Concept confidențial,
+  proprietatea GO CRM (Ghiletchi Consulting).
+-->
+<style>
+  :root{
+    --brand:#243b6b;--brand-d:#182a4e;--brand-l:#eef1f8;--gold:#c9a24b;--bg:#eef1f7;--card:#fff;
+    --ink:#1e2430;--muted:#6b7280;--line:#e4e7ee;--amber:#ef6c00;--blue:#1565c0;--green:#2e7d32;--red:#c62828;
+    --shadow:0 8px 24px rgba(24,42,78,.10);
+  }
+  *{box-sizing:border-box} html,body{margin:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+  .topbar{background:linear-gradient(135deg,var(--brand),var(--brand-d));color:#fff;padding:12px 20px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:10}
+  .logo{width:36px;height:36px;color:#fff;flex:0 0 36px}
+  .brand b{font-size:18px;font-weight:800;display:block;line-height:1}
+  .brand span{font-size:11px;opacity:.9;letter-spacing:1px;text-transform:uppercase}
+  .role{margin-left:auto;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:7px}
+
+  .shell{display:grid;grid-template-columns:230px 1fr;gap:18px;max-width:1180px;margin:18px auto;padding:0 18px}
+  @media(max-width:820px){.shell{grid-template-columns:1fr}}
+  .nav{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px;height:max-content;box-shadow:var(--shadow);position:sticky;top:74px}
+  @media(max-width:820px){.nav{position:static;display:flex;flex-wrap:wrap;gap:6px}}
+  .nav button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;color:var(--ink);padding:10px 12px;border-radius:10px;font-size:13.5px;font-weight:600;cursor:pointer;text-align:left}
+  @media(max-width:820px){.nav button{width:auto}}
+  .nav button:hover{background:var(--brand-l)}
+  .nav button.on{background:var(--brand);color:#fff}
+  .nav .mi{font-size:17px;flex:0 0 20px;text-align:center}
+  .nav .sep{height:1px;background:var(--line);margin:6px 8px}
+
+  .main{min-width:0}
+  .h{display:flex;align-items:center;gap:12px;margin:2px 0 14px}
+  .h .ic{width:46px;height:46px;border-radius:12px;background:var(--brand-l);display:grid;place-items:center;font-size:24px;flex:0 0 46px}
+  .h h1{font-size:21px;margin:0}
+  .h p{margin:2px 0 0;color:var(--muted);font-size:13px}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+  @media(max-width:680px){.kpis{grid-template-columns:1fr 1fr}}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+  .kpi b{font-size:22px;color:var(--brand-d);display:block}
+  .kpi span{font-size:12px;color:var(--muted)}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:680px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+  .card h3{margin:0 0 11px;font-size:14.5px;display:flex;align-items:center;gap:8px}
+  .card h3 .c{font-size:11px;font-weight:700;color:var(--muted);background:var(--brand-l);padding:1px 8px;border-radius:999px;margin-left:auto}
+
+  .emp{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:13px}
+  .emp:first-of-type{border-top:0}
+  .emp .av{width:30px;height:30px;border-radius:50%;background:var(--brand-l);color:var(--brand-d);display:grid;place-items:center;font-size:12px;font-weight:700;flex:0 0 30px}
+  .emp .n{flex:1}
+  .emp .ct{font-size:11px;color:var(--muted)}
+
+  .task{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-top:1px solid var(--line);font-size:13px;line-height:1.4}
+  .task:first-of-type{border-top:0}
+  .st{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap;flex:0 0 auto}
+  .st.man{background:#fff3e0;color:var(--amber)}
+  .st.prog{background:#e3f2fd;color:var(--blue)}
+  .st.auto{background:#e8f5e9;color:var(--green)}
+
+  .auto{display:flex;gap:9px;padding:9px 0;border-top:1px dashed var(--line);font-size:13px;line-height:1.45}
+  .auto:first-of-type{border-top:0}
+  .auto .b{flex:0 0 22px;height:22px;border-radius:6px;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700}
+  .auto .benefit{color:var(--muted);font-size:11.5px;display:block;margin-top:1px}
+
+  .stores{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  @media(max-width:680px){.stores{grid-template-columns:1fr}}
+  .store{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+  .store .top{display:flex;align-items:center;gap:10px}
+  .store .pin{width:34px;height:34px;border-radius:9px;background:var(--brand-l);display:grid;place-items:center;font-size:18px}
+  .store b{font-size:14.5px}
+  .store .city{font-size:11.5px;color:var(--muted)}
+  .store .row{display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;border-top:1px solid var(--line);margin-top:8px}
+  .store .row:first-of-type{margin-top:10px}
+  .tag-ok{color:var(--green);font-weight:700}.tag-warn{color:var(--amber);font-weight:700}
+
+  .funnel .stage{margin:9px 0}
+  .funnel .lab{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px}
+  .funnel .lab b{font-weight:700;color:var(--brand-d)}
+  .funnel .track{height:22px;background:var(--brand-l);border-radius:8px;overflow:hidden}
+  .funnel .track i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--gold));border-radius:8px}
+
+  .agent{display:flex;align-items:center;gap:11px;padding:11px 0;border-top:1px solid var(--line)}
+  .agent:first-of-type{border-top:0}
+  .rank{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:14px;background:var(--brand-l);color:var(--brand-d);flex:0 0 30px}
+  .rank.top{background:var(--gold);color:#3a2c00}
+  .agent .who2{flex:1;min-width:0}
+  .agent .who2 b{font-size:13.5px}
+  .agent .who2 .z{font-size:11px;color:var(--muted)}
+  .agent .bar{height:6px;background:var(--line);border-radius:999px;margin-top:5px;overflow:hidden;max-width:170px}
+  .agent .bar i{display:block;height:100%;border-radius:999px}
+  .agent .nums{text-align:right;flex:0 0 auto;font-size:12px;line-height:1.5}
+  .agent .nums .s{font-weight:700}
+  .agent .nums .com{color:var(--brand-d);font-weight:800;display:block}
+  .pct{font-weight:700}
+
+  .offer{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid var(--line);padding:10px 0;font-size:13px}
+  .offer:first-of-type{border-top:0}
+  .offer .st2{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px}
+  .st2.rez{background:#fff3e0;color:var(--amber)}.st2.ctr{background:#e3f2fd;color:var(--blue)}.st2.sem{background:#e8f5e9;color:var(--green)}
+
+  .wish{background:linear-gradient(135deg,var(--brand-d),var(--brand));color:#fff;border-radius:14px;padding:18px;box-shadow:var(--shadow);margin-bottom:16px}
+  .wish h3{margin:0 0 4px;font-size:16px;display:flex;align-items:center;gap:8px}
+  .wish p.sub{margin:0 0 12px;font-size:12.5px;opacity:.9}
+  .wish ol{margin:0;padding-left:20px}
+  .wish li{padding:5px 0;font-size:13.5px;line-height:1.45}
+  .wish li b{background:rgba(255,255,255,.18);padding:0 6px;border-radius:5px}
+
+  .legal{max-width:1180px;margin:8px auto 26px;padding:0 18px;color:var(--muted);font-size:11px;text-align:center;line-height:1.5}
+  .demo-badge{background:var(--gold);color:#3a2c00;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.5px}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <svg class="logo" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+    <path d="M9 23 L24 11 L39 23"/><path d="M13 21 V37 H35 V21"/><path d="M21 37 V28 H27 V37"/>
+  </svg>
+  <div class="brand"><b>A-casa</b><span>Panou de management · GO CRM</span></div>
+  <div class="role">👤 Director Vânzări <span class="demo-badge">DEMO</span></div>
+</div>
+
+<div class="shell">
+  <nav class="nav" id="nav"></nav>
+  <main class="main" id="main"></main>
+</div>
+<p class="legal" id="legal"></p>
+
+<script>
+/* ============================================================
+   DATE DEMO — se completează cu cele reale A-casa (în €)
+   ============================================================ */
+const PROJECTS=[
+  {pin:"🏢",name:"Botanica Park · Bloc B",city:"Chișinău, Botanica",manager:"V. Rusu",staff:4,sales:"9 apart. / lună",stock:"58% vândut",ok:true},
+  {pin:"🏢",name:"Botanica Park · Bloc C",city:"Chișinău, Botanica",manager:"A. Ciobanu",staff:3,sales:"5 apart. / lună",stock:"41% vândut",ok:true},
+  {pin:"🏙️",name:"Centru Premium · Bloc 1",city:"Chișinău, Centru",manager:"I. Moraru",staff:2,sales:"4 apart. / lună",stock:"3 rezervări expiră în 48h",ok:false},
+  {pin:"🏘️",name:"Telecentru · Bloc A",city:"Chișinău, Telecentru",manager:"D. Postică",staff:2,sales:"7 apart. / lună",stock:"88% vândut",ok:true}
+];
+
+const FUNNEL=[
+  ["Lead nou",240],["Contactat",181],["Calificat",96],["Vizionare",54],["Ofertă",31],["Rezervare",21],["Contract",14]
+];
+
+const RESLIST=[
+  ["Botanica · Bloc B, ap. 24","2 cam · 58 m² · 53 800 €","rez","rezervat 2 zile"],
+  ["Centru · Bloc 1, ap. 62","2 cam · 61 m² · 64 000 €","ctr","contract în semnare"],
+  ["Telecentru · Bloc A, ap. 18","studio · 31 m² · 28 900 €","sem","contract semnat"],
+  ["Botanica · Bloc B, ap. 09","3 cam · 78 m² · 71 500 €","rez","rezervat 3 zile"]
+];
+
+const DEPTS={
+  vanzari:{ic:"💼",name:"Vânzări",sub:"lead-uri, vizionări, rezervări, contracte",
+    employees:[["Director vânzări",1,"DV"],["Agenți de vânzări",6,"AG"],["Operatori lead / call",3,"OP"],["Coordonator vizionări",1,"CV"]],
+    tasks:[["Lead-uri noi de contactat azi: 18","man"],["Follow-up fără răspuns: 27","man"],["Vizionări programate azi: 9","prog"],["Rezervări care expiră în 48h: 3","man"]],
+    autos:[["Captură & distribuție lead-uri omnicanal","site, reclame, WhatsApp, telefon — toate în pâlnie, cu sursa marcată"],
+      ["Răspuns instant + calificare prin asistentul AI","lead-ul ajunge la agent deja calificat"],
+      ["Reminder de follow-up automat","niciun lead uitat; escaladare dacă nu e contactat la timp"],
+      ["Oferte generate din grilă în secunde","preț corect, grafic de rate inclus"],
+      ["Alertă rezervări care expiră fără contract",""],
+      ["Comisioane agenți calculate automat","din contracte confirmate, fără Excel"]]},
+  marketing:{ic:"📣",name:"Marketing",sub:"campanii, lead-uri, portaluri",
+    employees:[["Marketing manager",1,"MM"],["Specialist ads",1,"AD"],["Content & social",2,"CS"]],
+    tasks:[["Campanie bloc nou de pregătit","man"],["Anunțuri pe portaluri de reînnoit","man"],["Raport ROI pe surse","prog"]],
+    autos:[["ROI pe sursă de lead","ce reclamă aduce contracte, nu doar click-uri"],
+      ["Sincronizare anunțuri cu grila","apartamentul vândut dispare automat de pe portaluri/site"],
+      ["Recuperare lead-uri „reci”","reactivare automată pe canalul clientului"],
+      ["Conținut & descrieri apartamente + traduceri RO/RU",""]]},
+  juridic:{ic:"📄",name:"Juridic & contracte",sub:"contracte, acte adiționale, termene",
+    employees:[["Jurist",1,"JR"],["Specialist contracte",2,"SC"]],
+    tasks:[["Contracte de întocmit: 6","man"],["Acte adiționale de pregătit: 4","man"],["Semnături de urmărit","prog"]],
+    autos:[["Generare contract din rezervare","pe șablonul companiei, fără re-tastare"],
+      ["Urmărire semnături și termene",""],
+      ["Arhivă în fișa clientului","tot dosarul, într-un loc"],
+      ["Alerte scadențe și acte adiționale",""]]},
+  finante:{ic:"💰",name:"Finanțe & încasări",sub:"grafic de rate, reconciliere",
+    employees:[["Contabil-șef",1,"CȘ"],["Contabili",2,"CB"],["Operator încasări",1,"OI"]],
+    tasks:[["Rate de reconciliat azi","man"],["Restanțe de urmărit: 4","man"],["Facturi/chitanțe de emis","prog"]],
+    autos:[["Confirmare automată a ratelor din grafic","plata se potrivește singură cu rata corectă"],
+      ["Radar de restanțe din prima zi","cine, cât, de câte zile + memento automat"],
+      ["Reconciliere bancară","încasări ↔ contracte, automat"],
+      ["Soldul clientului la zi","în fișa lui, mereu actual"]]},
+  constructie:{ic:"🏗️",name:"Construcție",sub:"șantier, stadiu, buget",
+    employees:[["Director tehnic",1,"DT"],["Diriginți de șantier",3,"DS"],["Ingineri / deviz",2,"IN"],["Aprovizionare",3,"AP"]],
+    tasks:[["Recepții pe faze de urmărit","prog"],["Bloc 1 în urma graficului","man"],["Devize de actualizat","man"]],
+    autos:[["Stadiu pe bloc și pe etapă, în timp real",""],
+      ["Buget planificat vs. cheltuit, cu alerte",""],
+      ["Alerte de întârziere față de termen",""],
+      ["Stadiul construcției vizibil clientului","în asistent — mai puține telefoane la birou"]]},
+  postvanzare:{ic:"🔑",name:"Post-vânzare",sub:"predare, garanții, sesizări",
+    employees:[["Coordonator predări",1,"CP"],["Suport clienți",1,"SU"]],
+    tasks:[["Predări programate luna aceasta: 11","prog"],["Sesizări în garanție: 5","man"]],
+    autos:[["Programare predare + proces-verbal digital",""],
+      ["Evidența garanțiilor pe apartament",""],
+      ["Sesizări post-predare urmărite automat",""],
+      ["Cerere de recomandare după predare","referințe pentru vânzări noi"]]}
+};
+
+const AGENTS=[
+  {name:"V. Rusu",zone:"Botanica Park",sales:648000,target:121,com:9720},
+  {name:"A. Ciobanu",zone:"Botanica Park",sales:512000,target:107,com:7680},
+  {name:"D. Postică",zone:"Telecentru",sales:474000,target:98,com:7110},
+  {name:"I. Moraru",zone:"Centru Premium",sales:398000,target:86,com:5970},
+  {name:"M. Cazacu",zone:"Centru Premium",sales:302000,target:74,com:4530},
+  {name:"S. Bejan",zone:"Online · telesales",sales:214000,target:68,com:3210}
+];
+
+const WISH=[
+  ["Fiecare lead urmărit până la contract","— nimic pierdut în WhatsApp sau pe hârtie"],
+  ["Grila (șahmatca) vie, fără dublă rezervare","— statut și preț unic peste tot"],
+  ["Oferte și contracte generate în minute","— din grilă, nu manual"],
+  ["Preț blocat; discountul îl aprob doar eu","— aplicat tehnic, jurnalizat"],
+  ["Confirmarea automată a ratelor din grafic","— restanțele, din prima zi"],
+  ["Clasament agenți + comisioane în timp real",""]
+];
+
+/* ============================================================
+   RENDARE
+   ============================================================ */
+const NAV=[
+  ["overview","📊","Privire de ansamblu"],
+  ["projects","🏢","Proiecte"],
+  ["funnel","🔻","Pâlnie lead-uri"],
+  ["rezervari","📝","Rezervări & contracte"],
+  ["agenti","🏆","Agenți (clasament)"],
+  ["sep"],
+  ["vanzari","💼","Vânzări"],
+  ["marketing","📣","Marketing"],
+  ["juridic","📄","Juridic & contracte"],
+  ["finante","💰","Finanțe & încasări"],
+  ["constructie","🏗️","Construcție"],
+  ["postvanzare","🔑","Post-vânzare"]
+];
+let view="overview";
+const $=s=>document.querySelector(s);
+const fmt=n=>n.toLocaleString("ro-RO");
+
+function renderNav(){
+  $('#nav').innerHTML=NAV.map(n=>{
+    if(n[0]==="sep") return '<div class="sep"></div>';
+    return `<button class="${view===n[0]?'on':''}" onclick="go('${n[0]}')"><span class="mi">${n[1]}</span>${n[2]}</button>`;
+  }).join('');
+}
+function go(v){ view=v; renderNav(); renderMain(); window.scrollTo({top:0,behavior:'smooth'}); }
+window.go=go;
+
+function empList(arr){ return arr.map(e=>`<div class="emp"><div class="av">${e[2]}</div><div class="n">${e[0]}</div><div class="ct">×${e[1]}</div></div>`).join(''); }
+function taskList(arr){ const lbl={man:"manual",prog:"în lucru",auto:"automatizat"}; return arr.map(t=>`<div class="task"><span class="st ${t[1]}">${lbl[t[1]]}</span><span>${t[0]}</span></div>`).join(''); }
+function autoList(arr){ return arr.map(a=>`<div class="auto"><span class="b">✓</span><span><b>${a[0]}</b>${a[1]?`<span class="benefit">${a[1]}</span>`:''}</span></div>`).join(''); }
+
+function renderMain(){
+  const m=$('#main');
+  if(view==="overview"){
+    const totalStaff=Object.values(DEPTS).reduce((s,d)=>s+d.employees.reduce((a,e)=>a+e[1],0),0);
+    m.innerHTML=`
+      <div class="h"><div class="ic">📊</div><div><h1>Privire de ansamblu</h1><p>Compania pe proiecte și departamente — date demo</p></div></div>
+      <div class="kpis">
+        <div class="kpi"><b>4</b><span>blocuri în vânzare</span></div>
+        <div class="kpi"><b>21</b><span>apart. vândute (luna)</span></div>
+        <div class="kpi"><b>38</b><span>rezervări active</span></div>
+        <div class="kpi"><b>240</b><span>lead-uri în pâlnie</span></div>
+      </div>
+      <div class="wish">
+        <h3>🎯 Ce aș automatiza întâi — din perspectiva directorului de vânzări</h3>
+        <p class="sub">Dacă aș conduce vânzările aici, astea mi-ar lua cel mai mult timp și le-aș automatiza primele:</p>
+        <ol>${WISH.map(w=>`<li>${w[0]} ${w[1]?`<b>${w[1].replace(/^— /,'')}</b>`:''}</li>`).join('')}</ol>
+      </div>
+      <div class="grid">
+        <div class="card"><h3>🏢 Proiecte <span class="c">${PROJECTS.length}</span></h3>
+          ${PROJECTS.map(p=>`<div class="task"><span class="st ${p.ok?'auto':'man'}">${p.ok?'OK':'alertă'}</span><span><b>${p.name}</b> — ${p.sales} · ${p.stock}</span></div>`).join('')}
+        </div>
+        <div class="card"><h3>👥 Echipă <span class="c">${totalStaff} pers.</span></h3>
+          ${Object.values(DEPTS).map(d=>`<div class="task"><span class="st prog">${d.employees.reduce((s,e)=>s+e[1],0)}</span><span>${d.ic} ${d.name}</span></div>`).join('')}
+        </div>
+      </div>
+      <p style="color:var(--muted);font-size:12.5px;margin-top:14px">Apasă un departament în stânga ca să vezi angajații, sarcinile curente și ce s-ar automatiza acolo. 👈</p>
+    `;
+  } else if(view==="projects"){
+    m.innerHTML=`
+      <div class="h"><div class="ic">🏢</div><div><h1>Proiecte</h1><p>Fiecare complex / bloc separat — date demo</p></div></div>
+      <div class="stores">${PROJECTS.map(s=>`
+        <div class="store">
+          <div class="top"><div class="pin">${s.pin}</div><div><b>${s.name}</b><div class="city">${s.city}</div></div></div>
+          <div class="row"><span>Responsabil</span><span><b>${s.manager}</b></span></div>
+          <div class="row"><span>Echipă vânzări</span><span>${s.staff}</span></div>
+          <div class="row"><span>Ritm vânzări</span><span><b>${s.sales}</b></span></div>
+          <div class="row"><span>Stadiu stoc</span><span class="${s.ok?'tag-ok':'tag-warn'}">${s.stock}</span></div>
+        </div>`).join('')}</div>
+      <div class="card" style="margin-top:16px"><h3>⚙️ Ce s-ar automatiza la nivel de proiecte</h3>
+        ${autoList([["Aceeași politică de preț pe TOATE canalele, inclusiv site","preț blocat pe grilă — modificabil doar de directorul de vânzări"],["Grilă și disponibilitate sincronizate cu site-ul","un apartament vândut dispare automat; un preț schimbat se reflectă instant"],["Comparație absorbție între proiecte, în timp real","vezi care bloc se vinde și care nu"],["Alertă rezervări care expiră fără contract","stoc eliberat automat, la timp"]])}
+      </div>
+    `;
+  } else if(view==="funnel"){
+    const max=FUNNEL[0][1];
+    m.innerHTML=`
+      <div class="h"><div class="ic">🔻</div><div><h1>Pâlnie de lead-uri</h1><p>Luna curentă · de la lead la contract — date demo</p></div></div>
+      <div class="kpis">
+        <div class="kpi"><b>240</b><span>lead-uri (luna)</span></div>
+        <div class="kpi"><b>22%</b><span>lead → vizionare</span></div>
+        <div class="kpi"><b>14</b><span>contracte</span></div>
+        <div class="kpi"><b>5,8%</b><span>lead → contract</span></div>
+      </div>
+      <div class="card funnel"><h3>🔻 Etape <span class="c">conversie</span></h3>
+        ${FUNNEL.map(f=>`<div class="stage"><div class="lab"><span>${f[0]}</span><b>${f[1]}</b></div><div class="track"><i style="width:${Math.round(f[1]/max*100)}%"></i></div></div>`).join('')}
+      </div>
+      <div class="card" style="margin-top:16px"><h3>⚙️ Ce automatizăm în pâlnie <span class="c">AI</span></h3>
+        ${autoList([["Captură automată din toate canalele","niciun lead nu rămâne pe WhatsApp sau pe hârtie"],["Calificare prin asistentul AI, 24/7","lead-ul ajunge la agent deja pregătit"],["Distribuție + reminder de follow-up","escaladare dacă un lead nu e contactat la timp"],["Alerte de blocaj pe etapă","vezi unde se pierd lead-urile și de ce"]])}
+      </div>
+    `;
+  } else if(view==="rezervari"){
+    m.innerHTML=`
+      <div class="h"><div class="ic">📝</div><div><h1>Rezervări & contracte</h1><p>Status în timp real — date demo</p></div></div>
+      <div class="kpis">
+        <div class="kpi"><b>38</b><span>rezervări active</span></div>
+        <div class="kpi"><b>9</b><span>contracte în semnare</span></div>
+        <div class="kpi"><b>3</b><span>expiră în 48h</span></div>
+        <div class="kpi"><b>14</b><span>semnate (luna)</span></div>
+      </div>
+      <div class="card"><h3>📝 Rezervări recente</h3>
+        ${RESLIST.map(r=>`<div class="offer"><span><b>${r[0]}</b><br><span style="color:var(--muted);font-size:12px">${r[1]}</span></span><span class="st2 ${r[2]}">${r[3]}</span></div>`).join('')}
+      </div>
+      <div class="card" style="margin-top:16px"><h3>⚙️ Ce automatizăm aici <span class="c">AI</span></h3>
+        ${autoList([["Rezervare cu termen automat","dacă nu devine contract, apartamentul revine în grilă"],["Generare contract din rezervare","pe șablon, fără re-tastare"],["Alerte rezervări care expiră",""],["Totul în fișa clientului","istoric, ofertă, contract, plăți"]])}
+      </div>
+    `;
+  } else if(view==="agenti"){
+    const sorted=[...AGENTS].sort((a,b)=>b.sales-a.sales);
+    const totCom=AGENTS.reduce((s,a)=>s+a.com,0);
+    const totSales=AGENTS.reduce((s,a)=>s+a.sales,0);
+    const medal=["🥇","🥈","🥉"];
+    const tcol=p=>p>=100?"#2e7d32":(p>=85?"#ef6c00":"#c62828");
+    m.innerHTML=`
+      <div class="h"><div class="ic">🏆</div><div><h1>Agenți — clasament & comisioane</h1><p>Luna curentă · comision 1,5% din contracte · date demo</p></div></div>
+      <div class="kpis">
+        <div class="kpi"><b>${AGENTS.length}</b><span>agenți activi</span></div>
+        <div class="kpi"><b>${fmt(totSales)} €</b><span>contractat (lună)</span></div>
+        <div class="kpi"><b>${fmt(totCom)} €</b><span>comisioane de plată</span></div>
+        <div class="kpi"><b>${sorted[0].name}</b><span>top agent 🏆</span></div>
+      </div>
+      <div class="card"><h3>📈 Clasament <span class="c">după vânzări</span></h3>
+        ${sorted.map((a,i)=>`
+          <div class="agent">
+            <div class="rank ${i<3?'top':''}">${i<3?medal[i]:(i+1)}</div>
+            <div class="who2"><b>${a.name}</b><div class="z">${a.zone}</div>
+              <div class="bar"><i style="width:${Math.min(a.target,100)}%;background:${tcol(a.target)}"></i></div>
+            </div>
+            <div class="nums"><span class="s">${fmt(a.sales)} €</span> · <span class="pct" style="color:${tcol(a.target)}">${a.target}%</span><span class="com">+${fmt(a.com)} € comision</span></div>
+          </div>`).join('')}
+      </div>
+      <div class="card" style="margin-top:16px"><h3>⚙️ Ce automatizăm aici <span class="c">AI</span></h3>
+        ${autoList([["Comisioane calculate automat","din contractele confirmate — fără Excel, fără erori"],["Clasament în timp real","fiecare agent își vede poziția și targetul"],["Alerte agenți sub target","intervii din timp, nu la final de lună"],["Lead-uri distribuite echilibrat","după disponibilitate și performanță"]])}
+      </div>
+    `;
+  } else {
+    const d=DEPTS[view];
+    m.innerHTML=`
+      <div class="h"><div class="ic">${d.ic}</div><div><h1>${d.name}</h1><p>${d.sub} — date demo</p></div></div>
+      <div class="grid">
+        <div class="card"><h3>👥 Angajați <span class="c">${d.employees.reduce((s,e)=>s+e[1],0)} pers.</span></h3>${empList(d.employees)}</div>
+        <div class="card"><h3>📋 Sarcini curente</h3>${taskList(d.tasks)}</div>
+      </div>
+      <div class="card" style="margin-top:16px"><h3>⚙️ Ce automatizăm în ${d.name} <span class="c">AI</span></h3>${autoList(d.autos)}</div>
+    `;
+  }
+}
+
+$('#legal').textContent="© 2026 · GO CRM (Ghiletchi Consulting) · Demo confidențial, realizat la comandă. Date ilustrative — se completează cu cele reale A-casa. Concept, design și implementare = proprietatea dezvoltatorului; reproducerea fără acord interzisă.";
+renderNav(); renderMain();
+</script>
+</body>
+</html>
