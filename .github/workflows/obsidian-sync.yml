@@ -1,0 +1,53 @@
+name: Obsidian Sync
+
+# Rulează zilnic și actualizează folderul obsidian/ cu activitatea repo-ului.
+# Pornește și manual din tab-ul Actions (Run workflow).
+
+on:
+  schedule:
+    # 05:00 UTC ≈ 08:00 ora Chișinău (vara). Cron-ul GitHub este mereu în UTC.
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+
+# Necesar ca Action-ul să poată face commit + push în repo.
+permissions:
+  contents: write
+
+# Evită rulări suprapuse.
+concurrency:
+  group: obsidian-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Europe/Chisinau
+    steps:
+      - name: Checkout (istoric complet pentru git log)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generează notițele Obsidian
+        run: bash scripts/obsidian-sync.sh
+
+      - name: Rezumat AI (opțional — necesită secretul ANTHROPIC_API_KEY)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Setează variabila de repo ANTHROPIC_MODEL ca să schimbi modelul
+          # (ex. claude-haiku-4-5 pentru cost mai mic). Implicit: claude-opus-4-8.
+          ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL }}
+        run: bash scripts/obsidian-ai-summary.sh
+
+      - name: Commit & push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add obsidian
+          if git diff --cached --quiet; then
+            echo "Nimic de comis."
+          else
+            git commit -m "Obsidian sync: $(date +%F)"
+            git push
+          fi
