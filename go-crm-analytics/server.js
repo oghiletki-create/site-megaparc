@@ -3,6 +3,7 @@ const http = require('http')
 const path = require('path')
 const crypto = require('crypto')
 const { collectKpi } = require('./analytics')
+const { resolveScope } = require('./access')
 const { ICON_192, ICON_512 } = require('./icons')
 
 const html = fs.readFileSync(path.join(__dirname, 'panou.html'), 'utf8')
@@ -59,6 +60,11 @@ function tokenOk(token, provided) {
   if (!valid.length) return false
   if (provided == null || provided === '') return false
   return valid.some(t => safeEqual(t, provided))
+}
+
+function authScope(opts, provided) {
+  if (tokenOk(opts.token, provided)) return { role: 'ceo' }
+  return resolveScope(provided, { secret: opts.secret })
 }
 
 function clientIp(req) {
@@ -126,23 +132,23 @@ function registerPanelRoutes(app, queryAll, options = {}) {
   const limiter = createRateLimiter()
   const guard = (req, res, next) => {
     const ip = clientIp(req)
+    secureHeaders((k, v) => res.set(k, v))
     if (limiter.blocked(ip)) {
-      secureHeaders((k, v) => res.set(k, v))
       return res.status(429).type('text/plain').send('429')
     }
-    if (tokenOk(opts.token, req.query.token)) {
+    const scope = authScope(opts, req.query.token)
+    if (scope) {
       limiter.reset(ip)
-      secureHeaders((k, v) => res.set(k, v))
+      req.panelScope = scope
       return next()
     }
     limiter.fail(ip)
-    secureHeaders((k, v) => res.set(k, v))
     res.status(403).type('text/plain').send('403')
   }
   const sendKpi = async (req, res) => {
     try {
       res.set('Cache-Control', 'no-store')
-      res.json(await collectKpi(queryAll, schemaOf(opts)))
+      res.json(await collectKpi(queryAll, schemaOf(opts), req.panelScope))
     } catch (err) {
       res.status(500).json({ error: String((err && err.message) || err) })
     }
@@ -184,7 +190,8 @@ function createPanelServer(queryAll, options = {}) {
     secureHeaders((k, v) => { secure[k] = v })
     const ip = clientIp(req)
     if (limiter.blocked(ip)) return send(429, 'text/plain', '429', secure)
-    if (!tokenOk(opts.token, url.searchParams.get('token'))) {
+    const scope = authScope(opts, url.searchParams.get('token'))
+    if (!scope) {
       limiter.fail(ip)
       return send(403, 'text/plain', '403', secure)
     }
@@ -199,7 +206,7 @@ function createPanelServer(queryAll, options = {}) {
     }
     if (p === base + '/api' || p === '/api/kpi') {
       try {
-        return send(200, 'application/json', JSON.stringify(await collectKpi(queryAll, schemaOf(opts))), secure)
+        return send(200, 'application/json', JSON.stringify(await collectKpi(queryAll, schemaOf(opts), scope)), secure)
       } catch (err) {
         return send(500, 'application/json', JSON.stringify({ error: String((err && err.message) || err) }), secure)
       }

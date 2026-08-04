@@ -69,6 +69,21 @@ function placeholders(list) {
   return list.map(() => '?').join(',')
 }
 
+function scopeConds(s, cols) {
+  const scope = s.scope || {}
+  const conds = []
+  const args = []
+  if (scope.role === 'employee') {
+    if (scope.emp != null && scope.emp !== '' && cols.id) { conds.push(cols.id + ' = ?'); args.push(scope.emp) }
+    else if (scope.name && cols.name) { conds.push(cols.name + ' = ?'); args.push(scope.name) }
+    else if (scope.dept && cols.dept) { conds.push(cols.dept + ' = ?'); args.push(scope.dept) }
+  } else if (scope.role === 'head' && scope.dept && cols.dept) {
+    conds.push(cols.dept + ' = ?')
+    args.push(scope.dept)
+  }
+  return { conds, args }
+}
+
 function normalizeStages(s) {
   return s.stageOrder.map(entry => typeof entry === 'string'
     ? { label: (s.stageLabels && s.stageLabels[entry]) || entry, statuses: [entry] }
@@ -314,23 +329,33 @@ const PANELS = {
     async collect(q, s) {
       const emps = s.employeesTable || 'employees'
       const tasks = s.tasksTable || 'tasks'
+      const empDept = "COALESCE(NULLIF(department, ''), 'Fără departament')"
+      const eDept = "COALESCE(NULLIF(e.department, ''), 'Fără departament')"
+      const empScope = scopeConds(s, { dept: empDept })
+      const eScope = scopeConds(s, { dept: eDept })
+      const empWhere = empScope.conds.length ? 'WHERE ' + empScope.conds.join(' AND ') : ''
+      const taskWhere = eScope.conds.length ? 'WHERE ' + eScope.conds.join(' AND ') : ''
+      const evalAnd = eScope.conds.length ? ' AND ' + eScope.conds.join(' AND ') : ''
       const empRows = await q(
-        `SELECT COALESCE(NULLIF(department, ''), 'Fără departament') AS departament, COUNT(*) AS angajati
-         FROM ${emps} GROUP BY departament`
+        `SELECT ${empDept} AS departament, COUNT(*) AS angajati
+         FROM ${emps} ${empWhere} GROUP BY departament`,
+        empScope.args
       )
       if (!empRows.length) return null
       const taskRows = await q(
-        `SELECT COALESCE(NULLIF(e.department, ''), 'Fără departament') AS departament,
+        `SELECT ${eDept} AS departament,
                 SUM(CASE WHEN t.done = 0 THEN 1 ELSE 0 END) AS active,
                 SUM(CASE WHEN t.done = 1 AND t.done_at IS NOT NULL AND date(t.done_at) >= date('now', '-29 days') THEN 1 ELSE 0 END) AS finalizate,
                 SUM(CASE WHEN t.done = 1 AND t.done_at IS NOT NULL AND date(t.done_at) >= date('now', '-29 days') AND (t.deadline IS NULL OR t.deadline = '' OR t.done_at <= t.deadline) THEN 1 ELSE 0 END) AS laTimp
-         FROM ${tasks} t LEFT JOIN ${emps} e ON e.id = t.employee_id GROUP BY departament`
+         FROM ${tasks} t LEFT JOIN ${emps} e ON e.id = t.employee_id ${taskWhere} GROUP BY departament`,
+        eScope.args
       )
       const evalRows = await q(
-        `SELECT COALESCE(NULLIF(e.department, ''), 'Fără departament') AS departament, t.ai_evaluation AS evaluare
+        `SELECT ${eDept} AS departament, t.ai_evaluation AS evaluare
          FROM ${tasks} t LEFT JOIN ${emps} e ON e.id = t.employee_id
          WHERE t.ai_evaluation IS NOT NULL AND t.ai_evaluation != '' AND t.done_at IS NOT NULL
-           AND date(t.done_at) >= date('now', '-29 days')`
+           AND date(t.done_at) >= date('now', '-29 days')${evalAnd}`,
+        eScope.args
       )
       const noteByDep = new Map()
       for (const r of evalRows) {
@@ -395,20 +420,26 @@ const PANELS = {
     async collect(q, s) {
       const emps = s.employeesTable || 'employees'
       const tasks = s.tasksTable || 'tasks'
+      const eDept = "COALESCE(NULLIF(e.department, ''), 'Fără departament')"
+      const scope = scopeConds(s, { dept: eDept, id: 'e.id', name: 'e.name' })
+      const rowsWhere = scope.conds.length ? 'WHERE ' + scope.conds.join(' AND ') : ''
+      const evalAnd = scope.conds.length ? ' AND ' + scope.conds.join(' AND ') : ''
       const rows = await q(
-        `SELECT e.name AS nume, COALESCE(NULLIF(e.department, ''), 'Fără departament') AS departament,
+        `SELECT e.name AS nume, ${eDept} AS departament,
                 SUM(CASE WHEN t.done = 0 AND t.id IS NOT NULL THEN 1 ELSE 0 END) AS active,
                 SUM(CASE WHEN t.done = 1 AND t.done_at IS NOT NULL AND date(t.done_at) >= date('now', '-29 days') THEN 1 ELSE 0 END) AS finalizate,
                 SUM(CASE WHEN t.done = 1 AND t.done_at IS NOT NULL AND date(t.done_at) >= date('now', '-29 days') AND (t.deadline IS NULL OR t.deadline = '' OR t.done_at <= t.deadline) THEN 1 ELSE 0 END) AS laTimp
          FROM ${emps} e LEFT JOIN ${tasks} t ON t.employee_id = e.id
-         GROUP BY e.id ORDER BY finalizate DESC, active DESC`
+         ${rowsWhere} GROUP BY e.id ORDER BY finalizate DESC, active DESC`,
+        scope.args
       )
       if (!rows.length) return null
       const evalRows = await q(
         `SELECT e.name AS nume, t.ai_evaluation AS evaluare
          FROM ${tasks} t JOIN ${emps} e ON e.id = t.employee_id
          WHERE t.ai_evaluation IS NOT NULL AND t.ai_evaluation != '' AND t.done_at IS NOT NULL
-           AND date(t.done_at) >= date('now', '-29 days')`
+           AND date(t.done_at) >= date('now', '-29 days')${evalAnd}`,
+        scope.args
       )
       const noteByEmp = new Map()
       for (const r of evalRows) {
