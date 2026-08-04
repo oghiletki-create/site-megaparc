@@ -143,6 +143,10 @@ Valabilă pentru TOATE proiectele/boții:
    coincid cu Power BI); același OData le poate alimenta și Power BI-ul direct,
    fără Excel. Argument de vânzare: la ei raportul e vechi de la ultimul export,
    la noi cifrele sunt de acum, în Telegram.
+5. Datele din 1С alimentează AMBELE suprafețe ale noastre: rapoartele din
+   Telegram **și panoul analitic** (panoul directorului). Nu e lucru dublu —
+   panoul urmează meniul botului (regula din 2026-07-25), deci aceeași citire
+   OData umple și butoanele din `/start`, și secțiunile panoului.
 
 ## Site publicat
 
