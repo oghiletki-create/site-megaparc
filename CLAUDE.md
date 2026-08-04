@@ -12,6 +12,19 @@ Valabilă pentru TOATE proiectele/boții (crm-go-bot și orice instanță):
    Megaparc; Alexandru Muravschi (416540704) = doar instanța Metalica Zuev.
 4. La orice bot nou, lista de admini pornește goală — decide Oleg.
 
+## ⚠️ REGULĂ GLOBALĂ — cum se numește produsul (Oleg, 2026-08-04)
+
+Valabilă pentru TOATE textele: oferte, mesaje, marketing, prezentări, site.
+
+1. **NU se mai folosește** expresia „direct în Telegram" („прямо в Telegram").
+   Formula corectă: lucrezi **direct în sistem** — sistemul de automatizare are
+   **interfață în Telegram** (pe telefon) **și variantă web pentru calculator**.
+   RU: «система автоматизации: интерфейс в Telegram на телефоне и веб-версия
+   для компьютера».
+2. Această regulă BATE formularea veche din skill-ul `vanzare-go-crm`
+   („sistem de automatizare direct în Telegram") — cererea explicită a lui Oleg
+   are prioritate. Rămâne valabil: NICIODATĂ cuvântul „bot" în texte publice.
+
 ## ⚠️ REGULĂ GLOBALĂ — panoul analitic (Oleg, 2026-07-25)
 
 Valabilă pentru TOATE proiectele/boții:
@@ -112,6 +125,12 @@ zeci de utilizatori).
 
 ## Memorie — context clienți/prospecți
 
+- **Alexandru (prospect 1С, 2026-08-04)** — prietenul lui Oleg; au discutat pe
+  2026-08-04 la oficiul lui Alexandru. El e contactul firmei care ține datele în
+  **1С:Управление компанией** și azi le exportă manual în Excel → Power BI
+  (contextul din regula globală „integrare 1С", punctul 4). **Tonul mesajelor
+  către Alexandru: prietenesc, cald, fără formalisme de vânzare** — nu e un
+  prospect rece. (A nu se confunda cu Alexandru Muravschi / Metalica Zuev.)
 - **Art Granit (artgranit.md)** — prospect (blaturi piatră, reprezentant Cosentino).
   Nu a răspuns la propunere. Conținutul a fost eliminat din proiect la cererea lui Oleg.
   **A nu se mai pomeni public și a nu se mai lucra pe el** decât dacă Oleg cere explicit.
