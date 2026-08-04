@@ -3,7 +3,7 @@ const http = require('http')
 const path = require('path')
 const crypto = require('crypto')
 const { collectKpi } = require('./analytics')
-const { resolveScope } = require('./access')
+const { resolveScope, capabilities, delegate } = require('./access')
 const { ICON_192, ICON_512 } = require('./icons')
 
 const html = fs.readFileSync(path.join(__dirname, 'panou.html'), 'utf8')
@@ -43,6 +43,76 @@ self.addEventListener('fetch', event => {
   )
 })
 `
+
+const ACCESS_PAGE = `<!doctype html><html lang="ro"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GO CRM · Acces</title>
+<style>
+:root{--bg:#f9f9f7;--card:#fff;--text:#1a1a1a;--muted:#6b7280;--line:#e5e7eb;--accent:#2a78d6;--ok:#137a4b;--err:#b42318}
+@media(prefers-color-scheme:dark){:root{--bg:#16171a;--card:#1f2126;--text:#f2f2f2;--muted:#9aa0a6;--line:#33363c;--accent:#5aa0ef}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:560px;margin:0 auto;padding:24px 18px}
+h1{font-size:22px;margin:0 0 4px}.muted{color:var(--muted)}
+label{display:block;margin:14px 0 4px;font-weight:600}
+input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--text);font:inherit}
+fieldset{margin:16px 0;border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+legend{padding:0 6px;color:var(--muted);font-size:14px}
+.chk{font-weight:400;display:flex;align-items:center;gap:8px;margin:6px 0}.chk input{width:auto}
+button{margin-top:18px;padding:12px 18px;border:0;border-radius:10px;background:var(--accent);color:#fff;font:inherit;font-weight:600;cursor:pointer}
+a.tg{display:inline-block;margin-left:8px;padding:12px 18px;border-radius:10px;background:#229ed9;color:#fff;text-decoration:none;font-weight:600}
+textarea{width:100%;margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--text);font:14px/1.4 ui-monospace,monospace}
+.ok{color:var(--ok)}.err{color:var(--err)}.row{margin-top:10px;display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-top:16px}
+</style></head><body><main id="app"><p class="muted">Se încarcă…</p></main>
+<script>
+(function(){
+  var params=new URLSearchParams(location.search);var token=params.get('token')||'';
+  var app=document.getElementById('app');
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function api(path,extra){var u=path+'?token='+encodeURIComponent(token)+(extra||'');return fetch(u,{cache:'no-store'}).then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};},function(){return {ok:false,j:{}};});});}
+  api('acces/api').then(function(res){var c=res.j;if(!res.ok||!c||!c.canGrant){app.innerHTML='<h1>Acces</h1><p class="muted">Nu ai drept de administrare aici.</p>';return;}render(c);}).catch(function(){app.innerHTML='<p class="err">Eroare de conexiune.</p>';});
+  function render(c){
+    var h='<h1>Adaugă persoană</h1>';
+    if(c.role==='ceo'){
+      h+='<label for="role">Tip</label><select id="role"><option value="head">Director de departament</option><option value="employee">Angajat</option></select>';
+      h+='<label for="dept">Departament</label><input id="dept" placeholder="ex: Vânzări">';
+    } else {
+      h+='<p class="muted">Adaugi angajați în departamentul <b>'+esc(c.dept||'—')+'</b>.</p>';
+    }
+    h+='<label for="name">Nume</label><input id="name" placeholder="ex: Ion Popescu">';
+    h+='<fieldset><legend>Ce module vede</legend>';
+    (c.sections||[]).forEach(function(s){h+='<label class="chk"><input type="checkbox" name="menu" value="'+esc(s.id)+'"> '+esc(s.ro)+'</label>';});
+    h+='</fieldset><button id="go">Generează link</button><div id="out"></div>';
+    app.innerHTML=h;
+    document.getElementById('go').addEventListener('click',function(){submit(c);});
+  }
+  function submit(c){
+    var name=(document.getElementById('name').value||'').trim();
+    if(!name){alert('Scrie numele.');return;}
+    var menu=Array.prototype.slice.call(document.querySelectorAll('input[name=menu]:checked')).map(function(x){return x.value;});
+    var extra='&name='+encodeURIComponent(name)+'&menu='+encodeURIComponent(menu.join(','));
+    if(c.role==='ceo'){
+      extra+='&role='+encodeURIComponent(document.getElementById('role').value);
+      extra+='&dept='+encodeURIComponent((document.getElementById('dept').value||'').trim());
+    }
+    api('acces/nou',extra).then(function(res){
+      var out=document.getElementById('out');
+      if(!res.ok||!res.j||res.j.error){out.innerHTML='<p class="err">'+esc((res.j&&res.j.error)||'Eroare')+'</p>';return;}
+      var basePath=location.pathname.replace(/\\/acces\\/?$/,'');
+      var link=location.origin+basePath+'/?token='+encodeURIComponent(res.j.token);
+      out.innerHTML='<div class="card"><p class="ok">Link pentru <b>'+esc(res.j.name)+'</b> — trimite-i-l:</p>'+
+        '<textarea id="lnk" readonly rows="3">'+esc(link)+'</textarea>'+
+        '<div class="row"><button id="copy" type="button">Copiază</button>'+
+        '<a class="tg" target="_blank" rel="noopener" href="https://t.me/share/url?url='+encodeURIComponent(link)+'">Trimite pe Telegram</a></div></div>';
+      document.getElementById('copy').addEventListener('click',function(){
+        var t=document.getElementById('lnk');t.select();try{document.execCommand('copy');}catch(e){}
+        if(navigator.clipboard){navigator.clipboard.writeText(link).catch(function(){});}
+        this.textContent='Copiat ✓';
+      });
+    });
+  }
+})();
+</script></body></html>`
 
 function validTokens(token) {
   const list = Array.isArray(token) ? token : String(token == null ? '' : token).split(',')
@@ -160,6 +230,12 @@ function registerPanelRoutes(app, queryAll, options = {}) {
   })
   app.get(base + '/', guard, (req, res) => res.type('html').send(html))
   app.get(base + '/api', guard, sendKpi)
+  app.get(base + '/acces', guard, (req, res) => res.type('html').send(ACCESS_PAGE))
+  app.get(base + '/acces/api', guard, (req, res) => res.json(capabilities(req.panelScope)))
+  app.get(base + '/acces/nou', guard, (req, res) => {
+    const out = delegate(req.panelScope, req.query, opts.secret)
+    res.status(out.error ? 400 : 200).json(out)
+  })
   app.get(base + '/manifest.webmanifest', guard, (req, res) => {
     res.type('application/manifest+json')
     res.send(JSON.stringify(manifestFor(queryOf(req.originalUrl).replace(/^\?/, ''), opts)))
@@ -201,6 +277,21 @@ function createPanelServer(queryAll, options = {}) {
       return res.end()
     }
     if (p === base + '/') return send(200, 'text/html; charset=utf-8', html, secure)
+    if (p === base + '/acces') return send(200, 'text/html; charset=utf-8', ACCESS_PAGE, secure)
+    if (p === base + '/acces/api') {
+      return send(200, 'application/json', JSON.stringify(capabilities(scope)), secure)
+    }
+    if (p === base + '/acces/nou') {
+      const params = {
+        role: url.searchParams.get('role'),
+        dept: url.searchParams.get('dept'),
+        name: url.searchParams.get('name'),
+        emp: url.searchParams.get('emp'),
+        menu: url.searchParams.get('menu')
+      }
+      const out = delegate(scope, params, opts.secret)
+      return send(out.error ? 400 : 200, 'application/json', JSON.stringify(out), secure)
+    }
     if (p === base + '/manifest.webmanifest') {
       return send(200, 'application/manifest+json', JSON.stringify(manifestFor(url.search.replace(/^\?/, ''), opts)), secure)
     }

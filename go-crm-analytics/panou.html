@@ -150,6 +150,7 @@ td:last-child, th:last-child { text-align: right; }
     <h1 id="title">GO CRM — Panou analitic</h1>
     <span id="badge" class="badge">…</span>
     <button id="install" class="btn accent" type="button" hidden>⊕ Instalează</button>
+    <a id="addlink" class="btn accent" hidden>➕ Adaugă persoană</a>
     <button id="refresh-now" class="btn" type="button" style="margin-left:auto">↻</button>
     <button id="lang" class="btn" type="button">Русский</button>
     <button id="theme" class="btn" type="button">Temă: auto</button>
@@ -174,6 +175,7 @@ const STR = {
     langBtn: 'Русский',
     themeAuto: 'Temă: auto', themeLight: 'Temă: luminoasă', themeDark: 'Temă: întunecată',
     install: '⊕ Instalează pe desktop',
+    addPerson: '➕ Adaugă persoană',
     seeTable: 'Vezi tabelul',
     empty: 'Niciun modul activ în meniul botului. Activează un modul în Telegram și panoul îl afișează automat.',
     min: 'min', days: 'zile'
@@ -190,6 +192,7 @@ const STR = {
     langBtn: 'Română',
     themeAuto: 'Тема: авто', themeLight: 'Тема: светлая', themeDark: 'Тема: тёмная',
     install: '⊕ Установить на рабочий стол',
+    addPerson: '➕ Добавить человека',
     seeTable: 'Показать таблицу',
     empty: 'В меню бота нет активных модулей. Включите модуль в Telegram — панель покажет его автоматически.',
     min: 'мин', days: 'дн.'
@@ -517,6 +520,13 @@ function renderAll() {
   document.getElementById('title').textContent = company ? company + ' — ' + t('title') : t('title')
   document.getElementById('lang').textContent = t('langBtn')
   document.getElementById('install').textContent = t('install')
+  const addlink = document.getElementById('addlink')
+  const canGrant = lastLive && lastKpi.viewer && lastKpi.viewer.canGrant
+  addlink.hidden = !canGrant
+  if (canGrant) {
+    addlink.textContent = t('addPerson')
+    addlink.href = 'acces' + location.search
+  }
   const badge = document.getElementById('badge')
   const when = new Date(lastKpi.generatedAt).toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' })
   badge.textContent = lastLive ? t('live') : (lastGoodAt ? t('offline') + ' ' + when : t('demo'))

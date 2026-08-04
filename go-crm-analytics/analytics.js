@@ -64,6 +64,7 @@ async function collectKpi(queryAll, overrides = {}, scope = null) {
     currency: s.currency,
     company: s.company,
     menu: menuTree(menu),
+    viewer: scope ? { role: scope.role, canGrant: scope.role === 'ceo' || scope.role === 'head' } : null,
     sections
   }
 }

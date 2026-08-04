@@ -78,6 +78,54 @@ function resolveScope(provided, opts = {}) {
   return null
 }
 
+function grantableSections() {
+  return MENU.map(s => ({ id: s.id, ro: s.label, ru: s.labelRu }))
+}
+
+function capabilities(scope) {
+  const all = grantableSections()
+  if (!scope || (scope.role !== 'ceo' && scope.role !== 'head')) {
+    return { role: scope ? scope.role : null, canGrant: false, sections: [] }
+  }
+  if (scope.role === 'ceo') {
+    return { role: 'ceo', canGrant: true, canPickRole: true, canPickDept: true, dept: null, sections: all }
+  }
+  const allow = Array.isArray(scope.menu) && scope.menu.length ? new Set(scope.menu) : null
+  const sections = allow ? all.filter(s => allow.has(s.id)) : all
+  return { role: 'head', canGrant: true, canPickRole: false, canPickDept: false, dept: scope.dept || null, sections }
+}
+
+function delegate(caller, req, secret) {
+  if (!caller || (caller.role !== 'ceo' && caller.role !== 'head')) {
+    return { error: 'Nu ai dreptul să adaugi persoane.' }
+  }
+  if (!secret) return { error: 'Lipsește cheia de semnare (PANEL_SECRET).' }
+  const name = req && req.name != null ? String(req.name).trim() : ''
+  if (!name) return { error: 'Numele e obligatoriu.' }
+  const reqMenu = normList(req.menu).filter(id => SECTION_IDS.includes(id))
+  let role, dept, menu, days, emp
+
+  if (caller.role === 'ceo') {
+    role = req.role === 'employee' ? 'employee' : 'head'
+    dept = req.dept != null ? String(req.dept).trim() : ''
+    if (role === 'head' && !dept) return { error: 'Departamentul e obligatoriu pentru un director.' }
+    menu = reqMenu
+    emp = req.emp
+    days = role === 'head' ? 365 : 180
+  } else {
+    if (!caller.dept) return { error: 'Contul tău nu are un departament setat, nu poți adăuga angajați.' }
+    role = 'employee'
+    dept = caller.dept
+    const allowed = Array.isArray(caller.menu) && caller.menu.length ? caller.menu : SECTION_IDS
+    menu = (reqMenu.length ? reqMenu : allowed).filter(id => allowed.includes(id))
+    emp = req.emp
+    days = 180
+  }
+
+  const token = mint({ role, dept, name, emp, menu }, secret, { days })
+  return { ok: true, role, dept, name, menu, days, token }
+}
+
 if (require.main === module) {
   const args = process.argv.slice(2)
   const secret = process.env.PANEL_SECRET
@@ -120,4 +168,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { sign, verify, mint, resolveScope, scopeFromClaims, ROLES, SECTION_IDS }
+module.exports = { sign, verify, mint, resolveScope, scopeFromClaims, capabilities, delegate, grantableSections, ROLES, SECTION_IDS }

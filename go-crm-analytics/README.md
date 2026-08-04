@@ -104,7 +104,25 @@ criptografic** (HMAC-SHA256 cu `PANEL_SECRET`) — nu se pot falsifica și nu se
 modifica. Tokenul de CEO rămâne un secret simplu; nimic din linkurile existente nu
 se strică.
 
-### Generarea unui link per persoană
+### Auto-serviciu: fiecare își adaugă oamenii (recomandat)
+
+În panou, sus, apare butonul **➕ Adaugă persoană** — doar pentru cine are dreptul:
+
+- **CEO** adaugă **directori de departament** (alege departamentul și modulele) și,
+  la nevoie, angajați.
+- **Directorul** adaugă **angajați**, automat în departamentul lui și doar cu module
+  din cele pe care le are el.
+- **Angajatul** nu vede butonul.
+
+Formularul generează pe loc linkul persoanei, gata de copiat sau de trimis pe
+Telegram. Serverul **impune ierarhia**: un director nu poate crea alt director, nu
+poate schimba departamentul și nu poate acorda module pe care el nu le are. Fără
+bază de date separată — dreptul de a adăuga vine din tokenul semnat al fiecăruia.
+
+Rute implicate (toate cer token valid): `/panou/acces` (pagina), `/panou/acces/api`
+(ce poate acorda), `/panou/acces/nou` (generează tokenul noii persoane).
+
+### Generarea unui link din linia de comandă (alternativă)
 
 ```
 PANEL_SECRET=…  node access.js ceo
