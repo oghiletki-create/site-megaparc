@@ -12,6 +12,19 @@ Valabilă pentru TOATE proiectele/boții (crm-go-bot și orice instanță):
    Megaparc; Alexandru Muravschi (416540704) = doar instanța Metalica Zuev.
 4. La orice bot nou, lista de admini pornește goală — decide Oleg.
 
+## ⚠️ REGULĂ GLOBALĂ — cum se numește produsul (Oleg, 2026-08-04)
+
+Valabilă pentru TOATE textele: oferte, mesaje, marketing, prezentări, site.
+
+1. **NU se mai folosește** expresia „direct în Telegram" („прямо в Telegram").
+   Formula corectă: lucrezi **direct în sistem** — sistemul de automatizare are
+   **interfață în Telegram** (pe telefon) **și variantă web pentru calculator**.
+   RU: «система автоматизации: интерфейс в Telegram на телефоне и веб-версия
+   для компьютера».
+2. Această regulă BATE formularea veche din skill-ul `vanzare-go-crm`
+   („sistem de automatizare direct în Telegram") — cererea explicită a lui Oleg
+   are prioritate. Rămâne valabil: NICIODATĂ cuvântul „bot" în texte publice.
+
 ## ⚠️ REGULĂ GLOBALĂ — panoul analitic (Oleg, 2026-07-25)
 
 Valabilă pentru TOATE proiectele/boții:
@@ -112,10 +125,47 @@ zeci de utilizatori).
 
 ## Memorie — context clienți/prospecți
 
+- **Alexandru (prospect 1С, 2026-08-04)** — prietenul lui Oleg; au discutat pe
+  2026-08-04 la oficiul lui Alexandru. El e contactul firmei care ține datele în
+  **1С:Управление компанией** și azi le exportă manual în Excel → Power BI
+  (contextul din regula globală „integrare 1С", punctul 4). **Tonul mesajelor
+  către Alexandru: prietenesc, cald, fără formalisme de vânzare** — nu e un
+  prospect rece. (A nu se confunda cu Alexandru Muravschi / Metalica Zuev.)
 - **Art Granit (artgranit.md)** — prospect (blaturi piatră, reprezentant Cosentino).
   Nu a răspuns la propunere. Conținutul a fost eliminat din proiect la cererea lui Oleg.
   **A nu se mai pomeni public și a nu se mai lucra pe el** decât dacă Oleg cere explicit.
   Reținut doar ca memorie internă.
+
+## ⚠️ REGULĂ GLOBALĂ — integrare 1С (Oleg, 2026-08-04)
+
+Valabilă pentru TOATE proiectele/boții:
+
+1. Datele din 1С se iau prin **interfața standard OData** a platformei (REST,
+   fără cod pe partea 1С). Referința: **`INTEGRARE-1C-ODATA.md`** — conspect
+   complet după textul integral al articolului Infostart nr. 1570140 „Работа с
+   1С через протокол OData" (textul l-a furnizat Oleg; site-ul e blocat din
+   mediul de dezvoltare). Se citește înainte de orice lucrare pe date din 1С.
+2. Capcana nr. 1: după publicare lista de obiecte OData e GOALĂ până când
+   1С-istul clientului rulează `УстановитьСоставСтандартногоИнтерфейсаOData`
+   (la configurațiile tipice e deseori deja activată — se verifică cu
+   `ПолучитьСоставСтандартногоИнтерфейсаOData`).
+3. Produsul de la clienți: **„1С:Управление компанией"** (confirmat de Oleg,
+   2026-08-04) — ediția localizată (Moldova) din familia УНФ / „Управление
+   нашей фирмой" (internațional 1C:Drive). Configurație tipică pe platforma
+   8.3, ERP pentru firme mici: vânzări, comenzi, clienți, stoc, bani, salarii,
+   producție. OData funcționează pe ea ca în referință; ediția/versiunea exactă
+   se confirmă din „Despre program" la client.
+4. Context client (2026-08-04): clientul discutat ține datele în 1С УНФ și azi
+   le **exportă manual în Excel → Power BI**. Deci OData probabil NU e publicat
+   la el — checklist-ul din `INTEGRARE-1C-ODATA.md` se aplică integral. Aceleași
+   date se extrag prin OData și pentru sistemul nostru (aceeași sursă → cifrele
+   coincid cu Power BI); același OData le poate alimenta și Power BI-ul direct,
+   fără Excel. Argument de vânzare: la ei raportul e vechi de la ultimul export,
+   la noi cifrele sunt de acum, în Telegram.
+5. Datele din 1С alimentează AMBELE suprafețe ale noastre: rapoartele din
+   Telegram **și panoul analitic** (panoul directorului). Nu e lucru dublu —
+   panoul urmează meniul botului (regula din 2026-07-25), deci aceeași citire
+   OData umple și butoanele din `/start`, și secțiunile panoului.
 
 ## Site publicat
 
