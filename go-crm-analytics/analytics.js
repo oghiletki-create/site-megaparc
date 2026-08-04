@@ -24,9 +24,18 @@ const defaultSchema = {
   currency: 'EUR'
 }
 
-async function collectKpi(queryAll, overrides = {}) {
+function scopeMenu(menu, scope) {
+  if (!scope || scope.role === 'ceo') return menu
+  if (!Array.isArray(scope.menu) || !scope.menu.length) return menu
+  const allowed = new Set(scope.menu)
+  return menu.filter(section => allowed.has(section.id))
+}
+
+async function collectKpi(queryAll, overrides = {}, scope = null) {
   const s = { ...defaultSchema, ...overrides }
-  const menu = s.menu && s.menu.length ? s.menu : activeMenu()
+  if (scope) s.scope = scope
+  const base = s.menu && s.menu.length ? s.menu : activeMenu()
+  const menu = scopeMenu(base, scope)
   const sections = []
   for (const entry of panelsOf(menu)) {
     const def = PANELS[entry.panel]
@@ -55,6 +64,7 @@ async function collectKpi(queryAll, overrides = {}) {
     currency: s.currency,
     company: s.company,
     menu: menuTree(menu),
+    viewer: scope ? { role: scope.role, canGrant: scope.role === 'ceo' || scope.role === 'head' } : null,
     sections
   }
 }

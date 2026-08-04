@@ -48,6 +48,7 @@ if (process.env.DASHBOARD_TOKEN) {
   panou.registerPanelRoutes(app, queryAll, {
     schema: schema,
     token: process.env.DASHBOARD_TOKEN,
+    secret: process.env.PANEL_SECRET,
     company: COMPANY_NAME
   });
 }
@@ -59,14 +60,15 @@ if (process.env.DASHBOARD_TOKEN) {
 Fără Express, pentru un proces separat:
 
 ```js
-panou.createPanelServer(queryAll, { port: 8080, token: '…', schema: schema });
+panou.createPanelServer(queryAll, { port: 8080, token: '…', secret: process.env.PANEL_SECRET, schema: schema });
 ```
 
 ## Variabile de mediu
 
 | Variabilă | Efect |
 |---|---|
-| `DASHBOARD_TOKEN` | **obligatorie** — fără ea rutele nici nu se înregistrează, panoul nu există |
+| `DASHBOARD_TOKEN` | **obligatorie** — fără ea rutele nici nu se înregistrează, panoul nu există. E tokenul de **CEO** (vede tot). Poate conține mai multe tokene separate prin virgulă (`tok1,tok2`), ca să dai linkuri diferite unor persoane diferite și să revoci unul singur fără să le strici pe toate |
+| `PANEL_SECRET` | opțională — cheia cu care se **semnează tokenele pe rol** (șef de departament, angajat). Fără ea funcționează doar tokenul de CEO |
 | `MODULES` | listă separată prin virgulă cu modulele active (implicit: `contabilitate`) |
 | `PUBLIC_URL` / `RAILWAY_PUBLIC_DOMAIN` | domeniul folosit în linkul trimis în Telegram |
 | `ONEC_ODATA_URL`, `ONEC_USER`, `ONEC_PASSWORD` | conectorul 1C (opțional) |
@@ -86,6 +88,81 @@ Module disponibile: `contabilitate`, `sarcini`, `angajati`, `raport`, `vanzari`,
 | `/dashboard` | redirecționează la `/panou/` (linkuri vechi) |
 
 Totul în afară de service worker și iconițe cere tokenul; fără el răspunde 403.
+
+## Acces pe roluri (CEO / șef de departament / angajat)
+
+Panoul cunoaște trei niveluri de acces, în locul unui singur token care vede tot:
+
+- **CEO** — vede tot. Folosește tokenul simplu `DASHBOARD_TOKEN` (linkul de până acum).
+- **Șef de departament** — vede doar secțiunile din meniul lui, iar panourile de
+  oameni (Angajați, Sarcini pe departamente) filtrate la **departamentul lui**.
+- **Angajat** — vede doar secțiunile din meniul lui, iar datele de oameni filtrate
+  la **el însuși**.
+
+Rolul, departamentul și meniul permis sunt scrise într-un **token semnat
+criptografic** (HMAC-SHA256 cu `PANEL_SECRET`) — nu se pot falsifica și nu se pot
+modifica. Tokenul de CEO rămâne un secret simplu; nimic din linkurile existente nu
+se strică.
+
+### Auto-serviciu: fiecare își adaugă oamenii (recomandat)
+
+În panou, sus, apare butonul **➕ Adaugă persoană** — doar pentru cine are dreptul:
+
+- **CEO** adaugă **directori de departament** (alege departamentul și modulele) și,
+  la nevoie, angajați.
+- **Directorul** adaugă **angajați**, automat în departamentul lui și doar cu module
+  din cele pe care le are el.
+- **Angajatul** nu vede butonul.
+
+Formularul generează pe loc linkul persoanei, gata de copiat sau de trimis pe
+Telegram. Serverul **impune ierarhia**: un director nu poate crea alt director, nu
+poate schimba departamentul și nu poate acorda module pe care el nu le are. Fără
+bază de date separată — dreptul de a adăuga vine din tokenul semnat al fiecăruia.
+
+Rute implicate (toate cer token valid): `/panou/acces` (pagina), `/panou/acces/api`
+(ce poate acorda), `/panou/acces/nou` (generează tokenul noii persoane).
+
+### Generarea unui link din linia de comandă (alternativă)
+
+```
+PANEL_SECRET=…  node access.js ceo
+PANEL_SECRET=…  node access.js head     --dept "Vânzări"  --menu vanzari,angajati       --name "Ion"  --days 180
+PANEL_SECRET=…  node access.js employee --dept "Vânzări"  --emp 42 --menu sarcini       --name "Ana"  --days 90
+PANEL_SECRET=…  node access.js verify   <token>
+```
+
+Setează și `PANEL_URL` (sau `PUBLIC_URL`) ca să primești linkul complet, gata de
+trimis. `--days 0` = token permanent (util doar pentru CEO).
+
+Ce vede fiecare rol **în interiorul** panoului se decide prin `--menu` (lista de
+module la care are acces) plus filtrarea automată pe departament/persoană a
+panourilor de oameni. Modulele financiare nu sunt legate de departament — dacă un
+șef nu trebuie să vadă cifrele firmei, pur și simplu nu i le pui în `--menu`.
+
+Module valide pentru `--menu`: `contabilitate`, `sarcini`, `angajati`, `raport`,
+`vanzari`, `prospecti`, `unuc`, `jurist`.
+
+## Securitate
+
+- **Tokenul se compară în timp constant** (nu se poate ghici caracter cu caracter
+  după cât durează răspunsul).
+- **Fail-closed:** dacă nu e configurat niciun token, panoul răspunde 403 la tot —
+  nu se deschide public din greșeală.
+- **Limită de încercări:** după prea multe tokene greșite de la același IP,
+  serverul răspunde 429 pentru o vreme (oprește forța brută).
+- **Anteturi:** răspunsurile cu token folosesc `Cache-Control: no-store`,
+  `Referrer-Policy: no-referrer`, `X-Content-Type-Options: nosniff`,
+  `X-Frame-Options: DENY` — tokenul din link nu se scurge prin Referer și
+  paginile cu token nu se cachează de proxy-uri.
+- **Service worker-ul nu salvează pe disc datele sensibile** (`/api`, manifestul):
+  cifrele reale nu rămân în cache-ul browserului pe calculatoare partajate. Doar
+  învelișul paginii se cachează pentru afișarea offline.
+
+Rămâne o limitare de arhitectură: tokenul călătorește în link (`?token=`) și, la
+aplicația instalată, ajunge în manifest. Tokenele pe rol au acum semnătură și
+expirare (vezi mai sus), dar pentru identitate cu login clasic (utilizator +
+parolă, sesiune) în locul linkului cu token e nevoie de un strat de autentificare
+separat.
 
 ## Instalare pe desktop
 
