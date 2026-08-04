@@ -66,7 +66,7 @@ panou.createPanelServer(queryAll, { port: 8080, token: '…', schema: schema });
 
 | Variabilă | Efect |
 |---|---|
-| `DASHBOARD_TOKEN` | **obligatorie** — fără ea rutele nici nu se înregistrează, panoul nu există |
+| `DASHBOARD_TOKEN` | **obligatorie** — fără ea rutele nici nu se înregistrează, panoul nu există. Poate conține mai multe tokene separate prin virgulă (`tok1,tok2`), ca să dai linkuri diferite unor persoane diferite și să revoci unul singur fără să le strici pe toate |
 | `MODULES` | listă separată prin virgulă cu modulele active (implicit: `contabilitate`) |
 | `PUBLIC_URL` / `RAILWAY_PUBLIC_DOMAIN` | domeniul folosit în linkul trimis în Telegram |
 | `ONEC_ODATA_URL`, `ONEC_USER`, `ONEC_PASSWORD` | conectorul 1C (opțional) |
@@ -86,6 +86,27 @@ Module disponibile: `contabilitate`, `sarcini`, `angajati`, `raport`, `vanzari`,
 | `/dashboard` | redirecționează la `/panou/` (linkuri vechi) |
 
 Totul în afară de service worker și iconițe cere tokenul; fără el răspunde 403.
+
+## Securitate
+
+- **Tokenul se compară în timp constant** (nu se poate ghici caracter cu caracter
+  după cât durează răspunsul).
+- **Fail-closed:** dacă nu e configurat niciun token, panoul răspunde 403 la tot —
+  nu se deschide public din greșeală.
+- **Limită de încercări:** după prea multe tokene greșite de la același IP,
+  serverul răspunde 429 pentru o vreme (oprește forța brută).
+- **Anteturi:** răspunsurile cu token folosesc `Cache-Control: no-store`,
+  `Referrer-Policy: no-referrer`, `X-Content-Type-Options: nosniff`,
+  `X-Frame-Options: DENY` — tokenul din link nu se scurge prin Referer și
+  paginile cu token nu se cachează de proxy-uri.
+- **Service worker-ul nu salvează pe disc datele sensibile** (`/api`, manifestul):
+  cifrele reale nu rămân în cache-ul browserului pe calculatoare partajate. Doar
+  învelișul paginii se cachează pentru afișarea offline.
+
+Rămâne o limitare de arhitectură: tokenul călătorește în link (`?token=`) și, la
+aplicația instalată, ajunge în manifest. Pentru identitate per-persoană cu
+expirare și pentru acces limitat pe rol/departament în panoul web e nevoie de un
+strat de login separat.
 
 ## Instalare pe desktop
 
