@@ -117,15 +117,30 @@ zeci de utilizatori).
   **A nu se mai pomeni public și a nu se mai lucra pe el** decât dacă Oleg cere explicit.
   Reținut doar ca memorie internă.
 
-## Integrare 1С
+## ⚠️ REGULĂ GLOBALĂ — integrare 1С (Oleg, 2026-08-04)
 
-- Datele din 1С se iau prin **interfața standard OData** a platformei (REST,
-  fără cod pe partea 1С). Referința proiectului: **`INTEGRARE-1C-ODATA.md`**
-  (conspect după articolul Infostart nr. 1570140 „Работа с 1С через протокол
-  OData" — site-ul e blocat din mediul de dezvoltare, conspectul e verificat cu
-  documentația platformei). Se citește înainte de orice lucrare pe date din 1С.
-- Capcana nr. 1: după publicare lista de obiecte OData e GOALĂ până când 1С-istul
-  clientului rulează `УстановитьСоставСтандартногоИнтерфейсаOData`.
+Valabilă pentru TOATE proiectele/boții:
+
+1. Datele din 1С se iau prin **interfața standard OData** a platformei (REST,
+   fără cod pe partea 1С). Referința: **`INTEGRARE-1C-ODATA.md`** — conspect
+   complet după textul integral al articolului Infostart nr. 1570140 „Работа с
+   1С через протокол OData" (textul l-a furnizat Oleg; site-ul e blocat din
+   mediul de dezvoltare). Se citește înainte de orice lucrare pe date din 1С.
+2. Capcana nr. 1: după publicare lista de obiecte OData e GOALĂ până când
+   1С-istul clientului rulează `УстановитьСоставСтандартногоИнтерфейсаOData`
+   (la configurațiile tipice e deseori deja activată — se verifică cu
+   `ПолучитьСоставСтандартногоИнтерфейсаOData`).
+3. **„1С Conducerea afacerii"** la clienți = 1С:Управление нашей фирмой
+   (УНФ; internațional 1C:Drive) — configurație tipică pe platforma 8.3, ERP
+   pentru firme mici: vânzări, comenzi, clienți, stoc, bani, salarii, producție.
+   OData funcționează pe ea ca în referință.
+4. Context client (2026-08-04): clientul discutat ține datele în 1С УНФ și azi
+   le **exportă manual în Excel → Power BI**. Deci OData probabil NU e publicat
+   la el — checklist-ul din `INTEGRARE-1C-ODATA.md` se aplică integral. Aceleași
+   date se extrag prin OData și pentru sistemul nostru (aceeași sursă → cifrele
+   coincid cu Power BI); același OData le poate alimenta și Power BI-ul direct,
+   fără Excel. Argument de vânzare: la ei raportul e vechi de la ultimul export,
+   la noi cifrele sunt de acum, în Telegram.
 
 ## Site publicat
 
