@@ -130,10 +130,12 @@ Valabilă pentru TOATE proiectele/boții:
    1С-istul clientului rulează `УстановитьСоставСтандартногоИнтерфейсаOData`
    (la configurațiile tipice e deseori deja activată — se verifică cu
    `ПолучитьСоставСтандартногоИнтерфейсаOData`).
-3. **„1С Conducerea afacerii"** la clienți = 1С:Управление нашей фирмой
-   (УНФ; internațional 1C:Drive) — configurație tipică pe platforma 8.3, ERP
-   pentru firme mici: vânzări, comenzi, clienți, stoc, bani, salarii, producție.
-   OData funcționează pe ea ca în referință.
+3. Produsul de la clienți: **„1С:Управление компанией"** (confirmat de Oleg,
+   2026-08-04) — ediția localizată (Moldova) din familia УНФ / „Управление
+   нашей фирмой" (internațional 1C:Drive). Configurație tipică pe platforma
+   8.3, ERP pentru firme mici: vânzări, comenzi, clienți, stoc, bani, salarii,
+   producție. OData funcționează pe ea ca în referință; ediția/versiunea exactă
+   se confirmă din „Despre program" la client.
 4. Context client (2026-08-04): clientul discutat ține datele în 1С УНФ și azi
    le **exportă manual în Excel → Power BI**. Deci OData probabil NU e publicat
    la el — checklist-ul din `INTEGRARE-1C-ODATA.md` se aplică integral. Aceleași
