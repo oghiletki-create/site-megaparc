@@ -117,6 +117,16 @@ zeci de utilizatori).
   **A nu se mai pomeni public și a nu se mai lucra pe el** decât dacă Oleg cere explicit.
   Reținut doar ca memorie internă.
 
+## Integrare 1С
+
+- Datele din 1С se iau prin **interfața standard OData** a platformei (REST,
+  fără cod pe partea 1С). Referința proiectului: **`INTEGRARE-1C-ODATA.md`**
+  (conspect după articolul Infostart nr. 1570140 „Работа с 1С через протокол
+  OData" — site-ul e blocat din mediul de dezvoltare, conspectul e verificat cu
+  documentația platformei). Se citește înainte de orice lucrare pe date din 1С.
+- Capcana nr. 1: după publicare lista de obiecte OData e GOALĂ până când 1С-istul
+  clientului rulează `УстановитьСоставСтандартногоИнтерфейсаOData`.
+
 ## Site publicat
 
 - Netlify publică folderul **`lider/`** ca rădăcină (vezi `netlify.toml`).
