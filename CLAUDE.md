@@ -72,6 +72,44 @@ Valabilă pentru TOATE proiectele, boții, panourile, ofertele și prezentările
 > (`connect_rejected` la `goproperty.digital:443` — verificat prin WebFetch, curl și
 > Chromium). Se completează din ce trimite Oleg: fundal, text, accent, fonturi.
 
+## ⚠️ REGULĂ GLOBALĂ — pază & acces pe roluri în panou (Oleg, 2026-08-04)
+
+Valabilă pentru TOȚI boții — cei activi și cei ce urmează. Face parte din **codul
+de bază** (`go-crm-analytics/`, oglindit în `analytics/` la fiecare bot). Se pune
+peste tot; **modificările trebuie propagate în `gocrm-base`** (sursa oglindită la
+toți boții), nu doar în instanța unde s-au scris prima dată.
+
+1. **Trei niveluri de acces în panou, după organigramă:**
+   - **CEO** — vede tot. Tokenul simplu `DASHBOARD_TOKEN` (linkul de până acum).
+   - **Director de departament** — doar secțiunile din meniul lui; panourile de
+     oameni (Angajați, Sarcini) filtrate la **departamentul lui**.
+   - **Angajat** — doar meniul lui; datele de oameni filtrate la **el însuși**.
+
+   Rolul, departamentul și meniul stau într-un **token semnat criptografic**
+   (HMAC-SHA256 cu `PANEL_SECRET`) — nu se pot falsifica sau modifica; au expirare.
+
+2. **Auto-serviciu — ierarhia se administrează singură.** Buton „➕ Adaugă
+   persoană" în panou, vizibil doar cui are dreptul: **CEO adaugă directori**,
+   **directorii adaugă angajați**. Serverul impune ierarhia și **blochează
+   escaladarea** (un director nu poate face alt director, nu schimbă departamentul,
+   nu acordă module pe care nu le are). Stateless — **fără bază de date separată**,
+   dreptul vine din tokenul semnat. Nu se mai generează linkuri manual/din CLI decât
+   ca alternativă.
+
+3. **Pază de bază a panoului (aplicată la toți):** comparație token în timp
+   constant, **fail-closed** (fără token → 403, nu se deschide public), tokene
+   multiple revocabile (`DASHBOARD_TOKEN=tok1,tok2`), rate limiting per IP,
+   anteturi de securitate (`no-store`, `no-referrer`, `nosniff`, `X-Frame-Options`),
+   iar service worker-ul **nu cachează pe disc** datele sensibile (`/api`, manifest).
+
+4. **Variabile de mediu (Railway):** `DASHBOARD_TOKEN` (CEO, obligatorie) +
+   `PANEL_SECRET` (rolurile de director/angajat și butonul de adăugare). La **boți
+   noi** se pun ambele din start. Fără `PANEL_SECRET` merge doar CEO.
+
+5. **Neschimbat / verificat:** SQL parametrizat (fără injection), HTML cu escapare
+   (fără XSS), zero secrete în cod. **Ce NU s-a făcut:** login clasic (utilizator +
+   parolă) — rămâne linkul cu token; de decis separat dacă se cere.
+
 ## 📋 CE EXISTĂ DEJA în codul de bază (2026-07-26)
 
 Documentul complet: **`IMPLEMENTARE-BOTI.md` din repo-ul `gocrm-base`** — ce s-a
@@ -90,6 +128,9 @@ care deschide de trei ori un raport fără cifre nu-l mai deschide niciodată.
 | Panoul directorului (server-rendered, grafice reale, o pagină per modul) | la toți | `PANEL_TOKEN` + `PANEL_URL` | ✅ |
 | Panoul în Telegram, pe tot ecranul, buton în bara de jos | la toți | vine cu `PANEL_TOKEN` | ✅ |
 | Acces limitat pe departament, semnat criptografic | la toți | automat, după organigramă | ✅ |
+| Acces pe roluri în panoul web: CEO / director / angajat (token semnat) | la toți | `PANEL_SECRET` | ✅ |
+| Auto-serviciu „➕ Adaugă persoană" (CEO adaugă directori, directorii adaugă angajați) | la toți | `PANEL_SECRET` | ✅ |
+| Pază panou: fail-closed, timp constant, rate limit, anteturi, SW fără date pe disc | la toți | automat | ✅ |
 | Date de demonstrație (firmă inventată, bandă roșie) | la toți, cât timp CRM-ul e gol | `PANEL_DEMO=on` | ✅ |
 | Import & vamă (termene, origine, cost real de intrare) | doar firmele care importă | `MODULES_ON=import` | ✅ |
 | Eligibilitate de plată, inclusiv calificarea clienților noi | doar unde se vinde pe credit | modulul `clients` | ✅ |
